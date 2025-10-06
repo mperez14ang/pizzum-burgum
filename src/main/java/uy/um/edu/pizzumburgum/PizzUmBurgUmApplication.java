@@ -1,4 +1,4 @@
-package uy.um.edu.pizzum_burgum;
+package uy.um.edu.pizzumburgum;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

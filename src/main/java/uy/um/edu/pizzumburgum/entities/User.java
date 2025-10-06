@@ -1,6 +1,5 @@
-package uy.um.edu.pizzum_burgum.entities;
+package uy.um.edu.pizzumburgum.entities;
 
-import uy.um.edu.pizzum_burgum.entities.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -18,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @AllArgsConstructor
 @Builder
 public abstract class User implements UserDetails{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -73,7 +73,7 @@ public abstract class User implements UserDetails{
         address.setUser(this);
     }
 
-
+    // Si se puede eliminar una direccion:
     public void removeAddress(Address address) {
         addresses.remove(address);
         address.setUser(null);

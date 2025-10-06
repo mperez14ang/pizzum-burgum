@@ -16,7 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Data
 @SuperBuilder
-@Table(name = "User")
+@Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING) // O Admin o Client
 @AllArgsConstructor

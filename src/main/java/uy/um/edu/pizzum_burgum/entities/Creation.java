@@ -1,0 +1,37 @@
+package uy.um.edu.pizzum_burgum.entities;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Set;
+
+@Entity
+@Table(name = "creation")
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+public class Creation {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "type", nullable = false)
+    private int type;
+
+    @Min(0)
+    @Column(name="price")
+    private float price;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<CreationHasProducts> products;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<OrderHasCreations> order;
+
+}

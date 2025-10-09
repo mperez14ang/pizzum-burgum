@@ -1,6 +1,7 @@
 package uy.um.edu.pizzum_burgum.configuration;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,17 @@ import javax.sql.DataSource;
 
 @Configuration
 public class EnvConfig {
+
+    @PostConstruct
+    public void loadEnv() {
+        Dotenv dotenv = Dotenv.load();
+
+        // Inyectar variables del .env en application.properties
+        dotenv.entries().forEach(entry -> {
+            System.setProperty(entry.getKey(), entry.getValue());
+        });
+    }
+
     @Bean
     public Dotenv getDotenv() {
         return Dotenv.load();

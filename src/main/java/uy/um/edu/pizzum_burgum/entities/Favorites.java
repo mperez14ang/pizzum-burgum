@@ -21,8 +21,8 @@ public class Favorites {
     @Column(name = "date_created", nullable = false)
     private LocalDateTime dateCreated;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Client client;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<Client> client;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Creation> creations;

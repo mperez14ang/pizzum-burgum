@@ -17,8 +17,9 @@ import java.util.Set;
 public class Client extends User {
 
     // Cada cliente tiene una tabla de favoritos
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<Favorites> favorites;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "favorite_id")
+    private Favorites favorites;
 
     // El atributo esta en la tabla order_by
     @OneToMany

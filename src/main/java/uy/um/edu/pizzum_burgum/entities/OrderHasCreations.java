@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-        name = "creation_has_products"
+        name = "order_has_creation"
 )
 @NoArgsConstructor
 @AllArgsConstructor

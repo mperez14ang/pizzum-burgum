@@ -14,8 +14,12 @@ import java.util.List;
 
 @Service
 public class ClientService implements ClientServiceInt {
+    private final ClientRepository clientRepository;
+
     @Autowired
-    public ClientRepository clientRepository;
+    public ClientService(ClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
+    }
 
     @Override
     public ClientDto createClient(ClientDto clientDto) {

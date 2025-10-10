@@ -13,9 +13,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/client")
 public class ClientController {
-    @Autowired
-    public ClientService clientService;
+    private final ClientService clientService;
 
+    public ClientController(ClientService clientService) {
+        this.clientService = clientService;
+    }
     @PostMapping("/create")
     public ClientDto createClient(@RequestBody ClientDto client) {
         return clientService.createClient(client);

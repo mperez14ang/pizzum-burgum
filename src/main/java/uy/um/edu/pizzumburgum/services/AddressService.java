@@ -13,8 +13,13 @@ import uy.um.edu.pizzumburgum.services.interfaces.AddressServiceInt;
 
 @Service
 public class AddressService implements AddressServiceInt {
+
+    private final AddressRepository addressRepository;
+
     @Autowired
-    public AddressRepository addressRepository;
+    public AddressService(AddressRepository addressRepository) {
+        this.addressRepository = addressRepository;
+    }
 
     public AddressDto createAddress(AddressDto addressDto, ClientDto clientDto) {
         Address address = AddressMapper.toAddress(addressDto, ClientMapper.toClient(clientDto));

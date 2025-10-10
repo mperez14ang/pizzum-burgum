@@ -1,11 +1,13 @@
 package uy.um.edu.pizzumburgum.entities;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
@@ -15,6 +17,10 @@ import java.util.Set;
 @NoArgsConstructor
 @SuperBuilder
 public class Client extends User {
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<Address> addresses = new HashSet<>();
 
     // Cada cliente tiene una tabla de favoritos
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

@@ -28,22 +28,22 @@ public abstract class User implements UserDetails{
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 50)
     @Column(nullable = false, length = 50)
-    private String nombre;
+    private String name;
 
     @NotBlank(message = "El apellido es obligatorio")
     @Size(min = 2, max = 50)
     @Column(nullable = false, length = 50)
-    private String apellido;
+    private String lastName;
 
     @NotNull(message = "La fecha de nacimiento es obligatoria")
     @Past(message = "La fecha de nacimiento debe ser en el pasado")
     @Column(name = "fecha_nacimiento", nullable = false)
-    private LocalDate fechaNacimiento;
+    private LocalDate birthDate;
 
     @NotBlank(message = "La cédula es obligatoria")
     @Pattern(regexp = "\\d{7,8}", message = "La cédula debe tener 7 u 8 dígitos")
     @Column(unique = true, nullable = false, length = 8)
-    private String ci;
+    private String dni;
 
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "Email inválido")
@@ -54,10 +54,6 @@ public abstract class User implements UserDetails{
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
     @Column(nullable = false)
     private String password;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private Set<Address> addresses = new HashSet<>();
 
     @Override
     public String getUsername() {
@@ -93,18 +89,6 @@ public abstract class User implements UserDetails{
     @Override
     public String getPassword() {
         return password;
-    }
-
-
-    public void addAddress(Address address) {
-        addresses.add(address);
-        address.setUser(this);
-    }
-
-
-    public void removeAddress(Address address) {
-        addresses.remove(address);
-        address.setUser(null);
     }
 
 }

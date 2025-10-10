@@ -29,9 +29,9 @@ public class Address {
     private String postalCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "client_id", nullable = false)
     @ToString.Exclude
-    private User user;
+    private Client client;
 
     @Column(nullable = false)
     @Builder.Default

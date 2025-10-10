@@ -1,8 +1,7 @@
-package uy.um.edu.pizzum_burgum.entities;
+package uy.um.edu.pizzumburgum.entities;
 
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
-import uy.um.edu.pizzum_burgum.entities.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;

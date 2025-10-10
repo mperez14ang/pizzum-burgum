@@ -1,4 +1,4 @@
-package uy.um.edu.pizzum_burgum.entities;
+package uy.um.edu.pizzumburgum.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -8,12 +8,13 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-        name = "order_has_creation"
+        name = "creation_has_products",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"creation_id", "product_id"})
 )
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class OrderHasCreations {
+public class CreationHasProducts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,10 +24,10 @@ public class OrderHasCreations {
     private int quantity;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn
+    @JoinColumn(name = "creation_id")
     private Creation creation;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn
-    private OrderBy order;
+    @JoinColumn(name = "product_id")
+    private Product product;
 }

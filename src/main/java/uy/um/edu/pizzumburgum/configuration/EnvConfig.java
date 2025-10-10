@@ -1,4 +1,4 @@
-package uy.um.edu.pizzum_burgum.configuration;
+package uy.um.edu.pizzumburgum.configuration;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.annotation.PostConstruct;

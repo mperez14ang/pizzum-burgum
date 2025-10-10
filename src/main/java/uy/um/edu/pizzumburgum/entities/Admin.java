@@ -1,4 +1,4 @@
-package uy.um.edu.pizzum_burgum.entities;
+package uy.um.edu.pizzumburgum.entities;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;

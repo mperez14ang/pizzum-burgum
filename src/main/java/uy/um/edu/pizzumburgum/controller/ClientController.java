@@ -1,13 +1,14 @@
 package uy.um.edu.pizzumburgum.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import uy.um.edu.pizzumburgum.dto.ClientDto;
 import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.entities.User;
+import uy.um.edu.pizzumburgum.exception.ResourceNotFoundException;
 import uy.um.edu.pizzumburgum.services.ClientService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/client")
@@ -16,7 +17,17 @@ public class ClientController {
     public ClientService clientService;
 
     @PostMapping("/create")
-    public User createClient(@RequestBody Client client) {
-        return clientService.addClient(client);
+    public ClientDto createClient(@RequestBody ClientDto client) {
+        return clientService.createClient(client);
+    }
+
+    @GetMapping("{clientId}")
+    public ClientDto getClientById(@PathVariable Long clientId) throws ResourceNotFoundException {
+        return clientService.getClientById(clientId);
+    }
+
+    @GetMapping
+    public List<ClientDto> getAllClients() {
+        return clientService.getClients();
     }
 }

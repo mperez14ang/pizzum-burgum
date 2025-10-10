@@ -3,13 +3,12 @@ package uy.um.edu.pizzumburgum.dto;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClientDto {
+public class UserDto {
     private Long id;
 
     private String name;
@@ -23,6 +22,4 @@ public class ClientDto {
     private String dni;
 
     private String mail;
-
-    private Set<AddressDto> addresses;
 }

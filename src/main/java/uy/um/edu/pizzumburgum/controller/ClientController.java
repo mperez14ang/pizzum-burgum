@@ -18,7 +18,7 @@ public class ClientController {
     public ClientController(ClientService clientService) {
         this.clientService = clientService;
     }
-    @PostMapping("/create")
+    @PostMapping
     public ClientDto createClient(@RequestBody ClientDto client) {
         return clientService.createClient(client);
     }

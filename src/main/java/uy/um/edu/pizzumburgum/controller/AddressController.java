@@ -31,7 +31,7 @@ public class AddressController {
         this.clientService = clientService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public AddressDto createAddress(@RequestBody AddressDto addressDto) throws ResourceNotFoundException {
 
         // Busca el usuario y si no existe returna error

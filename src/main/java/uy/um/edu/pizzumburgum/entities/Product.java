@@ -5,7 +5,9 @@ import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -28,6 +30,7 @@ public class Product {
     @Column(name = "type", nullable = false)
     private int type;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<CreationHasProducts> creation;
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ToString.Exclude
+    private Set<CreationHasProducts> creations = new HashSet<>();
 }

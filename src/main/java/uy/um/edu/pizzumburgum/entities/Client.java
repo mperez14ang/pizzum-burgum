@@ -21,9 +21,9 @@ public class Client extends User {
     private Set<Address> addresses = new HashSet<>();
 
     // Cada cliente tiene una tabla de favoritos
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "favorite_id")
-    private Favorites favorites;
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @Builder.Default
+    private Set<Favorites> favorites = new HashSet<>();
 
     // El atributo esta en la tabla order_by
     @OneToMany

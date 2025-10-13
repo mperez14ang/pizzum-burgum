@@ -30,4 +30,8 @@ public class Favorites {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Creation> creations;
 
+    @PrePersist
+    protected void onCreate() {
+        dateCreated = LocalDateTime.now();
+    }
 }

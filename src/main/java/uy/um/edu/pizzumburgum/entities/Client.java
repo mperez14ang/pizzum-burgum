@@ -26,10 +26,11 @@ public class Client extends User {
     private Set<Favorites> favorites = new HashSet<>();
 
     // El atributo esta en la tabla order_by
-    @OneToMany
-    private Set<OrderBy> orders;
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @Builder.Default
+    private Set<OrderBy> orders = new HashSet<>();
 
     // El atributo esta en la tabla card
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Card> cards;
 }

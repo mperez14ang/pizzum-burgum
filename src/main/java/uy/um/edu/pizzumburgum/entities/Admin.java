@@ -13,10 +13,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 public class Admin extends User{
-    @NotBlank(message = "Debe de especificar el nivel del usuario")
-    @Column(nullable = false)
-    private int level;
-
     @ManyToOne
     @JoinColumn(name = "created_by")
     @Nullable

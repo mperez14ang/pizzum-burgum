@@ -11,10 +11,9 @@ import java.util.Set;
 public class ClientMapper {
     public static Client toClient(ClientDto clientDto) {
         Client client = Client.builder()
-                .id(clientDto.getId())
-                .name(clientDto.getName())
+                .email(clientDto.getEmail())
+                .username(clientDto.getUsername())
                 .lastName(clientDto.getLastName())
-                .mail(clientDto.getMail())
                 .dni(clientDto.getDni())
                 .birthDate(clientDto.getBirthDate())
                 .password(clientDto.getPassword())
@@ -37,10 +36,9 @@ public class ClientMapper {
 
     public static ClientDto toClientDto(Client client) {
         ClientDto clientDto = ClientDto.builder()
-                .id(client.getId())
-                .name(client.getName())
+                .email(client.getEmail())
+                .username(client.getUsername())
                 .lastName(client.getLastName())
-                .mail(client.getMail())
                 .dni(client.getDni())
                 .birthDate(client.getBirthDate())
                 .password(client.getPassword())
@@ -52,7 +50,7 @@ public class ClientMapper {
             Set<AddressDto> addressesDto = new HashSet<>();
             for (Address address : addresses) {
                 AddressDto addressDto = AddressMapper.toAddressDto(address);
-                addressDto.setClientId(client.getId());
+                addressDto.setClientEmail(client.getEmail());
                 addressesDto.add(addressDto);
             }
             clientDto.setAddresses(addressesDto);

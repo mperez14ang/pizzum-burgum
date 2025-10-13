@@ -22,13 +22,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 @NoArgsConstructor
 public abstract class User implements UserDetails{
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "Email inválido")
+    @Column(unique = true, nullable = false, length = 100)
+    private String email;
 
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 50)
     @Column(nullable = false, length = 50)
-    private String name;
+    private String username;
 
     @NotBlank(message = "El apellido es obligatorio")
     @Size(min = 2, max = 50)
@@ -45,11 +47,6 @@ public abstract class User implements UserDetails{
     @Column(unique = true, nullable = false, length = 8)
     private String dni;
 
-    @NotBlank(message = "El email es obligatorio")
-    @Email(message = "Email inválido")
-    @Column(unique = true, nullable = false, length = 100)
-    private String mail;
-
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
     @Column(nullable = false)
@@ -57,7 +54,7 @@ public abstract class User implements UserDetails{
 
     @Override
     public String getUsername() {
-        return mail;
+        return this.username;
     }
 
     @Override

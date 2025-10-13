@@ -29,10 +29,10 @@ public class ClientService implements ClientServiceInt {
     }
 
     @Override
-    public ClientDto getClientById(Long id) throws ResourceNotFoundException {
-        Client client =  clientRepository.findById(id).orElse(null);
+    public ClientDto getClientByEmail(String email) throws ResourceNotFoundException {
+        Client client =  clientRepository.findById(email).orElse(null);
         if (client == null) {
-            throw new ResourceNotFoundException("Client with id " + id + " not found");
+            throw new ResourceNotFoundException("Client with id " + email + " not found");
         }
         return ClientMapper.toClientDto(client);
     }

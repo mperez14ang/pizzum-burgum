@@ -35,7 +35,7 @@ public class AddressController {
     public AddressDto createAddress(@RequestBody AddressDto addressDto) throws ResourceNotFoundException {
 
         // Busca el usuario y si no existe returna error
-        ClientDto clientDto = clientService.getClientById(addressDto.getClientId());
+        ClientDto clientDto = clientService.getClientByEmail(addressDto.getClientEmail());
 
         return addressService.createAddress(addressDto, clientDto);
     }

@@ -17,7 +17,7 @@ public class AddressMapper {
 
     public static AddressDto toAddressDto(Address address) {
         return AddressDto.builder()
-                .clientId(address.getClient().getId())
+                .clientEmail(address.getClient().getEmail())
                 .city(address.getCity())
                 .street(address.getStreet())
                 .postalCode(address.getPostalCode())

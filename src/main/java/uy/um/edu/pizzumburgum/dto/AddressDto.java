@@ -16,5 +16,5 @@ public class AddressDto {
 
     private String postalCode;
 
-    private Long clientId;
+    private String clientEmail;
 }

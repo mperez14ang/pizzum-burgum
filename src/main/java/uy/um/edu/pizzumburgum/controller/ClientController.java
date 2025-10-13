@@ -23,9 +23,9 @@ public class ClientController {
         return clientService.createClient(client);
     }
 
-    @GetMapping("{clientId}")
-    public ClientDto getClientById(@PathVariable Long clientId) throws ResourceNotFoundException {
-        return clientService.getClientById(clientId);
+    @GetMapping("{clientEmail}")
+    public ClientDto getClientByEmail(@PathVariable String clientEmail) throws ResourceNotFoundException {
+        return clientService.getClientByEmail(clientEmail);
     }
 
     @GetMapping

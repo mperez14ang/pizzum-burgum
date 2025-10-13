@@ -1,5 +1,6 @@
 package uy.um.edu.pizzumburgum.dto;
 
+import jakarta.persistence.Id;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -9,9 +10,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
-    private Long id;
+    @Id
+    private String email;
 
-    private String name;
+    private String username;
 
     private String lastName;
 
@@ -20,6 +22,4 @@ public class UserDto {
     private LocalDate birthDate;
 
     private String dni;
-
-    private String mail;
 }

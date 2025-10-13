@@ -8,7 +8,7 @@ import java.util.List;
 public interface ClientServiceInt {
     ClientDto createClient(ClientDto clientDto);
 
-    ClientDto getClientById(Long id) throws ResourceNotFoundException;
+    ClientDto getClientByEmail(String email) throws ResourceNotFoundException;
 
     List<ClientDto> getClients();
 }

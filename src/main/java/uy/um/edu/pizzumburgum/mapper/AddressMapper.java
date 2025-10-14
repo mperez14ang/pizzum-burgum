@@ -3,9 +3,10 @@ package uy.um.edu.pizzumburgum.mapper;
 import uy.um.edu.pizzumburgum.dto.AddressDto;
 import uy.um.edu.pizzumburgum.entities.Address;
 import uy.um.edu.pizzumburgum.entities.Client;
+import uy.um.edu.pizzumburgum.repository.ClientRepository;
 
 public class AddressMapper {
-    public static Address toAddress(AddressDto dto, Client client) {
+    public static Address toAddress(AddressDto dto, ClientRepository clientRepository) {
         return Address.builder()
                 .city(dto.getCity())
                 .street(dto.getStreet())

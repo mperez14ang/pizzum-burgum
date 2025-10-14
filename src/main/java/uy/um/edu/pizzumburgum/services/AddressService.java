@@ -21,9 +21,10 @@ public class AddressService implements AddressServiceInt {
         this.addressRepository = addressRepository;
     }
 
-    public AddressDto createAddress(AddressDto addressDto, ClientDto clientDto) {
-        Address address = AddressMapper.toAddress(addressDto, ClientMapper.toClient(clientDto));
+    public AddressDto createAddress(AddressDto addressDto) {
+        Address address = AddressMapper.toAddress(addressDto);
         addressRepository.save(address);
+
         return AddressMapper.toAddressDto(address);
     }
 }

@@ -11,8 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CardDto {
-    @Id
+
     private Long id;
+
+    private String stripeId;
 
     private String brand;
 
@@ -21,4 +23,6 @@ public class CardDto {
     private int expirationYear;
 
     private int expirationMonth;
+
+    private String clientId;
 }

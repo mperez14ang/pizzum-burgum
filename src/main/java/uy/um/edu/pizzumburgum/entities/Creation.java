@@ -21,8 +21,9 @@ public class Creation {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private int type;
+    private CreationType type;
 
     @Min(0)
     @Column(name="price")

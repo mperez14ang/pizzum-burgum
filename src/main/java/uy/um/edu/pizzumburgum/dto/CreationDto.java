@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uy.um.edu.pizzumburgum.entities.CreationType;
+
+import java.util.Set;
 
 @Data
 @Builder
@@ -16,7 +19,9 @@ public class CreationDto {
 
     private String name;
 
-    private int type;
+    private CreationType type;
 
     private float price;
+
+    private Set<CreationHasProductsDto> products;
 }

@@ -10,7 +10,4 @@ public class CreationHasProductsDto {
 
     private int quantity;
 
-    private Creation creation;
-
-    private Product product;
 }

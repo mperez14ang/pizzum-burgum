@@ -27,8 +27,9 @@ public class Product {
     @Column(name = "price", nullable = false)
     private int price;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private int type;
+    private ProductType type;
 
     @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @ToString.Exclude

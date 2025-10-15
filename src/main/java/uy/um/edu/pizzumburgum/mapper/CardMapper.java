@@ -15,7 +15,7 @@ public class CardMapper {
                 .last4Digits(card.getLast4Digits())
                 .expirationYear(card.getExpirationYear())
                 .expirationMonth(card.getExpirationMonth())
-                .clientId(card.getClients() != null ? card.getClients().getEmail() : null)
+                .clientId(card.getClient() != null ? card.getClient().getEmail() : null)
                 .build();
     }
 
@@ -33,7 +33,7 @@ public class CardMapper {
                 .last4Digits(cardDto.getLast4Digits())
                 .expirationYear(cardDto.getExpirationYear())
                 .expirationMonth(cardDto.getExpirationMonth())
-                .clients(client)
+                .client(client)
                 .build();
     }
 }

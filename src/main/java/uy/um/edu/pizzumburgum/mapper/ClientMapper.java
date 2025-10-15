@@ -20,7 +20,7 @@ public class ClientMapper {
     ) {
         Client client = Client.builder()
                 .email(clientDto.getEmail())
-                .userName(clientDto.getUserName())
+                .username(clientDto.getUsername())
                 .lastName(clientDto.getLastName())
                 .dni(clientDto.getDni())
                 .birthDate(clientDto.getBirthDate())
@@ -55,7 +55,7 @@ public class ClientMapper {
     public static ClientDto toClientDto(Client client) {
         ClientDto clientDto = ClientDto.builder()
                 .email(client.getEmail())
-                .userName(client.getUsername())
+                .username(client.getUsername())
                 .lastName(client.getLastName())
                 .dni(client.getDni())
                 .birthDate(client.getBirthDate())

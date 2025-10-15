@@ -38,6 +38,10 @@ public class ClientService implements ClientServiceInt {
                     HttpStatus.BAD_REQUEST, "El email es obligatorio"
             );
         }
+        if (clientRepository.existsById(clientDto.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un cliente con ese email");
+        }
+
         Client client = ClientMapper.toClient(clientDto, clientRepository, creationHasProductsRepository, orderHasCreationsRepository);
         clientRepository.save(client);
         return ClientMapper.toClientDto(client);

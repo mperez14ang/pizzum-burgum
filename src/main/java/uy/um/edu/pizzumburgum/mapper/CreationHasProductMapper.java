@@ -40,6 +40,7 @@ public class CreationHasProductMapper {
                 .id(creationHasProductsDto.getId())
                 .creation(creation)
                 .product(product)
+                .quantity(creationHasProductsDto.getQuantity())
                 .build();
     }
 }

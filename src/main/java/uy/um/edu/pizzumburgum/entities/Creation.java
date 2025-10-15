@@ -31,10 +31,10 @@ public class Creation {
     @Column(name="price")
     private float price;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "creation", cascade = CascadeType.ALL)
     private Set<CreationHasProducts> products;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "creation", cascade = CascadeType.ALL)
     private Set<OrderHasCreations> order;
 
 }

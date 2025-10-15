@@ -44,6 +44,6 @@ public class Card {
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "has_cards", nullable = false)
-    private Client clients;
+    private Client client;
 
 }

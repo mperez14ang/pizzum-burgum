@@ -31,7 +31,7 @@ public abstract class User implements UserDetails{
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 50)
     @Column(nullable = false, length = 50)
-    private String userName;
+    private String username;
 
     @NotBlank(message = "El apellido es obligatorio")
     @Size(min = 2, max = 50)
@@ -55,7 +55,7 @@ public abstract class User implements UserDetails{
 
     @Override
     public String getUsername() {
-        return this.userName;
+        return this.username;
     }
 
     @Override

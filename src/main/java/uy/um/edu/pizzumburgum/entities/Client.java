@@ -16,21 +16,18 @@ import java.util.Set;
 @ToString(exclude = "addresses")
 public class Client extends User {
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Address> addresses = new HashSet<>();
 
     // Cada cliente tiene una tabla de favoritos
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    @Builder.Default
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private Set<Favorites> favorites = new HashSet<>();
 
     // El atributo esta en la tabla order_by
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @Builder.Default
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<OrderBy> orders = new HashSet<>();
 
     // El atributo esta en la tabla card
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Card> cards;
 }

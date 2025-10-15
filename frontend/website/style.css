@@ -1,0 +1,77 @@
+/* Reset basic styles */
+* {
+    margin: 0; /* remove default margins */
+    padding: 0; /* remove default paddings */
+    box-sizing: border-box; /* include border and padding in element's total width/height */
+}
+
+body, html {
+    height: 100%; /* make the page take full viewport height */
+    font-family: "Segoe UI", Arial, sans-serif; /* set a clean, readable font */
+}
+
+.container {
+    position: relative; /* establish a positioning context for children */
+    width: 100%; /* full width container */
+    height: 100vh; /* make container fill the viewport height */
+    overflow: hidden; /* hide any overflow from blurred backgrounds */
+}
+
+/* shared styles for both diagonal halves */
+.split {
+    position: absolute; /* allow exact placement and stacking */
+    inset: 0; /* stretch to fill the container */
+    background-size: cover; /* scale background to cover the area */
+    background-position: center; /* keep the focal point centered */
+    filter: blur(8px); /* blur the background image */
+    transform: scale(1.05); /* slightly enlarge to hide blur edges */
+    z-index: 0; /* place behind content layer */
+    pointer-events: none; /* let clicks pass through to content */
+}
+
+/* left diagonal with burger background */
+.left {
+    background-image: url('burger.avif'); /* set burger image as background */
+    clip-path: polygon(0% 0%, 65% 0%, 35% 100%, 0% 100%); /* create a diagonal shape for the left half */
+}
+
+/* right diagonal with pizza background */
+.right {
+    background-image: url('pizza.avif'); /* set pizza image as background */
+    clip-path: polygon(65% 0%, 100% 0%, 100% 100%, 35% 100%); /* complementary diagonal shape for the right half */
+}
+
+/* centered content above backgrounds */
+.content {
+    position: absolute; /* position content over the backgrounds */
+    inset: 0; /* center within the container area */
+    display: flex; /* enable easy centering */
+    flex-direction: column; /* stack heading and buttons vertically */
+    align-items: center; /* center horizontally */
+    justify-content: center; /* center vertically */
+    gap: 1rem; /* add space between elements */
+    z-index: 1; /* keep content above the background layers */
+    text-align: center; /* center text alignment */
+    color: #fff; /* ensure good contrast on images */
+    text-shadow: 0 2px 6px rgba(0,0,0,0.5); /* subtle text shadow for readability */
+}
+
+/* simple layout for the buttons row */
+.buttons {
+    display: flex; /* lay buttons out horizontally */
+    gap: 0.75rem; /* spacing between buttons */
+}
+
+/* minimal button styling for clarity and accessibility */
+button {
+    padding: 0.6rem 1rem; /* comfortable click target */
+    border: none; /* remove default border */
+    border-radius: 6px; /* slightly rounded corners */
+    background: rgba(255,255,255,0.9); /* light background for contrast */
+    color: #222; /* dark text for readability */
+    cursor: pointer; /* show clickable cursor */
+}
+
+button:hover {
+    background: #fff; /* a bit brighter on hover */
+}

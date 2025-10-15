@@ -1,6 +1,5 @@
 package uy.um.edu.pizzumburgum.dto;
 
-import jakarta.persistence.Id;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -12,7 +11,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class ClientDto {
 
-    @Id
     private String email;
 
     private String username;
@@ -26,4 +24,6 @@ public class ClientDto {
     private String dni;
 
     private Set<AddressDto> addresses;
+
+    private Set<FavoritesDto> favorites;
 }

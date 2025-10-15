@@ -1,11 +1,11 @@
 package uy.um.edu.pizzumburgum.dto;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uy.um.edu.pizzumburgum.entities.CreationType;
+import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
 
 import java.util.Set;
 
@@ -14,7 +14,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreationDto {
-    @Id
     private Long id;
 
     private String name;
@@ -24,4 +23,6 @@ public class CreationDto {
     private float price;
 
     private Set<CreationHasProductsDto> products;
+
+    private Set<OrderHasCreationsDto> orders;
 }

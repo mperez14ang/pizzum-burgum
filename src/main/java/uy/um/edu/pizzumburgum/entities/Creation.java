@@ -3,6 +3,7 @@ package uy.um.edu.pizzumburgum.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 public class Creation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,10 +31,10 @@ public class Creation {
     @Column(name="price")
     private float price;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "creation", cascade = CascadeType.ALL)
     private Set<CreationHasProducts> products;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "creation", cascade = CascadeType.ALL)
     private Set<OrderHasCreations> order;
 
 }

@@ -17,17 +17,14 @@ import java.util.Set;
 public class Client extends User {
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
     private Set<Address> addresses = new HashSet<>();
 
     // Cada cliente tiene una tabla de favoritos
     @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    @Builder.Default
     private Set<Favorites> favorites = new HashSet<>();
 
     // El atributo esta en la tabla order_by
     @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @Builder.Default
     private Set<OrderBy> orders = new HashSet<>();
 
     // El atributo esta en la tabla card

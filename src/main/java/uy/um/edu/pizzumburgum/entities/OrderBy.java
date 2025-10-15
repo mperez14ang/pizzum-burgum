@@ -26,7 +26,7 @@ public class OrderBy {
     @JoinColumn(name = "to_deliver", nullable = false)
     private Address address;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private Set<OrderHasCreations> creations;
 
     @ManyToOne

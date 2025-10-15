@@ -31,7 +31,6 @@ public class Address {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_email", nullable = false)
-    @ToString.Exclude
     private Client client;
 
     @Column(nullable = false)

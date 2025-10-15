@@ -3,6 +3,7 @@ package uy.um.edu.pizzumburgum.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Builder
 public class CreationHasProducts {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

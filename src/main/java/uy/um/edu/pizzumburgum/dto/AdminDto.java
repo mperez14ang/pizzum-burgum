@@ -13,10 +13,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdminDto {
-    @Id
+
     private String email;
 
-    private String username;
+    private String userName;
 
     private String lastName;
 
@@ -26,5 +26,5 @@ public class AdminDto {
 
     private String dni;
 
-    private AdminDto createdBy;
+    private String createdById;
 }

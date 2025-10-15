@@ -25,8 +25,6 @@ body, html {
     background-position: center; /* keep the focal point centered */
     filter: blur(8px); /* blur the background image */
     transform: scale(1.05); /* slightly enlarge to hide blur edges */
-    z-index: 0; /* place behind content layer */
-    pointer-events: none; /* let clicks pass through to content */
 }
 
 /* left diagonal with burger background */

@@ -13,7 +13,7 @@ public class ClientDto {
 
     private String email;
 
-    private String username;
+    private String userName;
 
     private String lastName;
 

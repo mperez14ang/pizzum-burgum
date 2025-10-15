@@ -6,19 +6,26 @@ import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
 
 public class AddressMapper {
-    public static Address toAddress(AddressDto dto, ClientRepository clientRepository) {
+    public static Address toAddress(AddressDto addressDto, Client client) {
         return Address.builder()
-                .city(dto.getCity())
-                .street(dto.getStreet())
-                .postalCode(dto.getPostalCode())
-                .client(client)
+                .city(addressDto.getCity())
+                .street(addressDto.getStreet())
+                .postalCode(addressDto.getPostalCode())
                 .active(true)
+                .client(client)
                 .build();
     }
 
+
     public static AddressDto toAddressDto(Address address) {
+
+        String clientEmail = null;
+        if (address.getClient() != null) {
+            clientEmail = address.getClient().getEmail();
+        }
+
         return AddressDto.builder()
-                .clientEmail(address.getClient().getEmail())
+                .clientEmail(clientEmail)
                 .city(address.getCity())
                 .street(address.getStreet())
                 .postalCode(address.getPostalCode())

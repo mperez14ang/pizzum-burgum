@@ -6,15 +6,21 @@ import uy.um.edu.pizzumburgum.dto.FavoritesDto;
 import uy.um.edu.pizzumburgum.entities.Address;
 import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.entities.Favorites;
+import uy.um.edu.pizzumburgum.repository.ClientRepository;
+import uy.um.edu.pizzumburgum.repository.CreationHasProductsRepository;
+import uy.um.edu.pizzumburgum.repository.OrderHasCreationsRepository;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class ClientMapper {
-    public static Client toClient(ClientDto clientDto) {
+    public static Client toClient(
+            ClientDto clientDto, ClientRepository clientRepository,
+            CreationHasProductsRepository creationHasProductsRepository, OrderHasCreationsRepository orderHasCreationsRepository
+    ) {
         Client client = Client.builder()
                 .email(clientDto.getEmail())
-                .username(clientDto.getUsername())
+                .userName(clientDto.getUserName())
                 .lastName(clientDto.getLastName())
                 .dni(clientDto.getDni())
                 .birthDate(clientDto.getBirthDate())
@@ -38,7 +44,7 @@ public class ClientMapper {
         if (favoriteDtos != null) {
             Set<Favorites> favorites = new HashSet<>();
             for (FavoritesDto favoritesDto : favoriteDtos) {
-                favorites.add(FavoritesMapper.toFavorites(favoritesDto, client));
+                favorites.add(FavoritesMapper.toFavorites(favoritesDto, clientRepository, creationHasProductsRepository, orderHasCreationsRepository));
             }
             client.setFavorites(favorites);
         }
@@ -49,7 +55,7 @@ public class ClientMapper {
     public static ClientDto toClientDto(Client client) {
         ClientDto clientDto = ClientDto.builder()
                 .email(client.getEmail())
-                .username(client.getUsername())
+                .userName(client.getUsername())
                 .lastName(client.getLastName())
                 .dni(client.getDni())
                 .birthDate(client.getBirthDate())

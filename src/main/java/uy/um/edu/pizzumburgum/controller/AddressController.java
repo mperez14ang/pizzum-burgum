@@ -11,6 +11,7 @@ import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.entities.User;
 import uy.um.edu.pizzumburgum.exception.ResourceNotFoundException;
 import uy.um.edu.pizzumburgum.mapper.AddressMapper;
+import uy.um.edu.pizzumburgum.mapper.ClientMapper;
 import uy.um.edu.pizzumburgum.services.AddressService;
 import uy.um.edu.pizzumburgum.services.ClientService;
 import uy.um.edu.pizzumburgum.services.UserService;
@@ -33,8 +34,6 @@ public class AddressController {
 
     @PostMapping
     public AddressDto createAddress(@RequestBody AddressDto addressDto) throws ResourceNotFoundException {
-
-        // Busca el usuario y si no existe returna error
         ClientDto clientDto = clientService.getClientByEmail(addressDto.getClientEmail());
 
         return addressService.createAddress(addressDto, clientDto);

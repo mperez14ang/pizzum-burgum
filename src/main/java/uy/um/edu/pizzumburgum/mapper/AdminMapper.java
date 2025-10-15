@@ -15,7 +15,7 @@ public class AdminMapper {
                 .createdBy(null)
                 .birthDate(dto.getBirthDate())
                 .password(dto.getPassword())
-                .username(dto.getUsername())
+                .userName(dto.getUserName())
                 .lastName(dto.getLastName())
                 .build();
 
@@ -29,7 +29,7 @@ public class AdminMapper {
         AdminDto adminDto = AdminDto.builder()
                 .email(admin.getEmail())
                 .dni(admin.getDni())
-                .username(admin.getUsername())
+                .userName(admin.getUsername())
                 .lastName(admin.getLastName())
                 .createdById(null)
                 .birthDate(admin.getBirthDate())

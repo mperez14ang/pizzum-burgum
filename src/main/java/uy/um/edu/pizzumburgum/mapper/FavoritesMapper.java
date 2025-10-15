@@ -6,12 +6,17 @@ import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.entities.Creation;
 import uy.um.edu.pizzumburgum.entities.Favorites;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
+import uy.um.edu.pizzumburgum.repository.CreationHasProductsRepository;
+import uy.um.edu.pizzumburgum.repository.OrderHasCreationsRepository;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class FavoritesMapper {
-    public static Favorites toFavorites(FavoritesDto favoritesDto, ClientRepository clientRepository) {
+    public static Favorites toFavorites(
+            FavoritesDto favoritesDto, ClientRepository clientRepository,
+            CreationHasProductsRepository creationHasProductsRepository, OrderHasCreationsRepository orderHasCreationsRepository
+    ) {
 
         // Buscar cliente
         Client client = null;
@@ -24,7 +29,7 @@ public class FavoritesMapper {
         Set<Creation> creations = new HashSet<>();
         for (CreationDto creationDto : favoritesDto.getCreations()){
             creations.add(
-                    CreationMapper.toCreation(creationDto)
+                    CreationMapper.toCreation(creationDto, creationHasProductsRepository, orderHasCreationsRepository)
             );
         }
 

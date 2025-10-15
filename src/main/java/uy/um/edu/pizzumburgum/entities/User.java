@@ -1,16 +1,17 @@
 package uy.um.edu.pizzumburgum.entities;
 
-import lombok.experimental.SuperBuilder;
-import org.springframework.security.core.GrantedAuthority;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Data
@@ -30,7 +31,7 @@ public abstract class User implements UserDetails{
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 50)
     @Column(nullable = false, length = 50)
-    private String username;
+    private String userName;
 
     @NotBlank(message = "El apellido es obligatorio")
     @Size(min = 2, max = 50)
@@ -39,7 +40,7 @@ public abstract class User implements UserDetails{
 
     @NotNull(message = "La fecha de nacimiento es obligatoria")
     @Past(message = "La fecha de nacimiento debe ser en el pasado")
-    @Column(name = "fecha_nacimiento", nullable = false)
+    @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
     @NotBlank(message = "La cédula es obligatoria")
@@ -54,7 +55,7 @@ public abstract class User implements UserDetails{
 
     @Override
     public String getUsername() {
-        return this.username;
+        return this.userName;
     }
 
     @Override

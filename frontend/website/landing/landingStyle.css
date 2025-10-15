@@ -29,13 +29,13 @@ body, html {
 
 /* left diagonal with burger background */
 .left {
-    background-image: url('burger.avif'); /* set burger image as background */
+    background-image: url('../resources/burger.avif'); /* set burger image as background */
     clip-path: polygon(0% 0%, 65% 0%, 35% 100%, 0% 100%); /* create a diagonal shape for the left half */
 }
 
 /* right diagonal with pizza background */
 .right {
-    background-image: url('pizza.avif'); /* set pizza image as background */
+    background-image: url('../resources/pizza.avif'); /* set pizza image as background */
     clip-path: polygon(65% 0%, 100% 0%, 100% 100%, 35% 100%); /* complementary diagonal shape for the right half */
 }
 

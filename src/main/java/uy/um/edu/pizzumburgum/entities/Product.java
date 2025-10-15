@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,11 +24,15 @@ public class Product {
 
     @Min(0)
     @Column(name = "price", nullable = false)
-    private float price;
+    private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private ProductType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
+    private ProductCategory category;
 
     @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @ToString.Exclude

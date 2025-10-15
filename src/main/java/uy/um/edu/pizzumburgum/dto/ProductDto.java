@@ -1,7 +1,9 @@
 package uy.um.edu.pizzumburgum.dto;
 
+import jakarta.validation.constraints.*;
 import lombok.*;
 import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
+import uy.um.edu.pizzumburgum.entities.ProductCategory;
 import uy.um.edu.pizzumburgum.entities.ProductType;
 
 import java.math.BigDecimal;
@@ -17,9 +19,12 @@ public class ProductDto {
 
     private String name;
 
-    private float price;
+    private BigDecimal price;
 
-    private ProductType type;
+    private ProductType productType;
 
     private Set<CreationHasProductsDto> creations;
+    private ProductCategory productCategory;
+
+    private String description;
 }

@@ -1,7 +1,7 @@
 package uy.um.edu.pizzumburgum.services;
 
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,16 +14,11 @@ import uy.um.edu.pizzumburgum.repository.ClientRepository;
 
 
 @Service
+@RequiredArgsConstructor
 public class AddressService {
 
     private final AddressRepository addressRepository;
     private final ClientRepository clientRepository;
-
-    @Autowired
-    public AddressService(AddressRepository addressRepository, ClientRepository clientRepository) {
-        this.addressRepository = addressRepository;
-        this.clientRepository = clientRepository;
-    }
 
     @Transactional
     public AddressDto createAddress(AddressDto addressDto, String clientEmail) {

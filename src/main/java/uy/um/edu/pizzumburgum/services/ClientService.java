@@ -1,7 +1,7 @@
 package uy.um.edu.pizzumburgum.services;
 
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -9,7 +9,6 @@ import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientUpdateRequest;
 import uy.um.edu.pizzumburgum.dto.response.ClientDtoResponse;
-import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
 import uy.um.edu.pizzumburgum.entities.Address;
 import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.entities.Favorites;
@@ -18,20 +17,15 @@ import uy.um.edu.pizzumburgum.mapper.ClientMapper;
 import uy.um.edu.pizzumburgum.mapper.FavoritesMapper;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ClientService {
 
     private final ClientRepository clientRepository;
-
-    @Autowired
-    public ClientService(ClientRepository clientRepository) {
-        this.clientRepository = clientRepository;
-    }
 
     @Transactional
     public ClientDtoResponse createClient(ClientCreateRequest clientCreateRequest) {
@@ -43,11 +37,13 @@ public class ClientService {
                 .map(obj -> AddressMapper.toAddress(obj, finalClient))
                 .collect(Collectors.toSet());
 
-        // TODO Falta agregar favorites
-
+        Set<Favorites> favorites = clientCreateRequest.getFavorites().stream()
+                .map(FavoritesMapper::toFavorites)
+                .collect(Collectors.toSet());
 
 
         client.setAddresses(addresses);
+        client.setFavorites(favorites);
         client = clientRepository.save(client);
 
         return ClientMapper.toClientResponse(client);

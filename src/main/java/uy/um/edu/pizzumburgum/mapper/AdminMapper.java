@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public class AdminMapper {
 
-    public static Admin toAdmin(AdminCreateRequest dto, AdminRepository repository) {
-        Admin admin = Admin.builder()
+    public static Admin toAdmin(AdminCreateRequest dto) {
+        return Admin.builder()
                 .email(dto.getEmail())
                 .dni(dto.getDni())
                 .createdBy(null)
@@ -18,11 +18,6 @@ public class AdminMapper {
                 .username(dto.getUserName())
                 .lastName(dto.getLastName())
                 .build();
-
-        Optional<Admin> adminCreator = repository.findById(dto.getCreatedById());
-        if (dto.getCreatedById() != null && adminCreator.isPresent()) admin.setCreatedBy(adminCreator.get());
-
-        return admin;
     }
 
     public static AdminCreateRequest toAdminDto(Admin admin) {

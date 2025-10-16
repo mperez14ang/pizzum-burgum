@@ -2,12 +2,10 @@ package uy.um.edu.pizzumburgum.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uy.um.edu.pizzumburgum.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class AdminService {
 
-    private final UserRepository userRepository;
 
 }

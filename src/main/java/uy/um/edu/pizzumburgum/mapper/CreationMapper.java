@@ -6,8 +6,6 @@ import uy.um.edu.pizzumburgum.dto.shared.OrderHasCreationsDto;
 import uy.um.edu.pizzumburgum.entities.Creation;
 import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
 import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
-import uy.um.edu.pizzumburgum.repository.CreationHasProductsRepository;
-import uy.um.edu.pizzumburgum.repository.OrderHasCreationsRepository;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,34 +34,12 @@ public class CreationMapper {
                 .build();
     }
 
-    public static Creation toCreation(
-            CreationDto creationDto, CreationHasProductsRepository creationHasProductsRepository, OrderHasCreationsRepository orderHasCreationsRepository
-    ) {
-        // Convertir creationsHasProductsDto a creationsHasProducts
-        Set<CreationHasProducts> creationsHasProducts = new HashSet<>();
-        for (CreationHasProductsDto creationHasProductsDto : creationDto.getProducts()){
-            creationsHasProducts.add(
-                    creationHasProductsRepository.findById(creationHasProductsDto.getId()).
-                            orElseThrow(() -> new RuntimeException("No se encontro CreationHasProducts"))
-            );
-        }
-
-        // Convertir OrderHasCreationsDto a OrderHasCreations
-        Set<OrderHasCreations> orderHasCreations = new HashSet<>();
-        for (OrderHasCreationsDto orderHasCreationsDto : creationDto.getOrders()){
-            orderHasCreations.add(
-                    orderHasCreationsRepository.findById(orderHasCreationsDto.getId()).
-                            orElseThrow(() -> new RuntimeException("No se encontro OrderHasCreations"))
-            );
-        }
-
+    public static Creation toCreation(CreationDto creationDto) {
         return Creation.builder()
                 .id(creationDto.getId())
                 .name(creationDto.getName())
                 .price(creationDto.getPrice())
                 .type(creationDto.getType())
-                .products(creationsHasProducts)
-                .order(orderHasCreations)
                 .build();
     }
 }

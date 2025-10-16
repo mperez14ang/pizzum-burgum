@@ -2,18 +2,24 @@ package uy.um.edu.pizzumburgum.services;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import uy.um.edu.pizzumburgum.dto.shared.CreationHasProductsDto;
 import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
+import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
 import uy.um.edu.pizzumburgum.entities.Product;
 import uy.um.edu.pizzumburgum.entities.ProductCategory;
 import uy.um.edu.pizzumburgum.entities.ProductType;
 import uy.um.edu.pizzumburgum.exception.ResourceNotFoundException;
 import uy.um.edu.pizzumburgum.mapper.ProductMapper;
+import uy.um.edu.pizzumburgum.repository.CreationHasProductsRepository;
 import uy.um.edu.pizzumburgum.repository.ProductRepository;
-import uy.um.edu.pizzumburgum.repository.CreationRepository;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,11 +27,22 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final CreationRepository creationRepository;
+    private final CreationHasProductsRepository creationHasProductsRepository;
 
     @Transactional
-    public ProductDto createProduct(ProductDto dto) {
-        Product product = ProductMapper.toProduct(dto, creationRepository, productRepository);
+    public ProductDto createProduct(ProductDto productDto) {
+        Set<CreationHasProducts> creations = new HashSet<>();
+        for (CreationHasProductsDto creationHasProductsDto : productDto.getCreations()) {
+            CreationHasProducts creationHasProducts = creationHasProductsRepository.findById(creationHasProductsDto.getId())
+                    .orElseThrow( () -> new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST, "CreationHasProducts no fue encontrado"
+                    ));
+            creations.add(creationHasProducts);
+        }
+
+        Product product = ProductMapper.toProduct(productDto);
+        product.setCreations(creations);
+
         product = productRepository.save(product);
         return ProductMapper.toProductDto(product);
     }

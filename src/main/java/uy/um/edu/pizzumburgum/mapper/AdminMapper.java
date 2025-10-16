@@ -1,6 +1,6 @@
 package uy.um.edu.pizzumburgum.mapper;
 
-import uy.um.edu.pizzumburgum.dto.AdminDto;
+import uy.um.edu.pizzumburgum.dto.request.AdminCreateRequest;
 import uy.um.edu.pizzumburgum.entities.Admin;
 import uy.um.edu.pizzumburgum.repository.AdminRepository;
 
@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public class AdminMapper {
 
-    public static Admin toAdmin(AdminDto dto, AdminRepository repository) {
+    public static Admin toAdmin(AdminCreateRequest dto, AdminRepository repository) {
         Admin admin = Admin.builder()
                 .email(dto.getEmail())
                 .dni(dto.getDni())
@@ -25,8 +25,8 @@ public class AdminMapper {
         return admin;
     }
 
-    public static AdminDto toAdminDto(Admin admin) {
-        AdminDto adminDto = AdminDto.builder()
+    public static AdminCreateRequest toAdminDto(Admin admin) {
+        AdminCreateRequest adminCreateRequest = AdminCreateRequest.builder()
                 .email(admin.getEmail())
                 .dni(admin.getDni())
                 .userName(admin.getUsername())
@@ -36,8 +36,8 @@ public class AdminMapper {
                 .password(admin.getPassword())
                 .build();
 
-        if (admin.getCreatedBy() != null) adminDto.setCreatedById(admin.getCreatedBy().getEmail());
+        if (admin.getCreatedBy() != null) adminCreateRequest.setCreatedById(admin.getCreatedBy().getEmail());
 
-        return adminDto;
+        return adminCreateRequest;
     }
 }

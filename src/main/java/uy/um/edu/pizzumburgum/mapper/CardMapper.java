@@ -1,6 +1,6 @@
 package uy.um.edu.pizzumburgum.mapper;
 
-import uy.um.edu.pizzumburgum.dto.CardDto;
+import uy.um.edu.pizzumburgum.dto.shared.CardDto;
 import uy.um.edu.pizzumburgum.entities.Card;
 import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;

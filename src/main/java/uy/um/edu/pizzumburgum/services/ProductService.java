@@ -4,7 +4,7 @@ package uy.um.edu.pizzumburgum.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uy.um.edu.pizzumburgum.dto.ProductDto;
+import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
 import uy.um.edu.pizzumburgum.entities.Product;
 import uy.um.edu.pizzumburgum.entities.ProductCategory;
 import uy.um.edu.pizzumburgum.entities.ProductType;

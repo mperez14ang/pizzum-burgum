@@ -1,8 +1,6 @@
-package uy.um.edu.pizzumburgum.dto;
+package uy.um.edu.pizzumburgum.dto.shared;
 
-import jakarta.validation.constraints.*;
 import lombok.*;
-import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
 import uy.um.edu.pizzumburgum.entities.ProductCategory;
 import uy.um.edu.pizzumburgum.entities.ProductType;
 

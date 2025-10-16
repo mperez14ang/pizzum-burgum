@@ -1,11 +1,10 @@
-package uy.um.edu.pizzumburgum.dto;
+package uy.um.edu.pizzumburgum.dto.shared;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uy.um.edu.pizzumburgum.entities.CreationType;
-import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
 
 import java.util.Set;
 

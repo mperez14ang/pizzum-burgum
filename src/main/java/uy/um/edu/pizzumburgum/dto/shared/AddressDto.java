@@ -1,4 +1,4 @@
-package uy.um.edu.pizzumburgum.dto;
+package uy.um.edu.pizzumburgum.dto.shared;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +15,4 @@ public class AddressDto {
     private String city;
 
     private String postalCode;
-
-    private String clientEmail;
 }

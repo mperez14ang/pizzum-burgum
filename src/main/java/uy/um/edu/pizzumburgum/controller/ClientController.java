@@ -1,11 +1,13 @@
 package uy.um.edu.pizzumburgum.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uy.um.edu.pizzumburgum.dto.ClientDto;
-import uy.um.edu.pizzumburgum.entities.Client;
-import uy.um.edu.pizzumburgum.entities.User;
+import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
+import uy.um.edu.pizzumburgum.dto.request.ClientUpdateRequest;
+import uy.um.edu.pizzumburgum.dto.response.ClientDtoResponse;
+import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
 import uy.um.edu.pizzumburgum.exception.ResourceNotFoundException;
+import uy.um.edu.pizzumburgum.services.AddressService;
 import uy.um.edu.pizzumburgum.services.ClientService;
 
 import java.util.List;
@@ -14,22 +16,41 @@ import java.util.List;
 @RequestMapping("/api/client")
 public class ClientController {
     private final ClientService clientService;
+    private final AddressService addressService;
 
-    public ClientController(ClientService clientService) {
+    public ClientController(ClientService clientService, AddressService addressService) {
         this.clientService = clientService;
+        this.addressService = addressService;
     }
+
     @PostMapping
-    public ClientDto createClient(@RequestBody ClientDto client) {
+    public ClientDtoResponse createClient(@RequestBody ClientCreateRequest client) {
         return clientService.createClient(client);
     }
 
     @GetMapping("{clientEmail}")
-    public ClientDto getClientByEmail(@PathVariable String clientEmail) throws ResourceNotFoundException {
+    public ClientDtoResponse getClientByEmail(@PathVariable String clientEmail){
         return clientService.getClientByEmail(clientEmail);
     }
 
+    @PutMapping("{clientEmail}")
+    public void updateClient(@PathVariable String clientEmail, @RequestBody ClientUpdateRequest clientUpdateRequest){
+        clientService.updateClient(clientEmail, clientUpdateRequest);
+    }
+
+    @DeleteMapping("{clientEmail}")
+    public ResponseEntity<String> deleteClient(@PathVariable String clientEmail) {
+        return clientService.deleteClient(clientEmail);
+    }
+
     @GetMapping
-    public List<ClientDto> getAllClients() {
+    public List<ClientDtoResponse> getAllClients() {
         return clientService.getClients();
     }
+
+    @PostMapping("{clientEmail}/address")
+    public AddressDto createCAddress(@PathVariable String clientEmail, @RequestBody AddressDto addressDto) throws ResourceNotFoundException {
+        return addressService.createAddress(addressDto, clientEmail);
+    }
+
 }

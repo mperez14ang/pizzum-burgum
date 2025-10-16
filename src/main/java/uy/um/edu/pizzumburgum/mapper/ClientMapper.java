@@ -1,90 +1,52 @@
 package uy.um.edu.pizzumburgum.mapper;
 
-import uy.um.edu.pizzumburgum.dto.AddressDto;
-import uy.um.edu.pizzumburgum.dto.ClientDto;
-import uy.um.edu.pizzumburgum.dto.FavoritesDto;
-import uy.um.edu.pizzumburgum.entities.Address;
+import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
+import uy.um.edu.pizzumburgum.dto.response.ClientDtoResponse;
+import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
+import uy.um.edu.pizzumburgum.dto.shared.FavoritesDto;
 import uy.um.edu.pizzumburgum.entities.Client;
-import uy.um.edu.pizzumburgum.entities.Favorites;
-import uy.um.edu.pizzumburgum.repository.ClientRepository;
-import uy.um.edu.pizzumburgum.repository.CreationHasProductsRepository;
-import uy.um.edu.pizzumburgum.repository.OrderHasCreationsRepository;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ClientMapper {
-    public static Client toClient(
-            ClientDto clientDto, ClientRepository clientRepository,
-            CreationHasProductsRepository creationHasProductsRepository, OrderHasCreationsRepository orderHasCreationsRepository
-    ) {
-        Client client = Client.builder()
-                .email(clientDto.getEmail())
-                .username(clientDto.getUsername())
-                .lastName(clientDto.getLastName())
-                .dni(clientDto.getDni())
-                .birthDate(clientDto.getBirthDate())
-                .password(clientDto.getPassword())
+
+    // Client Request -> Client Entity
+    public static Client toClient(ClientCreateRequest clientCreateRequest) {
+        return Client.builder()
+                .email(clientCreateRequest.getEmail())
+                .username(clientCreateRequest.getUsername())
+                .lastName(clientCreateRequest.getLastName())
+                .dni(clientCreateRequest.getDni())
+                .birthDate(clientCreateRequest.getBirthDate())
+                .password(clientCreateRequest.getPassword())
                 .build();
-
-        // Agregar los AddressDto a Client
-        Set<AddressDto> addressDtos = clientDto.getAddresses();
-        if (addressDtos != null) {
-            Set<Address> addresses = new HashSet<>();
-            for (AddressDto addressDto : addressDtos) {
-                Address address = AddressMapper.toAddress(addressDto, client);
-                addresses.add(address);
-            }
-            client.setAddresses(addresses);
-
-        }
-
-        // Agregar favoritos a client
-        Set<FavoritesDto>  favoriteDtos = clientDto.getFavorites();
-        if (favoriteDtos != null) {
-            Set<Favorites> favorites = new HashSet<>();
-            for (FavoritesDto favoritesDto : favoriteDtos) {
-                favorites.add(FavoritesMapper.toFavorites(favoritesDto, clientRepository, creationHasProductsRepository, orderHasCreationsRepository));
-            }
-            client.setFavorites(favorites);
-        }
-
-        return client;
     }
 
-    public static ClientDto toClientDto(Client client) {
-        ClientDto clientDto = ClientDto.builder()
+    // Client Entity -> Client Response
+    public static ClientDtoResponse toClientResponse(Client client) {
+        Set<AddressDto> addressDtos = null;
+        if (client.getAddresses() != null) {
+            addressDtos = client.getAddresses().stream()
+                    .map(AddressMapper::toAddressDto)
+                    .collect(Collectors.toSet());
+        }
+
+        Set<FavoritesDto> favoritesDtos = null;
+        if (client.getFavorites() != null) {
+            favoritesDtos = client.getFavorites().stream()
+                    .map(FavoritesMapper::toFavoritesDto)
+                    .collect(Collectors.toSet());
+        }
+
+        return ClientDtoResponse.builder()
                 .email(client.getEmail())
                 .username(client.getUsername())
                 .lastName(client.getLastName())
-                .dni(client.getDni())
                 .birthDate(client.getBirthDate())
-                .password(client.getPassword())
+                .addresses(addressDtos)
+                .favorites(favoritesDtos)
                 .build();
 
-        // Agregar los Address a ClientDto
-        Set<Address> addresses = client.getAddresses();
-        if (addresses != null) {
-            Set<AddressDto> addressesDto = new HashSet<>();
-            for (Address address : addresses) {
-                AddressDto addressDto = AddressMapper.toAddressDto(address);
-                addressesDto.add(addressDto);
-            }
-            clientDto.setAddresses(addressesDto);
-
-        }
-
-        // Agregar favorites a ClientDto
-        Set<Favorites> favorites = client.getFavorites();
-        if (favorites != null) {
-            Set<FavoritesDto> favoritesDto = new HashSet<>();
-            for (Favorites favorite : favorites) {
-                FavoritesDto favoriteDto = FavoritesMapper.toFavoritesDto(favorite);
-                favoritesDto.add(favoriteDto);
-            }
-            clientDto.setFavorites(favoritesDto);
-        }
-
-        return clientDto;
     }
 }

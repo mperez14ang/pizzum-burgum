@@ -1,25 +1,16 @@
 package uy.um.edu.pizzumburgum.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminDtoResponse {
-
-    private String email;
-
-    private String userName;
-
-    private String lastName;
-
-    private LocalDate birthDate;
+public class AdminDtoResponse extends UserDtoResponse {
 
     private String createdById;
 }

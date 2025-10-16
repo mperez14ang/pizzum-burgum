@@ -11,16 +11,18 @@ import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.mapper.AddressMapper;
 import uy.um.edu.pizzumburgum.repository.AddressRepository;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
+import uy.um.edu.pizzumburgum.services.interfaces.AddressServiceInt;
 
 
 @Service
 @RequiredArgsConstructor
-public class AddressService {
+public class AddressService implements AddressServiceInt {
 
     private final AddressRepository addressRepository;
     private final ClientRepository clientRepository;
 
     @Transactional
+    @Override
     public AddressDto createAddress(AddressDto addressDto, String clientEmail) {
         if (clientEmail == null) {
             throw new ResponseStatusException(
@@ -37,6 +39,7 @@ public class AddressService {
     }
 
     @Transactional
+    @Override
     public AddressDto getAddress(Long addressId) {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -47,6 +50,7 @@ public class AddressService {
     }
 
     @Transactional
+    @Override
     public AddressDto updateAddress(Long id, AddressDto addressDto) {
         Address address = addressRepository.getReferenceById(id);
 
@@ -59,6 +63,7 @@ public class AddressService {
     }
 
     @Transactional
+    @Override
     public void deleteAddress(String clientEmail, Long addressId) {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResponseStatusException(

@@ -16,6 +16,7 @@ import uy.um.edu.pizzumburgum.mapper.AddressMapper;
 import uy.um.edu.pizzumburgum.mapper.ClientMapper;
 import uy.um.edu.pizzumburgum.mapper.FavoritesMapper;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
+import uy.um.edu.pizzumburgum.services.interfaces.ClientServiceInt;
 
 import java.util.List;
 import java.util.Set;
@@ -23,11 +24,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ClientService {
+public class ClientService implements ClientServiceInt {
 
     private final ClientRepository clientRepository;
 
     @Transactional
+    @Override
     public ClientDtoResponse createClient(ClientCreateRequest clientCreateRequest) {
         Client client = ClientMapper.toClient(clientCreateRequest);
 
@@ -50,6 +52,7 @@ public class ClientService {
     }
 
     @Transactional
+    @Override
     public ClientDtoResponse getClientByEmail(String email) {
         Client client =  clientRepository.findById(email).orElse(null);
         if (client == null) {
@@ -61,12 +64,14 @@ public class ClientService {
     }
 
     @Transactional
+    @Override
     public List<ClientDtoResponse> getClients() {
         List<Client> clients = clientRepository.findAll();
         return clients.stream().map(ClientMapper::toClientResponse).collect(Collectors.toList());
     }
 
     @Transactional
+    @Override
     public ClientDtoResponse updateClient(String clientEmail, ClientUpdateRequest clientUpdateRequest) {
         Client client = clientRepository.findById(clientEmail).orElse(null);
 
@@ -86,6 +91,7 @@ public class ClientService {
     }
 
     @Transactional
+    @Override
     public ResponseEntity<String> deleteClient(String email) {
         Client client = clientRepository.findById(email).orElse(null);
         if (client == null) {

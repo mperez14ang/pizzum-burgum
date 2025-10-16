@@ -1,7 +1,7 @@
 package uy.um.edu.pizzumburgum.mapper;
 
-import uy.um.edu.pizzumburgum.dto.CreationDto;
-import uy.um.edu.pizzumburgum.dto.FavoritesDto;
+import uy.um.edu.pizzumburgum.dto.shared.CreationDto;
+import uy.um.edu.pizzumburgum.dto.shared.FavoritesDto;
 import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.entities.Creation;
 import uy.um.edu.pizzumburgum.entities.Favorites;

@@ -1,6 +1,8 @@
-package uy.um.edu.pizzumburgum.dto;
+package uy.um.edu.pizzumburgum.dto.request;
 
 import lombok.*;
+import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
+import uy.um.edu.pizzumburgum.dto.shared.FavoritesDto;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -9,7 +11,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClientDto {
+public class ClientCreateRequest {
 
     private String email;
 

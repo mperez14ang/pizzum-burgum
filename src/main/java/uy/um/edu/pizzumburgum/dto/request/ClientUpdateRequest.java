@@ -1,30 +1,26 @@
-package uy.um.edu.pizzumburgum.dto;
+package uy.um.edu.pizzumburgum.dto.request;
 
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
+import uy.um.edu.pizzumburgum.dto.shared.FavoritesDto;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminDto {
+public class ClientUpdateRequest {
 
-    private String email;
-
-    private String userName;
+    private String username;
 
     private String lastName;
-
-    private String password;
 
     private LocalDate birthDate;
 
     private String dni;
-
-    private String createdById;
 }

@@ -1,4 +1,4 @@
-package uy.um.edu.pizzumburgum.dto;
+package uy.um.edu.pizzumburgum.dto.shared;
 
 import lombok.*;
 

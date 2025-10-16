@@ -1,7 +1,7 @@
 package uy.um.edu.pizzumburgum.mapper;
 
-import uy.um.edu.pizzumburgum.dto.CreationHasProductsDto;
-import uy.um.edu.pizzumburgum.dto.ProductDto;
+import uy.um.edu.pizzumburgum.dto.shared.CreationHasProductsDto;
+import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
 import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
 import uy.um.edu.pizzumburgum.entities.Product;
 import uy.um.edu.pizzumburgum.repository.CreationRepository;
@@ -21,7 +21,7 @@ public class ProductMapper {
         return ProductDto.builder()
                 .id(product.getId())
                 .name(product.getName())
-                .type(product.getType())
+                .productType(product.getType())
                 .price(product.getPrice())
                 .creations(creationsDto)
                 .build();
@@ -38,7 +38,7 @@ public class ProductMapper {
         return Product.builder()
                 .id(productDto.getId())
                 .name(productDto.getName())
-                .type(productDto.getType())
+                .type(productDto.getProductType())
                 .creations(creations)
                 .price(productDto.getPrice())
                 .build();

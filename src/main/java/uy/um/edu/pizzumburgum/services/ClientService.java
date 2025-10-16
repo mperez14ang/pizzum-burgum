@@ -1,68 +1,104 @@
 package uy.um.edu.pizzumburgum.services;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import uy.um.edu.pizzumburgum.dto.ClientDto;
+import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
+import uy.um.edu.pizzumburgum.dto.request.ClientUpdateRequest;
+import uy.um.edu.pizzumburgum.dto.response.ClientDtoResponse;
+import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
+import uy.um.edu.pizzumburgum.entities.Address;
 import uy.um.edu.pizzumburgum.entities.Client;
-import uy.um.edu.pizzumburgum.exception.ResourceNotFoundException;
+import uy.um.edu.pizzumburgum.entities.Favorites;
+import uy.um.edu.pizzumburgum.mapper.AddressMapper;
 import uy.um.edu.pizzumburgum.mapper.ClientMapper;
+import uy.um.edu.pizzumburgum.mapper.FavoritesMapper;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
-import uy.um.edu.pizzumburgum.repository.CreationHasProductsRepository;
-import uy.um.edu.pizzumburgum.repository.OrderHasCreationsRepository;
-import uy.um.edu.pizzumburgum.services.interfaces.ClientServiceInt;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
-public class ClientService implements ClientServiceInt {
+public class ClientService {
+
     private final ClientRepository clientRepository;
 
-    private final CreationHasProductsRepository creationHasProductsRepository;
-
-    private final OrderHasCreationsRepository orderHasCreationsRepository;
-
     @Autowired
-    public ClientService(ClientRepository clientRepository, CreationHasProductsRepository creationHasProductsRepository, OrderHasCreationsRepository orderHasCreationsRepository) {
+    public ClientService(ClientRepository clientRepository) {
         this.clientRepository = clientRepository;
-        this.creationHasProductsRepository = creationHasProductsRepository;
-        this.orderHasCreationsRepository = orderHasCreationsRepository;
     }
 
-    @Override
-    public ClientDto createClient(ClientDto clientDto) {
-        if (clientDto.getEmail() == null || clientDto.getEmail().isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "El email es obligatorio"
-            );
-        }
-        if (clientRepository.existsById(clientDto.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un cliente con ese email");
-        }
+    @Transactional
+    public ClientDtoResponse createClient(ClientCreateRequest clientCreateRequest) {
+        Client client = ClientMapper.toClient(clientCreateRequest);
 
-        Client client = ClientMapper.toClient(clientDto, clientRepository, creationHasProductsRepository, orderHasCreationsRepository);
-        clientRepository.save(client);
-        return ClientMapper.toClientDto(client);
+        // Agregar addresses y favorites
+        Client finalClient = client;
+        Set<Address> addresses = clientCreateRequest.getAddresses().stream()
+                .map(obj -> AddressMapper.toAddress(obj, finalClient))
+                .collect(Collectors.toSet());
+
+        // TODO Falta agregar favorites
+
+
+
+        client.setAddresses(addresses);
+        client = clientRepository.save(client);
+
+        return ClientMapper.toClientResponse(client);
     }
 
-    @Override
-    public ClientDto getClientByEmail(String email) throws ResourceNotFoundException {
+    @Transactional
+    public ClientDtoResponse getClientByEmail(String email) {
         Client client =  clientRepository.findById(email).orElse(null);
         if (client == null) {
-            throw new ResourceNotFoundException("Client with id " + email + " not found");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Cliente con id " + email + " no fue encontrado"
+            );
         }
-        return ClientMapper.toClientDto(client);
+        return ClientMapper.toClientResponse(client);
     }
 
-    @Override
-    public List<ClientDto> getClients() {
+    @Transactional
+    public List<ClientDtoResponse> getClients() {
         List<Client> clients = clientRepository.findAll();
-        List<ClientDto> clientDtos = new ArrayList<>();
-        for (Client client : clients) {
-            clientDtos.add(ClientMapper.toClientDto(client));
+        return clients.stream().map(ClientMapper::toClientResponse).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public ClientDtoResponse updateClient(String clientEmail, ClientUpdateRequest clientUpdateRequest) {
+        Client client = clientRepository.findById(clientEmail).orElse(null);
+
+        if (client == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Cliente con id " + clientEmail + " no fue encontrado"
+            );
         }
-        return clientDtos;
+        // La contraseña por ejemplo no la va a actualizar, eso se hace en otro lado
+        client.setUsername(clientUpdateRequest.getUsername());
+        client.setLastName(clientUpdateRequest.getLastName());
+        client.setBirthDate(clientUpdateRequest.getBirthDate());
+        client.setDni(clientUpdateRequest.getDni());
+
+        clientRepository.save(client);
+        return ClientMapper.toClientResponse(client);
+    }
+
+    @Transactional
+    public ResponseEntity<String> deleteClient(String email) {
+        Client client = clientRepository.findById(email).orElse(null);
+        if (client == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Cliente con id " + email + " no fue encontrado"
+            );
+        }
+
+        clientRepository.delete(client);
+        return ResponseEntity.ok("Cliente " + email + " fue eliminado");
     }
 }

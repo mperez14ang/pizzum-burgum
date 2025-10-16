@@ -1,6 +1,5 @@
-package uy.um.edu.pizzumburgum.dto;
+package uy.um.edu.pizzumburgum.dto.shared;
 
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

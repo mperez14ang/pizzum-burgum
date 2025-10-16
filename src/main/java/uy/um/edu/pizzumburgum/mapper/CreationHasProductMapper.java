@@ -1,6 +1,6 @@
 package uy.um.edu.pizzumburgum.mapper;
 
-import uy.um.edu.pizzumburgum.dto.CreationHasProductsDto;
+import uy.um.edu.pizzumburgum.dto.shared.CreationHasProductsDto;
 import uy.um.edu.pizzumburgum.entities.Creation;
 import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
 import uy.um.edu.pizzumburgum.entities.Product;

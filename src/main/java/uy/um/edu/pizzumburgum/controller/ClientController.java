@@ -34,8 +34,8 @@ public class ClientController {
     }
 
     @PutMapping("{clientEmail}")
-    public void updateClient(@PathVariable String clientEmail, @RequestBody ClientUpdateRequest clientUpdateRequest){
-        clientService.updateClient(clientEmail, clientUpdateRequest);
+    public ClientDtoResponse updateClient(@PathVariable String clientEmail, @RequestBody ClientUpdateRequest clientUpdateRequest){
+        return clientService.updateClient(clientEmail, clientUpdateRequest);
     }
 
     @DeleteMapping("{clientEmail}")

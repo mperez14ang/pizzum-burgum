@@ -1,7 +1,5 @@
 package uy.um.edu.pizzumburgum.mapper;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
 import uy.um.edu.pizzumburgum.entities.Address;
 import uy.um.edu.pizzumburgum.entities.Client;

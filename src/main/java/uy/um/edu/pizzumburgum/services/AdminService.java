@@ -1,0 +1,40 @@
+package uy.um.edu.pizzumburgum.services;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import uy.um.edu.pizzumburgum.dto.request.AdminCreateRequest;
+import uy.um.edu.pizzumburgum.dto.request.AdminUpdateRequest;
+import uy.um.edu.pizzumburgum.dto.response.AdminDtoResponse;
+import uy.um.edu.pizzumburgum.services.interfaces.AdminServiceInt;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class AdminService implements AdminServiceInt {
+    @Override
+    public AdminDtoResponse createAdmin(AdminCreateRequest adminCreateRequest) {
+        return null;
+    }
+
+    @Override
+    public AdminDtoResponse getAdminByEmail(String email) {
+        return null;
+    }
+
+    @Override
+    public List<AdminDtoResponse> getAdmins() {
+        return List.of();
+    }
+
+    @Override
+    public AdminDtoResponse updateAdmin(String adminEmail, AdminUpdateRequest adminUpdateRequest) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<String> deleteClient(String email) {
+        return null;
+    }
+}

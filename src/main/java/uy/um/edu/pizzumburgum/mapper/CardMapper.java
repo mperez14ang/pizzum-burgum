@@ -2,8 +2,6 @@ package uy.um.edu.pizzumburgum.mapper;
 
 import uy.um.edu.pizzumburgum.dto.shared.CardDto;
 import uy.um.edu.pizzumburgum.entities.Card;
-import uy.um.edu.pizzumburgum.entities.Client;
-import uy.um.edu.pizzumburgum.repository.ClientRepository;
 
 public class CardMapper {
 
@@ -19,13 +17,7 @@ public class CardMapper {
                 .build();
     }
 
-    public static Card toCard(CardDto cardDto, ClientRepository clientRepository) {
-        Client client = null;
-        if (cardDto.getClientId() != null) {
-            client = clientRepository.findById(cardDto.getClientId())
-                    .orElseThrow(() -> new RuntimeException("No se encontro el cliente"));
-        }
-
+    public static Card toCard(CardDto cardDto) {
         return Card.builder()
                 .id(cardDto.getId())
                 .stripeId(cardDto.getStripeId())
@@ -33,7 +25,6 @@ public class CardMapper {
                 .last4Digits(cardDto.getLast4Digits())
                 .expirationYear(cardDto.getExpirationYear())
                 .expirationMonth(cardDto.getExpirationMonth())
-                .client(client)
                 .build();
     }
 }

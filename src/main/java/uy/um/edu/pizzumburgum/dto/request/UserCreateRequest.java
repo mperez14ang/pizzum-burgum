@@ -1,4 +1,4 @@
-package uy.um.edu.pizzumburgum.dto.response;
+package uy.um.edu.pizzumburgum.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,13 +12,16 @@ import java.time.LocalDate;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDtoResponse {
-
+public class UserCreateRequest {
     private String email;
 
     private String username;
 
     private String lastName;
 
+    private String password;
+
     private LocalDate birthDate;
+
+    private String dni;
 }

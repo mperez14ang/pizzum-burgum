@@ -2,38 +2,57 @@ package uy.um.edu.pizzumburgum.services;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import uy.um.edu.pizzumburgum.dto.shared.CreationHasProductsDto;
 import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
+import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
 import uy.um.edu.pizzumburgum.entities.Product;
 import uy.um.edu.pizzumburgum.entities.ProductCategory;
 import uy.um.edu.pizzumburgum.entities.ProductType;
-import uy.um.edu.pizzumburgum.exception.ResourceNotFoundException;
 import uy.um.edu.pizzumburgum.mapper.ProductMapper;
+import uy.um.edu.pizzumburgum.repository.CreationHasProductsRepository;
 import uy.um.edu.pizzumburgum.repository.ProductRepository;
-import uy.um.edu.pizzumburgum.repository.CreationRepository;
+import uy.um.edu.pizzumburgum.services.interfaces.ProductServiceInt;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ProductService {
+public class ProductService implements ProductServiceInt {
 
     private final ProductRepository productRepository;
-    private final CreationRepository creationRepository;
+    private final CreationHasProductsRepository creationHasProductsRepository;
 
     @Transactional
-    public ProductDto createProduct(ProductDto dto) {
-        Product product = ProductMapper.toProduct(dto, creationRepository, productRepository);
+    @Override
+    public ProductDto createProduct(ProductDto productDto) {
+        Set<CreationHasProducts> creations = new HashSet<>();
+        for (CreationHasProductsDto creationHasProductsDto : productDto.getCreations()) {
+            CreationHasProducts creationHasProducts = creationHasProductsRepository.findById(creationHasProductsDto.getId())
+                    .orElseThrow( () -> new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST, "CreationHasProducts no fue encontrado"
+                    ));
+            creations.add(creationHasProducts);
+        }
+
+        Product product = ProductMapper.toProduct(productDto);
+        product.setCreations(creations);
+
         product = productRepository.save(product);
         return ProductMapper.toProductDto(product);
     }
 
     @Transactional
-    public ProductDto updateProduct(Long id, ProductDto dto) throws ResourceNotFoundException {
+    @Override
+    public ProductDto updateProduct(Long id, ProductDto dto) throws ResponseStatusException {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Producto con id : " + id + " no encontrado"));
 
         product.setName(dto.getName());
         product.setPrice(dto.getPrice());
@@ -44,13 +63,15 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ProductDto getProductById(Long id) throws ResourceNotFoundException {
+    @Override
+    public ProductDto getProductById(Long id) throws ResponseStatusException {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Producto con id : " + id + " no encontrado"));
         return ProductMapper.toProductDto(product);
     }
 
     @Transactional(readOnly = true)
+    @Override
     public List<ProductDto> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(ProductMapper::toProductDto)
@@ -58,6 +79,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public List<ProductDto> getProductsByCategory(ProductCategory category) {
         return productRepository.findByCategory(category).stream()
                 .map(ProductMapper::toProductDto)
@@ -65,17 +87,18 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public List<ProductDto> getProductsByType(ProductType type) {
         return productRepository.findByType(type).stream()
                 .map(ProductMapper::toProductDto)
                 .collect(Collectors.toList());
     }
 
-
     @Transactional
-    public void deleteProduct(Long id) throws ResourceNotFoundException {
+    @Override
+    public void deleteProduct(Long id) throws ResponseStatusException {
         if (!productRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Product not found with id: " + id);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Producto con id : " + id + " no encontrado");
         }
         productRepository.deleteById(id);
     }

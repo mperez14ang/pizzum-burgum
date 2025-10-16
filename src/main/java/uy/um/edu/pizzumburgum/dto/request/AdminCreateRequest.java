@@ -1,29 +1,13 @@
 package uy.um.edu.pizzumburgum.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
-
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class AdminCreateRequest {
-
-    private String email;
-
-    private String userName;
-
-    private String lastName;
-
-    private String password;
-
-    private LocalDate birthDate;
-
-    private String dni;
+@SuperBuilder
+public class AdminCreateRequest extends UserCreateRequest {
 
     private String createdById;
 }

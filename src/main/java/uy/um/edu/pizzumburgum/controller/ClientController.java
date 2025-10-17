@@ -49,7 +49,7 @@ public class ClientController {
     }
 
     @PostMapping("{clientEmail}/address")
-    public AddressDto createCAddress(@PathVariable String clientEmail, @RequestBody AddressDto addressDto) throws ResourceNotFoundException {
+    public AddressDto createAddress(@PathVariable String clientEmail, @RequestBody AddressDto addressDto) throws ResourceNotFoundException {
         return addressService.createAddress(addressDto, clientEmail);
     }
 

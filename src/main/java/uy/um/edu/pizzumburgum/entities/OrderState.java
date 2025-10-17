@@ -1,6 +1,7 @@
 package uy.um.edu.pizzumburgum.entities;
 
 public enum OrderState {
+    UNPAID,
     IN_QUEUE,
     MAKING,
     DELIVERING,

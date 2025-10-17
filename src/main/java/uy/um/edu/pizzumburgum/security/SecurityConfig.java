@@ -1,6 +1,7 @@
 package uy.um.edu.pizzumburgum.security;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -28,6 +29,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     @Bean
@@ -40,16 +42,16 @@ public class SecurityConfig {
                         // Endpoints para todos
                         .requestMatchers("/api/public/**").permitAll()
 
-                        // Endpoints para Admin
+                        // Admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("Admin")
 
-                        // Endpoints para Client o Admin TODO: Esto capaz lo cambiamos despues y que sea solo Client
+                        // Client endpoints
                         .requestMatchers("/api/client/**").hasAnyRole("Client", "Admin")
 
-                        // Endpoints Admin o Client
+                        // Common endpoints
                         .requestMatchers("/api/common/**").hasAnyRole("Admin", "Client")
 
-                        // Cualquer otro lo denega
+                        // Deny any other request
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())

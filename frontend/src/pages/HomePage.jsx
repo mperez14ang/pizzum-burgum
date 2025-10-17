@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Header } from '../components/common/Header';
-import { FAVORITES } from '../constants/favorites';
+import { FAVORITES } from '../components/favorites';
 
 export const HomePage = ({ onNavigate }) => {
     const [scrollPosition, setScrollPosition] = useState(0);

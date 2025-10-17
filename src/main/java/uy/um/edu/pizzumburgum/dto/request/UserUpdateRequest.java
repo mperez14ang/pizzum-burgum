@@ -10,6 +10,8 @@ import java.time.LocalDate;
 @SuperBuilder
 @NoArgsConstructor
 public class UserUpdateRequest {
+    private String email;
+
     private String username;
 
     private String lastName;

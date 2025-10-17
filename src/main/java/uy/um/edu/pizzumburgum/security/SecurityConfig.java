@@ -4,6 +4,9 @@ import io.github.cdimascio.dotenv.Dotenv;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,25 +20,26 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import uy.um.edu.pizzumburgum.entities.Admin;
+import uy.um.edu.pizzumburgum.services.DatabaseUserDetailsService;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.List;
 
+/** <a href="https://www.kindsonthegenius.com/how-to-authenticate-from-react-to-spring-boot/">...</a> **/
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final Dotenv dotenv;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers("/api/products/**").permitAll()
+        return httpSecurity.authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/login").permitAll()
+
+                        .requestMatchers("/api/register").permitAll()
+
+                        // Endpoints para todos
                         .requestMatchers("/api/public/**").permitAll()
 
                         // Admin endpoints
@@ -50,41 +54,34 @@ public class SecurityConfig {
                         // Deny any other request
                         .anyRequest().authenticated()
                 )
-                .httpBasic(http -> {})
+                .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .build();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        Admin admin = Admin.builder()
-                .email("admin@admin.com")
-                .username(dotenv.get("ADMIN_USERNAME"))
-                .lastName("Admin")
-                .birthDate(LocalDate.now())
-                .dni("00000000")
-                .password(passwordEncoder().encode(dotenv.get("ADMIN_PASSWORD")))
-                .createdBy(null)
-                .build();
-
-        return new InMemoryUserDetailsManager(admin);
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider(DatabaseUserDetailsService databaseUserDetailsService) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(databaseUserDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    /** Permitir acceso desde React **/
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3001"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowCredentials(true);
+        configuration.addAllowedHeader("*");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

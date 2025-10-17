@@ -86,12 +86,12 @@ public class ClientService implements ClientServiceInt {
 
     @Transactional
     @Override
-    public ClientDtoResponse updateClient(String clientEmail, ClientUpdateRequest clientUpdateRequest) {
-        Client client = clientRepository.findById(clientEmail).orElse(null);
+    public ClientDtoResponse updateClient(ClientUpdateRequest clientUpdateRequest) {
+        Client client = clientRepository.findById(clientUpdateRequest.getEmail()).orElse(null);
 
         if (client == null) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Cliente con id " + clientEmail + " no fue encontrado"
+                    HttpStatus.BAD_REQUEST, "Cliente con id " + clientUpdateRequest.getEmail() + " no fue encontrado"
             );
         }
         // La contraseña por ejemplo no la va a actualizar, eso se hace en otro lado

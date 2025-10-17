@@ -14,6 +14,7 @@ import java.util.Set;
 @SuperBuilder
 @EqualsAndHashCode(exclude = "addresses", callSuper = false)
 @ToString(exclude = "addresses")
+@DiscriminatorValue("Client")
 public class Client extends User {
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)

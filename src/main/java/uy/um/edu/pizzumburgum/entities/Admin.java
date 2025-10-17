@@ -12,10 +12,10 @@ import lombok.experimental.SuperBuilder;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@DiscriminatorValue("admin")
 @Data
 @NoArgsConstructor
 @SuperBuilder
+@DiscriminatorValue("Admin")
 public class Admin extends User{
     @ManyToOne
     @JoinColumn(name = "created_by")

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Header } from '../components/common/Header';
-import { FAVORITES } from '../constants/favorites';
 
 export const HomePage = ({ onNavigate }) => {
     const [scrollPosition, setScrollPosition] = useState(0);
@@ -64,61 +63,6 @@ export const HomePage = ({ onNavigate }) => {
                             <h3 className="text-4xl font-bold text-white mb-2">Pizzas</h3>
                             <p className="text-white/90 text-lg">Create your artisan pizza</p>
                         </div>
-                    </div>
-                </div>
-
-                {/* Favorites Carousel */}
-                <div className="mb-12">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-3xl font-bold text-gray-900">Your Favorites</h3>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => scrollCarousel('left')}
-                                className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
-                            >
-                                <ChevronDown className="w-6 h-6 rotate-90" />
-                            </button>
-                            <button
-                                onClick={() => scrollCarousel('right')}
-                                className="p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
-                            >
-                                <ChevronDown className="w-6 h-6 -rotate-90" />
-                            </button>
-                        </div>
-                    </div>
-
-                    <div
-                        id="favorites-carousel"
-                        className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
-                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                    >
-                        {FAVORITES.map(item => (
-                            <div
-                                key={item.id}
-                                onClick={() => onNavigate(item.type)}
-                                className="flex-shrink-0 w-72 bg-white rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer group"
-                            >
-                                <div className="relative h-48 overflow-hidden rounded-t-xl">
-                                    <img
-                                        src={item.image}
-                                        alt={item.name}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                    />
-                                </div>
-                                <div className="p-4">
-                                    <h4 className="text-lg font-bold text-gray-900 mb-1">{item.name}</h4>
-                                    <p className="text-sm text-gray-600 mb-2 capitalize">
-                                        {item.type === 'burger' ? 'Burger' : 'Pizza'}
-                                    </p>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-2xl font-bold text-orange-600">${item.price}</span>
-                                        <button className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors">
-                                            Repeat
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
                     </div>
                 </div>
             </main>

@@ -3,7 +3,7 @@ import { Header } from '../components/common/Header';
 import { Accordion } from '../components/common/Accordion';
 import { QuantitySelector } from '../components/common/QuantitySelector';
 import { useCreatorStore } from '../contexts/CreatorContext';
-import { PRODUCTS } from '../constants/products';
+import { PRODUCTS } from '../components/Products'
 import {
     BREAD_OPTIONS,
     MEAT_OPTIONS,
@@ -17,7 +17,7 @@ import {
     PIZZA_CHEESE,
     PIZZA_TOPPINGS,
     MAX_TOPPINGS
-} from '../constants/ingredients';
+} from '../components/Ingredients';
 
 export const CreatorPage = ({ productType, onBack }) => {
     const store = useCreatorStore();

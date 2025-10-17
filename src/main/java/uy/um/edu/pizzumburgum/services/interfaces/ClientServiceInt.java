@@ -15,7 +15,7 @@ public interface ClientServiceInt {
 
     List<ClientDtoResponse> getClients();
 
-    ClientDtoResponse updateClient(String clientEmail, ClientUpdateRequest clientUpdateRequest);
+    ClientDtoResponse updateClient(ClientUpdateRequest clientUpdateRequest);
 
     ResponseEntity<String> deleteClient(String email);
 }

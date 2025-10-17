@@ -13,7 +13,7 @@ import uy.um.edu.pizzumburgum.services.ClientService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/client")
+@RequestMapping("/api/client/v1")
 public class ClientController {
     private final ClientService clientService;
     private final AddressService addressService;

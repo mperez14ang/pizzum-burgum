@@ -2,8 +2,10 @@ package uy.um.edu.pizzumburgum.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
@@ -28,6 +30,9 @@ public class ClientService implements ClientServiceInt {
 
     private final ClientRepository clientRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Transactional
     @Override
     public ClientDtoResponse createClient(ClientCreateRequest clientCreateRequest) {
@@ -43,6 +48,8 @@ public class ClientService implements ClientServiceInt {
                 .map(FavoritesMapper::toFavorites)
                 .collect(Collectors.toSet());
 
+        // Encriptar contraseña
+        client.setPassword(passwordEncoder.encode(clientCreateRequest.getPassword()));
 
         client.setAddresses(addresses);
         client.setFavorites(favorites);

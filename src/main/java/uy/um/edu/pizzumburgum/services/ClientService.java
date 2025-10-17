@@ -36,6 +36,13 @@ public class ClientService implements ClientServiceInt {
     @Transactional
     @Override
     public ClientDtoResponse createClient(ClientCreateRequest clientCreateRequest) {
+        // Verificar que el cliente no existe
+        if (clientRepository.existsById(clientCreateRequest.getEmail())){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Cliente con id " + clientCreateRequest.getEmail() + " ya existe"
+            );
+        }
+
         Client client = ClientMapper.toClient(clientCreateRequest);
 
         // Agregar addresses y favorites

@@ -1,14 +1,13 @@
 package uy.um.edu.pizzumburgum.dto.response;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.time.LocalDate;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
 public class AdminDtoResponse extends UserDtoResponse {
 

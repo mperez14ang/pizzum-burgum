@@ -11,6 +11,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
+@NoArgsConstructor
 public class ClientCreateRequest extends UserCreateRequest {
 
     private Set<AddressDto> addresses;

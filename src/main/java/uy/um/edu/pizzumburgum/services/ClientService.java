@@ -121,7 +121,6 @@ public class ClientService implements ClientServiceInt {
         Map<String, Object> body = new HashMap<>();
         body.put("message", "Cliente " + email + " fue eliminado");
 
-
         return ResponseEntity.ok(body);
     }
 }

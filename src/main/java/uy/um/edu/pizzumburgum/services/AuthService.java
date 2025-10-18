@@ -1,7 +1,6 @@
 package uy.um.edu.pizzumburgum.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
@@ -14,16 +13,13 @@ import uy.um.edu.pizzumburgum.services.interfaces.AuthServiceInt;
 
 @Service
 public class AuthService implements AuthServiceInt {
-    @Autowired
     private final UserRepository userRepository;
 
-    @Autowired
     private final ClientService clientService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
     private final JwtService jwtService;
 
     public AuthService(UserRepository userRepository, ClientService clientService, JwtService jwtService) {

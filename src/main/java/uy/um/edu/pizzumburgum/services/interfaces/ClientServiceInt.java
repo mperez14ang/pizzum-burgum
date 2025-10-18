@@ -6,6 +6,7 @@ import uy.um.edu.pizzumburgum.dto.request.ClientUpdateRequest;
 import uy.um.edu.pizzumburgum.dto.response.ClientDtoResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ClientServiceInt {
 
@@ -17,5 +18,5 @@ public interface ClientServiceInt {
 
     ClientDtoResponse updateClient(ClientUpdateRequest clientUpdateRequest);
 
-    ResponseEntity<String> deleteClient(String email);
+    ResponseEntity<Map<String, Object>> deleteClient(String email);
 }

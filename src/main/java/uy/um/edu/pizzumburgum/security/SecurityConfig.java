@@ -1,7 +1,5 @@
 package uy.um.edu.pizzumburgum.security;
 
-import io.github.cdimascio.dotenv.Dotenv;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,29 +10,31 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import uy.um.edu.pizzumburgum.entities.Admin;
 import uy.um.edu.pizzumburgum.services.DatabaseUserDetailsService;
 
-import java.time.LocalDate;
 import java.util.List;
+
+import static uy.um.edu.pizzumburgum.entities.UserType.ADMIN;
+import static uy.um.edu.pizzumburgum.entities.UserType.CLIENT;
 
 /** <a href="https://www.kindsonthegenius.com/how-to-authenticate-from-react-to-spring-boot/">...</a> **/
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity httpSecurity, AuthenticationProvider authenticationProvider,
+            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         return httpSecurity.authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/login").permitAll()
 
@@ -44,16 +44,16 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                        .requestMatchers("/api/products/**").hasRole("Admin")
+                        .requestMatchers("/api/products/**").hasRole(ADMIN)
 
                         // Admin endpoints
-                        .requestMatchers("/api/admin/**").hasRole("Admin")
+                        .requestMatchers("/api/admin/**").hasRole(ADMIN)
 
                         // Client endpoints
-                        .requestMatchers("/api/client/**").hasAnyRole("Client", "Admin")
+                        .requestMatchers("/api/client/**").hasAnyRole(CLIENT, ADMIN)
 
-                        // Common endpoints
-                        .requestMatchers("/api/common/**").hasAnyRole("Admin", "Client")
+                        // Users endpoints
+                        .requestMatchers("/api/users/**").hasAnyRole(CLIENT, ADMIN)
 
                         // Deny any other request
                         .anyRequest().authenticated()
@@ -61,6 +61,8 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -70,9 +72,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(DatabaseUserDetailsService databaseUserDetailsService) {
+    public AuthenticationProvider authenticationProvider(DatabaseUserDetailsService databaseUserDetailsService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(databaseUserDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }
 

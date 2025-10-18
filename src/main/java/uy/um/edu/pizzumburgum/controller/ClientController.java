@@ -11,6 +11,7 @@ import uy.um.edu.pizzumburgum.services.AddressService;
 import uy.um.edu.pizzumburgum.services.ClientService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/client/v1")
@@ -39,7 +40,7 @@ public class ClientController {
     }
 
     @DeleteMapping("{clientEmail}")
-    public ResponseEntity<String> deleteClient(@PathVariable String clientEmail) {
+    public ResponseEntity<Map<String, Object>> deleteClient(@PathVariable String clientEmail) {
         return clientService.deleteClient(clientEmail);
     }
 

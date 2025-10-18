@@ -10,14 +10,11 @@ import uy.um.edu.pizzumburgum.repository.AdminRepository;
 
 import java.time.LocalDate;
 
-import static uy.um.edu.pizzumburgum.entities.Admin.*;
-
 /**
  * Esto crea un admin por defecto, y lo agrega a la base de datos (si no existe claro)
  * **/
 @Component
 public class AdminInitializer implements CommandLineRunner {
-    @Autowired
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -31,9 +28,9 @@ public class AdminInitializer implements CommandLineRunner {
         Dotenv dotenv = Dotenv.load();
         String adminEmail = "admin@admin.com";
         if (adminRepository.findById(adminEmail).isEmpty()) {
-            Admin admin = builder()
+            Admin admin = Admin.builder()
                     .email(adminEmail)
-                    .username(dotenv.get("ADMIN_USERNAME"))
+                    .firstName(dotenv.get("ADMIN_USERNAME"))
                     .lastName("admin")
                     .birthDate(LocalDate.of(1950, 7, 16))
                     .dni("00000000")
@@ -41,7 +38,7 @@ public class AdminInitializer implements CommandLineRunner {
                     .build();
             adminRepository.save(admin);
             System.out.println("Se creo un admin por defecto");
-            System.out.println("Nombre del admin: " + admin.getUsername() + " " + admin.getLastName());
+            System.out.println("Nombre del admin: " + admin.getFirstName() + " " + admin.getLastName());
         }
         else  {
             System.out.println("Admin con correo " + adminEmail +" ya existe!");

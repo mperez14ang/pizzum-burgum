@@ -20,7 +20,9 @@ import uy.um.edu.pizzumburgum.mapper.FavoritesMapper;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.ClientServiceInt;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -95,7 +97,7 @@ public class ClientService implements ClientServiceInt {
             );
         }
         // La contraseña por ejemplo no la va a actualizar, eso se hace en otro lado
-        client.setUsername(clientUpdateRequest.getUsername());
+        client.setFirstName(clientUpdateRequest.getFirstName());
         client.setLastName(clientUpdateRequest.getLastName());
         client.setBirthDate(clientUpdateRequest.getBirthDate());
         client.setDni(clientUpdateRequest.getDni());
@@ -106,7 +108,7 @@ public class ClientService implements ClientServiceInt {
 
     @Transactional
     @Override
-    public ResponseEntity<String> deleteClient(String email) {
+    public ResponseEntity<Map<String, Object>> deleteClient(String email) {
         Client client = clientRepository.findById(email).orElse(null);
         if (client == null) {
             throw new ResponseStatusException(
@@ -115,6 +117,11 @@ public class ClientService implements ClientServiceInt {
         }
 
         clientRepository.delete(client);
-        return ResponseEntity.ok("Cliente " + email + " fue eliminado");
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "Cliente " + email + " fue eliminado");
+
+
+        return ResponseEntity.ok(body);
     }
 }

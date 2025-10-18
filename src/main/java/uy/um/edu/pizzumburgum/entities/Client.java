@@ -14,7 +14,7 @@ import java.util.Set;
 @SuperBuilder
 @EqualsAndHashCode(exclude = "addresses", callSuper = false)
 @ToString(exclude = "addresses")
-@DiscriminatorValue("Client")
+@DiscriminatorValue(UserType.CLIENT)
 public class Client extends User {
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -31,4 +31,7 @@ public class Client extends User {
     // El atributo esta en la tabla card
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Card> cards;
+
+    @Override
+    public String getUserType() {return UserType.CLIENT;}
 }

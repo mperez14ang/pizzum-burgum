@@ -26,17 +26,17 @@ public abstract class User implements UserDetails{
     @Id
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "Email inválido")
-    @Column(unique = true, nullable = false, length = 100)
+    @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;
 
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 50)
-    @Column(nullable = false, length = 50)
-    private String username;
+    @Column(name = "first_name", nullable = false, length = 50)
+    private String firstName;
 
     @NotBlank(message = "El apellido es obligatorio")
     @Size(min = 2, max = 50)
-    @Column(nullable = false, length = 50)
+    @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
     @NotNull(message = "La fecha de nacimiento es obligatoria")
@@ -54,9 +54,13 @@ public abstract class User implements UserDetails{
     @Column(nullable = false)
     private String password;
 
+    @Transient
+    public abstract String getUserType();
+
+    /** Aqui el username es el email porque es el identificador **/
     @Override
     public String getUsername() {
-        return this.username;
+        return this.email;
     }
 
     @Override
@@ -82,7 +86,7 @@ public abstract class User implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + this.getClass().getSimpleName()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.getUserType()));
     }
 
     @Override

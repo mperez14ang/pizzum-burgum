@@ -14,21 +14,21 @@ public class AdminMapper {
                 .createdBy(null)
                 .birthDate(dto.getBirthDate())
                 .password(dto.getPassword())
-                .username(dto.getUsername())
+                .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .build();
     }
 
     // Admin Entity -> Admin Response
     public static AdminDtoResponse toAdminDtoResponse(Admin admin) {
-        AdminDtoResponse adminDtoResponse = AdminDtoResponse.builder()
+
+        return AdminDtoResponse.builder()
                 .email(admin.getEmail())
-                .username(admin.getUsername())
+                .firstName(admin.getFirstName())
                 .lastName(admin.getLastName())
                 .createdById(admin.getEmail())
                 .birthDate(admin.getBirthDate())
+                .userType(admin.getUserType())
                 .build();
-
-        return adminDtoResponse;
     }
 }

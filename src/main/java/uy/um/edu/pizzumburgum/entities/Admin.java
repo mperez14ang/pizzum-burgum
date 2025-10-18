@@ -15,10 +15,13 @@ import lombok.experimental.SuperBuilder;
 @Data
 @NoArgsConstructor
 @SuperBuilder
-@DiscriminatorValue("Admin")
+@DiscriminatorValue(UserType.ADMIN)
 public class Admin extends User{
     @ManyToOne
     @JoinColumn(name = "created_by")
     @Nullable
     private Admin createdBy;
+
+    @Override
+    public String getUserType() {return UserType.ADMIN;}
 }

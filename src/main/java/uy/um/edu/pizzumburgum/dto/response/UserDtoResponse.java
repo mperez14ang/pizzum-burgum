@@ -13,9 +13,11 @@ public class UserDtoResponse {
 
     private String email;
 
-    private String username;
+    private String firstName;
 
     private String lastName;
 
     private LocalDate birthDate;
+
+    private String userType;
 }

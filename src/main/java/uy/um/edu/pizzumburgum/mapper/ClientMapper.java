@@ -15,7 +15,7 @@ public class ClientMapper {
     public static Client toClient(ClientCreateRequest clientCreateRequest) {
         return Client.builder()
                 .email(clientCreateRequest.getEmail())
-                .username(clientCreateRequest.getUsername())
+                .firstName(clientCreateRequest.getFirstName())
                 .lastName(clientCreateRequest.getLastName())
                 .dni(clientCreateRequest.getDni())
                 .birthDate(clientCreateRequest.getBirthDate())
@@ -41,11 +41,12 @@ public class ClientMapper {
 
         return ClientDtoResponse.builder()
                 .email(client.getEmail())
-                .username(client.getUsername())
+                .firstName(client.getFirstName())
                 .lastName(client.getLastName())
                 .birthDate(client.getBirthDate())
                 .addresses(addressDtos)
                 .favorites(favoritesDtos)
+                .userType(client.getUserType())
                 .build();
 
     }

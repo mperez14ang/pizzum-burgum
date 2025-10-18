@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uy.um.edu.pizzumburgum.dto.request.ClientUpdateRequest;
 import uy.um.edu.pizzumburgum.dto.request.UserCreateRequest;
+import uy.um.edu.pizzumburgum.dto.request.UserUpdateRequest;
 import uy.um.edu.pizzumburgum.dto.response.UserDtoResponse;
 import uy.um.edu.pizzumburgum.repository.UserRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.UserServiceInt;
@@ -18,7 +19,7 @@ public class UserService implements UserServiceInt {
     private final UserRepository userRepository;
 
     @Override
-    public UserDtoResponse createUser(UserCreateRequest clientCreateRequest) {
+    public UserDtoResponse createUser(UserCreateRequest userCreateRequest) {
         return null;
     }
 
@@ -33,7 +34,7 @@ public class UserService implements UserServiceInt {
     }
 
     @Override
-    public UserDtoResponse updateUser(String clientEmail, ClientUpdateRequest clientUpdateRequest) {
+    public UserDtoResponse updateUser(UserUpdateRequest userUpdateRequest) {
         return null;
     }
 

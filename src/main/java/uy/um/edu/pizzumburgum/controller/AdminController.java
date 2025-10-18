@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import uy.um.edu.pizzumburgum.dto.request.AdminCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.AdminUpdateRequest;
 import uy.um.edu.pizzumburgum.dto.response.AdminDtoResponse;
+import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
+import uy.um.edu.pizzumburgum.entities.Product;
 import uy.um.edu.pizzumburgum.services.AdminService;
+import uy.um.edu.pizzumburgum.services.ProductService;
 
 import java.util.List;
 

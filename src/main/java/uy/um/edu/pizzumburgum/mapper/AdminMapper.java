@@ -1,13 +1,12 @@
 package uy.um.edu.pizzumburgum.mapper;
 
 import uy.um.edu.pizzumburgum.dto.request.AdminCreateRequest;
+import uy.um.edu.pizzumburgum.dto.response.AdminDtoResponse;
 import uy.um.edu.pizzumburgum.entities.Admin;
-import uy.um.edu.pizzumburgum.repository.AdminRepository;
-
-import java.util.Optional;
 
 public class AdminMapper {
 
+    // Admin Request -> Admin Entity
     public static Admin toAdmin(AdminCreateRequest dto) {
         return Admin.builder()
                 .email(dto.getEmail())
@@ -20,19 +19,16 @@ public class AdminMapper {
                 .build();
     }
 
-    public static AdminCreateRequest toAdminDto(Admin admin) {
-        AdminCreateRequest adminCreateRequest = AdminCreateRequest.builder()
+    // Admin Entity -> Admin Response
+    public static AdminDtoResponse toAdminDtoResponse(Admin admin) {
+        AdminDtoResponse adminDtoResponse = AdminDtoResponse.builder()
                 .email(admin.getEmail())
-                .dni(admin.getDni())
                 .username(admin.getUsername())
                 .lastName(admin.getLastName())
-                .createdById(null)
+                .createdById(admin.getEmail())
                 .birthDate(admin.getBirthDate())
-                .password(admin.getPassword())
                 .build();
 
-        if (admin.getCreatedBy() != null) adminCreateRequest.setCreatedById(admin.getCreatedBy().getEmail());
-
-        return adminCreateRequest;
+        return adminDtoResponse;
     }
 }

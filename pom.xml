@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>uy.um.edu</groupId>
-	<artifactId>pizzum-burgum</artifactId>
+	<artifactId>pizzumburgum</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>PizzUM-BurgUM</name>
 	<description>Sistema de pedidos online para pizzas y hamburguesas</description>
@@ -31,6 +31,7 @@
 		<spring-cloud.version>2025.0.0</spring-cloud.version>
 		<spring.version>6.2.11</spring.version>
 		<spring-security.version>6.5.5</spring-security.version>
+        <start-class>uy.um.edu.pizzumburgum.PizzUmBurgUmApplication</start-class>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -135,6 +136,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+                    <mainClass>${start-class}</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>

@@ -58,7 +58,8 @@ public class SecurityConfig {
                         // Deny any other request
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults()) // TODO Basic Auth, esto hay que sacarlo para produccion porque lo ideal es dejar solo tokens
+                .formLogin(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authenticationProvider(authenticationProvider)

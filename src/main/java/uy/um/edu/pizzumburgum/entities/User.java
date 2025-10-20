@@ -83,6 +83,9 @@ public abstract class User implements UserDetails{
         return UserDetails.super.isEnabled();
     }
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRole role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -21,8 +21,6 @@ public class ProductDto {
 
     private ProductType productType;
 
-    private Set<CreationHasProductsDto> creations;
     private ProductCategory productCategory;
 
-    private String description;
 }

@@ -32,17 +32,10 @@ public class ProductService implements ProductServiceInt {
     @Transactional
     @Override
     public ProductDto createProduct(ProductDto productDto) {
-        Set<CreationHasProducts> creations = new HashSet<>();
-        for (CreationHasProductsDto creationHasProductsDto : productDto.getCreations()) {
-            CreationHasProducts creationHasProducts = creationHasProductsRepository.findById(creationHasProductsDto.getId())
-                    .orElseThrow( () -> new ResponseStatusException(
-                            HttpStatus.BAD_REQUEST, "CreationHasProducts no fue encontrado"
-                    ));
-            creations.add(creationHasProducts);
-        }
-
         Product product = ProductMapper.toProduct(productDto);
-        product.setCreations(creations);
+
+
+        product.setCreations(new HashSet<>());
 
         product = productRepository.save(product);
         return ProductMapper.toProductDto(product);

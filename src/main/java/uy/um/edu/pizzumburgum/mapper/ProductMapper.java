@@ -4,12 +4,14 @@ import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
 import uy.um.edu.pizzumburgum.entities.Product;
 
 public class ProductMapper {
+
     public static ProductDto toProductDto(Product product) {
         return ProductDto.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .productType(product.getType())
                 .price(product.getPrice())
+                .productCategory(product.getCategory())
                 .build();
     }
 
@@ -19,6 +21,7 @@ public class ProductMapper {
                 .name(productDto.getName())
                 .type(productDto.getProductType())
                 .price(productDto.getPrice())
+                .category(productDto.getProductCategory())
                 .build();
     }
 }

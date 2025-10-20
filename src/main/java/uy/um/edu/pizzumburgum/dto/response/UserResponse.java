@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-public class UserDtoResponse {
+public class UserResponse {
 
     private String email;
 

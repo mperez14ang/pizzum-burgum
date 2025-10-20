@@ -2,10 +2,11 @@ package uy.um.edu.pizzumburgum.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uy.um.edu.pizzumburgum.dto.request.AddressRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientUpdateRequest;
-import uy.um.edu.pizzumburgum.dto.response.ClientDtoResponse;
-import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
+import uy.um.edu.pizzumburgum.dto.response.AddressResponse;
+import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
 import uy.um.edu.pizzumburgum.exception.ResourceNotFoundException;
 import uy.um.edu.pizzumburgum.services.AddressService;
 import uy.um.edu.pizzumburgum.services.ClientService;
@@ -25,17 +26,17 @@ public class ClientController {
     }
 
     @PostMapping
-    public ClientDtoResponse createClient(@RequestBody ClientCreateRequest client) {
+    public ClientResponse createClient(@RequestBody ClientCreateRequest client) {
         return clientService.createClient(client);
     }
 
     @GetMapping("{clientEmail}")
-    public ClientDtoResponse getClientByEmail(@PathVariable String clientEmail){
+    public ClientResponse getClientByEmail(@PathVariable String clientEmail){
         return clientService.getClientByEmail(clientEmail);
     }
 
     @PutMapping()
-    public ClientDtoResponse updateClient(@RequestBody ClientUpdateRequest clientUpdateRequest){
+    public ClientResponse updateClient(@RequestBody ClientUpdateRequest clientUpdateRequest){
         return clientService.updateClient(clientUpdateRequest);
     }
 
@@ -45,13 +46,13 @@ public class ClientController {
     }
 
     @GetMapping
-    public List<ClientDtoResponse> getAllClients() {
+    public List<ClientResponse> getAllClients() {
         return clientService.getClients();
     }
 
     @PostMapping("{clientEmail}/address")
-    public AddressDto createAddress(@PathVariable String clientEmail, @RequestBody AddressDto addressDto) throws ResourceNotFoundException {
-        return addressService.createAddress(addressDto, clientEmail);
+    public AddressResponse createAddress(@PathVariable String clientEmail, @RequestBody AddressRequest addressRequest) throws ResourceNotFoundException {
+        return addressService.createAddress(addressRequest, clientEmail);
     }
 
 }

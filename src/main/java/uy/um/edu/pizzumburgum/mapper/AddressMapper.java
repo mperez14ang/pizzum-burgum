@@ -1,25 +1,26 @@
 package uy.um.edu.pizzumburgum.mapper;
 
-import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
+import uy.um.edu.pizzumburgum.dto.request.AddressRequest;
+import uy.um.edu.pizzumburgum.dto.response.AddressResponse;
 import uy.um.edu.pizzumburgum.entities.Address;
 import uy.um.edu.pizzumburgum.entities.Client;
 
 public class AddressMapper {
-    public static Address toAddress(AddressDto addressDto, Client client) {
-
+    // AddressRequest -> Address
+    public static Address toAddress(AddressRequest addressRequest) {
         return Address.builder()
-                .city(addressDto.getCity())
-                .street(addressDto.getStreet())
-                .postalCode(addressDto.getPostalCode())
+                .city(addressRequest.getCity())
+                .street(addressRequest.getStreet())
+                .postalCode(addressRequest.getPostalCode())
                 .active(true)
-                .client(client)
                 .build();
     }
 
+    // Address -> AddressResponse
+    public static AddressResponse toAddressResponse(Address address) {
 
-    public static AddressDto toAddressDto(Address address) {
-
-        return AddressDto.builder()
+        return AddressResponse.builder()
+                .id(address.getId())
                 .city(address.getCity())
                 .street(address.getStreet())
                 .postalCode(address.getPostalCode())

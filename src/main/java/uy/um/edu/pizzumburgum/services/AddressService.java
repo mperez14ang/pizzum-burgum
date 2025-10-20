@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
+import uy.um.edu.pizzumburgum.dto.request.AddressRequest;
+import uy.um.edu.pizzumburgum.dto.response.AddressResponse;
 import uy.um.edu.pizzumburgum.entities.Address;
 import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.mapper.AddressMapper;
@@ -23,43 +24,46 @@ public class AddressService implements AddressServiceInt {
 
     @Transactional
     @Override
-    public AddressDto createAddress(AddressDto addressDto, String clientEmail) {
+    public AddressResponse createAddress(AddressRequest addressRequest, String clientEmail) {
         if (clientEmail == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "El cliente es obligatorio para crear una dirección"
             );
         }
 
-        Client client = clientRepository.getReferenceById(clientEmail);
+        Address address = AddressMapper.toAddress(addressRequest);
 
-        Address address = AddressMapper.toAddress(addressDto, client);
+        // Setear el cliente
+        Client client = clientRepository.getReferenceById(clientEmail);
+        address.setClient(client);
+
         addressRepository.save(address);
 
-        return AddressMapper.toAddressDto(address);
+        return AddressMapper.toAddressResponse(address);
     }
 
     @Transactional
     @Override
-    public AddressDto getAddress(Long addressId) {
+    public AddressResponse getAddress(Long addressId) {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.BAD_REQUEST, "No se pudo encontrar una direccion con id " + addressId
         ));
 
-        return AddressMapper.toAddressDto(address);
+        return AddressMapper.toAddressResponse(address);
     }
 
     @Transactional
     @Override
-    public AddressDto updateAddress(Long id, AddressDto addressDto) {
+    public AddressResponse updateAddress(Long id, AddressResponse addressResponse) {
         Address address = addressRepository.getReferenceById(id);
 
-        address.setCity(addressDto.getCity());
-        address.setStreet(addressDto.getStreet());
-        address.setPostalCode(addressDto.getPostalCode());
+        address.setCity(addressResponse.getCity());
+        address.setStreet(addressResponse.getStreet());
+        address.setPostalCode(addressResponse.getPostalCode());
 
         addressRepository.save(address);
-        return AddressMapper.toAddressDto(address);
+        return AddressMapper.toAddressResponse(address);
     }
 
     @Transactional

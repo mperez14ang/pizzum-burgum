@@ -1,18 +1,23 @@
 package uy.um.edu.pizzumburgum.services.interfaces;
 
 import org.springframework.http.ResponseEntity;
-import uy.um.edu.pizzumburgum.dto.shared.OrderByDto;
+import uy.um.edu.pizzumburgum.dto.request.OrderByRequest;
+import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
+import uy.um.edu.pizzumburgum.entities.OrderState;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OrderByInt {
-    OrderByDto createOder(OrderByDto orderByDto);
+    OrderByResponse createOder(OrderByRequest orderByDto);
 
-    OrderByDto getOrderById(Long id);
+    OrderByResponse getOrderById(Long id);
 
-    List<OrderByDto> getOrders();
+    List<OrderByResponse> getOrders();
 
-    OrderByDto updateOrder(Long id, OrderByDto orderByDto);
+    List<OrderByResponse> getOrdersByState(OrderState state);
 
-    ResponseEntity<String> deleteOrder(Long id);
+    OrderByResponse updateOrder(Long id, OrderByRequest orderByDto);
+
+    ResponseEntity<Map<String, Object>> deleteOrder(Long id);
 }

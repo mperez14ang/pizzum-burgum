@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @NoArgsConstructor
-public class AdminDtoResponse extends UserDtoResponse {
+public class AdminResponse extends UserResponse {
 
     private String createdById;
 }

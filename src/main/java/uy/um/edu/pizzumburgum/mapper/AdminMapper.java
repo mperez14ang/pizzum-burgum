@@ -1,7 +1,7 @@
 package uy.um.edu.pizzumburgum.mapper;
 
 import uy.um.edu.pizzumburgum.dto.request.AdminCreateRequest;
-import uy.um.edu.pizzumburgum.dto.response.AdminDtoResponse;
+import uy.um.edu.pizzumburgum.dto.response.AdminResponse;
 import uy.um.edu.pizzumburgum.entities.Admin;
 
 public class AdminMapper {
@@ -20,9 +20,9 @@ public class AdminMapper {
     }
 
     // Admin Entity -> Admin Response
-    public static AdminDtoResponse toAdminDtoResponse(Admin admin) {
+    public static AdminResponse toAdminDtoResponse(Admin admin) {
 
-        return AdminDtoResponse.builder()
+        return AdminResponse.builder()
                 .email(admin.getEmail())
                 .firstName(admin.getFirstName())
                 .lastName(admin.getLastName())

@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.response.AuthResponse;
-import uy.um.edu.pizzumburgum.dto.response.ClientDtoResponse;
+import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
 import uy.um.edu.pizzumburgum.dto.shared.LoginDto;
 import uy.um.edu.pizzumburgum.entities.User;
 import uy.um.edu.pizzumburgum.repository.UserRepository;
@@ -31,10 +31,10 @@ public class AuthService implements AuthServiceInt {
     @Override
     public AuthResponse register(ClientCreateRequest request) {
         // Crea Client con ClientService
-        ClientDtoResponse clientDtoResponse = clientService.createClient(request);
+        ClientResponse clientResponse = clientService.createClient(request);
 
-        String jwtToken = jwtService.generateToken(clientDtoResponse);
-        return new AuthResponse(jwtToken, clientDtoResponse.getEmail(), clientDtoResponse.getUserType() , "Usuario " + clientDtoResponse.getEmail() + " registrado correctamente");
+        String jwtToken = jwtService.generateToken(clientResponse);
+        return new AuthResponse(jwtToken, clientResponse.getEmail(), clientResponse.getUserType() , "Usuario " + clientResponse.getEmail() + " registrado correctamente");
 
     }
 

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientUpdateRequest;
-import uy.um.edu.pizzumburgum.dto.response.ClientDtoResponse;
+import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
 import uy.um.edu.pizzumburgum.entities.Address;
 import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.entities.Favorites;
@@ -37,7 +37,7 @@ public class ClientService implements ClientServiceInt {
 
     @Transactional
     @Override
-    public ClientDtoResponse createClient(ClientCreateRequest clientCreateRequest) {
+    public ClientResponse createClient(ClientCreateRequest clientCreateRequest) {
         // Verificar que el cliente no existe
         if (clientRepository.existsById(clientCreateRequest.getEmail())){
             throw new ResponseStatusException(
@@ -50,7 +50,11 @@ public class ClientService implements ClientServiceInt {
         // Agregar addresses y favorites
         Client finalClient = client;
         Set<Address> addresses = clientCreateRequest.getAddresses().stream()
-                .map(obj -> AddressMapper.toAddress(obj, finalClient))
+                .map(obj -> {
+                    Address address = AddressMapper.toAddress(obj);
+                    address.setClient(finalClient);
+                    return address;
+                })
                 .collect(Collectors.toSet());
 
         Set<Favorites> favorites = clientCreateRequest.getFavorites().stream()
@@ -69,7 +73,7 @@ public class ClientService implements ClientServiceInt {
 
     @Transactional
     @Override
-    public ClientDtoResponse getClientByEmail(String email) {
+    public ClientResponse getClientByEmail(String email) {
         Client client =  clientRepository.findById(email).orElse(null);
         if (client == null) {
             throw new ResponseStatusException(
@@ -81,14 +85,14 @@ public class ClientService implements ClientServiceInt {
 
     @Transactional
     @Override
-    public List<ClientDtoResponse> getClients() {
+    public List<ClientResponse> getClients() {
         List<Client> clients = clientRepository.findAll();
         return clients.stream().map(ClientMapper::toClientResponse).collect(Collectors.toList());
     }
 
     @Transactional
     @Override
-    public ClientDtoResponse updateClient(ClientUpdateRequest clientUpdateRequest) {
+    public ClientResponse updateClient(ClientUpdateRequest clientUpdateRequest) {
         Client client = clientRepository.findById(clientUpdateRequest.getEmail()).orElse(null);
 
         if (client == null) {

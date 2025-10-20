@@ -1,13 +1,14 @@
 package uy.um.edu.pizzumburgum.entities;
 
 public enum ProductType {
-    PAN,
-    CARNE,
-    MASA,
-    ADEREZOS,
-    TOPPINGS_HAM,
-    TOPPINGS_PIZZA,
-    SALSA,
-    QUESO_HAM,
-    QUESO_PIZZA,
+    BREAD,
+    MEAT,
+    DOUGH,
+    CONDIMENTS,
+    BURGER_TOPPINGS,
+    PIZZA_TOPPINGS,
+    SAUCE,
+    BURGER_CHEESE,
+    PIZZA_CHEESE,
+    PIZZA_SIZE
 }

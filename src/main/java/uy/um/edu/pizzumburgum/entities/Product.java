@@ -9,7 +9,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "product")
+@Table(
+        name = "product",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_product_name_type",
+                columnNames = {"name", "type"}
+        )
+)
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -19,7 +25,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", unique = true, nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Min(0)
@@ -27,7 +33,7 @@ public class Product {
     private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", unique = true, nullable = false)
+    @Column(name = "type", nullable = false)
     private ProductType type;
 
     @Enumerated(EnumType.STRING)

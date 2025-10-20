@@ -9,7 +9,9 @@ import uy.um.edu.pizzumburgum.entities.ProductCategory;
 import uy.um.edu.pizzumburgum.entities.ProductType;
 import uy.um.edu.pizzumburgum.services.ProductService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -43,7 +45,26 @@ public class ProductController {
     public ResponseEntity<List<ProductDto>> getProductsByType(@PathVariable ProductType type) {
         return ResponseEntity.ok(productService.getProductsByType(type));
     }
+    @GetMapping("/ingredients")
+    public ResponseEntity<Map<String, List<ProductDto>>> getIngredientsGrouped() {
+        Map<String, List<ProductDto>> ingredients = new HashMap<>();
 
+        // Ingredientes para Hamburguesa (ProductCategory.BURGER)
+        ingredients.put("BREAD_OPTIONS", productService.getProductsByType(ProductType.BREAD));
+        ingredients.put("MEAT_OPTIONS", productService.getProductsByType(ProductType.MEAT));
+        ingredients.put("BURGER_CHEESE", productService.getProductsByType(ProductType.BURGER_CHEESE));
+        ingredients.put("BURGER_TOPPINGS", productService.getProductsByType(ProductType.BURGER_TOPPINGS));
+        ingredients.put("BURGER_SAUCES", productService.getProductsByType(ProductType.SAUCE));
+
+        // Ingredientes para Pizza (ProductCategory.PIZZA)
+        ingredients.put("PIZZA_DOUGH", productService.getProductsByType(ProductType.DOUGH));
+        ingredients.put("PIZZA_SIZES", productService.getProductsByType(ProductType.PIZZA_SIZE));
+        ingredients.put("PIZZA_SAUCE", productService.getProductsByType(ProductType.SAUCE));
+        ingredients.put("PIZZA_CHEESE", productService.getProductsByType(ProductType.PIZZA_CHEESE));
+        ingredients.put("PIZZA_TOPPINGS", productService.getProductsByType(ProductType.PIZZA_TOPPINGS));
+
+        return ResponseEntity.ok(ingredients);
+    }
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto) {
         return ResponseEntity.ok(productService.updateProduct(id, productDto));

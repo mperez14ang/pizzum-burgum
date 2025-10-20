@@ -10,7 +10,7 @@ import { ingredientsService } from '../services/api';
 export const CreatorPage = ({ productType, onBack }) => {
     const { creation, updateCreation, resetCreation } = useCreatorStore();
 
-    // Código modificado - Definir las imágenes
+
     const images = {
         pizza: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80',
         burger: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80'
@@ -123,7 +123,7 @@ export const CreatorPage = ({ productType, onBack }) => {
             if (selectedToppings.length < MAX_TOPPINGS) {
                 setSelectedToppings([...selectedToppings, topping]);
             } else {
-                alert(`Solo puedes seleccionar hasta ${MAX_TOPPINGS} toppings`);
+                alert(`Puedes seleccionar hasta ${MAX_TOPPINGS} toppings`);
             }
         }
     };

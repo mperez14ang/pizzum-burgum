@@ -13,6 +13,8 @@ public interface FavoritesServiceInt {
 
     List<FavoritesDto> getFavoritesByClientId(Long id);
 
+    List<FavoritesDto> getFavoritesByClientEmail(String email);
+
     List<FavoritesDto> getFavorites();
 
     FavoritesDto updateFavorites(Long id, FavoritesDto favoritesDto);

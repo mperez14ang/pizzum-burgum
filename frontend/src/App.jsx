@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { AuthProvider } from './contexts/AuthContext';
 import { CreatorProvider } from './contexts/CreatorContext';
+import { FavoritesProvider } from './contexts/FavoritesContext';
 import { HomePage } from './pages/HomePage';
 import { CreatorPage } from './pages/CreatorPage';
 
@@ -18,12 +20,16 @@ function App() {
     };
 
     return (
-        <CreatorProvider>
-            {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
-            {currentPage === 'creator' && (
-                <CreatorPage productType={productType} onBack={handleBack} />
-            )}
-        </CreatorProvider>
+        <AuthProvider>
+            <FavoritesProvider>
+                <CreatorProvider>
+                    {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
+                    {currentPage === 'creator' && (
+                        <CreatorPage productType={productType} onBack={handleBack} />
+                    )}
+                </CreatorProvider>
+            </FavoritesProvider>
+        </AuthProvider>
     );
 }
 

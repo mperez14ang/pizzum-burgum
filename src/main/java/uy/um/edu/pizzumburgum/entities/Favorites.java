@@ -25,7 +25,12 @@ public class Favorites {
     @ToString.Exclude
     private Client client;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "favorites_creation",
+        joinColumns = @JoinColumn(name = "favorites_id"),
+        inverseJoinColumns = @JoinColumn(name = "creation_id")
+    )
     private Set<Creation> creations;
 
     @PrePersist

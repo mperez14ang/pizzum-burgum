@@ -55,6 +55,10 @@ public class SecurityConfig {
                         // Users endpoints
                         .requestMatchers("/api/users/**").hasAnyRole(CLIENT, ADMIN)
 
+                        // Favorites endpoints
+                        .requestMatchers("/api/favorites/my").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers("/api/favorites/**").hasAnyRole(CLIENT, ADMIN)
+
                         // Deny any other request
                         .anyRequest().authenticated()
                 )
@@ -79,14 +83,15 @@ public class SecurityConfig {
         return provider;
     }
 
-    /** Permitir acceso desde React **/
+    /** Permitir acceso desde React (Vite en desarrollo usa puerto 5173) **/
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3001"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3001", "http://localhost:5173"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
+        configuration.setExposedHeaders(List.of("Authorization"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

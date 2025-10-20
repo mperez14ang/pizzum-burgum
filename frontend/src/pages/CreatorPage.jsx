@@ -1,14 +1,22 @@
 
 import { useState, useEffect } from 'react';
-import { ChevronLeft, Plus, Minus, ShoppingCart } from 'lucide-react';
+import { ChevronLeft, Plus, Minus, ShoppingCart, Heart, X, Check } from 'lucide-react';
 import { Header } from '../components/common/Header';
 import { Accordion } from '../components/common/Accordion';
 import { QuantitySelector } from '../components/common/QuantitySelector';
 import { useCreatorStore } from '../contexts/CreatorContext';
+import { useFavorites } from '../contexts/FavoritesContext';
+import { useAuth } from '../contexts/AuthContext';
 import { ingredientsService } from '../services/api';
 
 export const CreatorPage = ({ productType, onBack }) => {
     const { creation, updateCreation, resetCreation } = useCreatorStore();
+    const { addToFavorites, isLoading: favoritesLoading, isAuthenticated } = useFavorites();
+    const { login } = useAuth();
+
+    const [favoriteName, setFavoriteName] = useState('');
+    const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+    const [isSavingFavorite, setIsSavingFavorite] = useState(false);
 
 
     const images = {
@@ -163,31 +171,80 @@ export const CreatorPage = ({ productType, onBack }) => {
         }
     };
 
-    // Guardar creación
-    const handleSaveCreation = () => {
+    // Guardar creación en favoritos
+    const handleSaveFavorite = async () => {
+        // Validar autenticación
+        if (!isAuthenticated) {
+            setShowLoginPrompt(true);
+            return;
+        }
+
+        // Validar que haya al menos un ingrediente seleccionado
+        const hasSelection = productType === 'pizza'
+            ? selectedSize || selectedDough || selectedSauce || selectedCheese || selectedToppings.length > 0
+            : selectedBread || selectedMeat || selectedBurgerCheese || selectedBurgerToppings.length > 0;
+
+        if (!hasSelection) {
+            alert('Selecciona al menos un ingrediente para guardar en favoritos');
+            return;
+        }
+
+        // Validar que haya un nombre
+        if (!favoriteName.trim()) {
+            alert('Por favor ingresa un nombre para tu favorito');
+            return;
+        }
+
+        setIsSavingFavorite(true);
+
         const creationData = productType === 'pizza' ? {
-            type: 'pizza',
+            name: favoriteName.trim(),
+            type: 'PIZZA',
+            price: calculateTotal(),
             size: selectedSize,
             dough: selectedDough,
             sauce: selectedSauce,
             cheese: selectedCheese,
-            toppings: selectedToppings,
-            total: calculateTotal()
+            toppings: selectedToppings
         } : {
-            type: 'burger',
+            name: favoriteName.trim(),
+            type: 'HAMBURGER',
+            price: calculateTotal(),
             bread: selectedBread,
             meat: selectedMeat,
             meatQuantity: meatQuantity,
             cheese: selectedBurgerCheese,
             toppings: selectedBurgerToppings,
-            sauces: selectedBurgerSauces,
-            total: calculateTotal()
+            sauces: selectedBurgerSauces
         };
 
-        console.log('Creación guardada:', creationData);
-        alert('¡Creación guardada en favoritos!');
-    };
+        console.log('Guardando creación:', creationData);
 
+        const result = await addToFavorites(creationData);
+
+        setIsSavingFavorite(false);
+
+        if (result.success) {
+            setFavoriteName('');
+            alert('¡Creación guardada en favoritos!');
+        } else {
+            if (result.needsAuth) {
+                setShowLoginPrompt(true);
+            } else {
+                alert('Error al guardar en favoritos: ' + (result.error || 'Intenta de nuevo'));
+            }
+        }
+    };
+//Login Forzado
+    // Login rápido de prueba
+    const handleQuickLogin = async () => {
+        const result = await login('usuario1@gmail.com', '12345678');
+        if (result.success) {
+            setShowLoginPrompt(false);
+            alert('¡Sesión iniciada correctamente!');
+        }
+    };
+//
     // Agregar al carrito
     const handleAddToCart = () => {
         const creationData = productType === 'pizza' ? {
@@ -657,17 +714,87 @@ export const CreatorPage = ({ productType, onBack }) => {
                                     Agregar al Carrito
                                 </button>
 
-                                <button
-                                    onClick={handleSaveCreation}
-                                    className="w-full border-2 border-orange-500 text-orange-500 py-3 rounded-lg hover:bg-orange-50 transition"
-                                >
-                                    Guardar en Favoritos
-                                </button>
+                                {/* Input para nombrar favorito con botón de corazón */}
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={favoriteName}
+                                        onChange={(e) => setFavoriteName(e.target.value)}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter' && favoriteName.trim()) {
+                                                handleSaveFavorite();
+                                            }
+                                        }}
+                                        placeholder={productType === 'pizza' ? 'Ej: Mi Pizza Suprema' : 'Ej: Mi Burger Especial'}
+                                        className="w-full pl-4 pr-14 py-3 border-2 border-orange-500 rounded-lg focus:outline-none focus:border-orange-600 transition text-gray-700 placeholder-gray-400"
+                                        maxLength={50}
+                                    />
+                                    <button
+                                        onClick={handleSaveFavorite}
+                                        disabled={!favoriteName.trim() || isSavingFavorite}
+                                        className={`
+                                            absolute right-2 top-1/2 -translate-y-1/2
+                                            p-2 rounded-lg transition-all
+                                            ${favoriteName.trim() && !isSavingFavorite
+                                                ? 'bg-orange-500 text-white hover:bg-orange-600 hover:scale-110'
+                                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                            }
+                                        `}
+                                        title={!isAuthenticated ? 'Inicia sesión para guardar favoritos' : 'Presiona Enter o haz click aquí para guardar'}
+                                    >
+                                        {isSavingFavorite ? (
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                        ) : (
+                                            <Heart size={20} fill={favoriteName.trim() ? 'currentColor' : 'none'} />
+                                        )}
+                                    </button>
+                                </div>
+                                <p className="text-xs text-gray-500 text-center">
+                                    Escribe un nombre y presiona el ❤️ o Enter para guardar
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Modal de login prompt */}
+            {showLoginPrompt && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
+                        <div className="text-center mb-6">
+                            <div className="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                                <Heart className="text-orange-500" size={32} />
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                                Inicia sesión para guardar favoritos
+                            </h3>
+                            <p className="text-gray-600">
+                                Crea una cuenta o inicia sesión para guardar tus creaciones favoritas
+                            </p>
+                        </div>
+
+                        <div className="space-y-3">
+                            <button
+                                onClick={handleQuickLogin}
+                                className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition font-semibold"
+                            >
+                                Iniciar Sesión (Demo)
+                            </button>
+                            <button
+                                onClick={() => setShowLoginPrompt(false)}
+                                className="w-full border-2 border-gray-200 py-3 rounded-lg hover:bg-gray-50 transition"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+
+                        <p className="text-xs text-gray-500 text-center mt-4">
+                            Demo: Haz click en "Iniciar Sesión" para usar un usuario de prueba
+                        </p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

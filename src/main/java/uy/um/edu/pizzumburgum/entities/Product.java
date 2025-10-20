@@ -19,7 +19,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", unique = true, nullable = false)
     private String name;
 
     @Min(0)
@@ -27,7 +27,7 @@ public class Product {
     private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
+    @Column(name = "type", unique = true, nullable = false)
     private ProductType type;
 
     @Enumerated(EnumType.STRING)

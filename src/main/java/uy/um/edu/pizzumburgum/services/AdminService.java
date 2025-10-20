@@ -7,11 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.AdminCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.AdminUpdateRequest;
-import uy.um.edu.pizzumburgum.dto.response.AdminDtoResponse;
+import uy.um.edu.pizzumburgum.dto.response.AdminResponse;
 import uy.um.edu.pizzumburgum.entities.Admin;
 import uy.um.edu.pizzumburgum.mapper.AdminMapper;
 import uy.um.edu.pizzumburgum.repository.AdminRepository;
-import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.AdminServiceInt;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public class AdminService implements AdminServiceInt {
     AdminRepository adminRepository;
 
     @Override
-    public AdminDtoResponse createAdmin(AdminCreateRequest adminCreateRequest) {
+    public AdminResponse createAdmin(AdminCreateRequest adminCreateRequest) {
         Admin admin = AdminMapper.toAdmin(adminCreateRequest);
         admin.setCreatedBy(
                 adminRepository.findById(adminCreateRequest.getCreatedById())
@@ -36,17 +35,17 @@ public class AdminService implements AdminServiceInt {
     }
 
     @Override
-    public AdminDtoResponse getAdminByEmail(String email) {
+    public AdminResponse getAdminByEmail(String email) {
         return null;
     }
 
     @Override
-    public List<AdminDtoResponse> getAdmins() {
+    public List<AdminResponse> getAdmins() {
         return List.of();
     }
 
     @Override
-    public AdminDtoResponse updateAdmin(String adminEmail, AdminUpdateRequest adminUpdateRequest) {
+    public AdminResponse updateAdmin(String adminEmail, AdminUpdateRequest adminUpdateRequest) {
         return null;
     }
 

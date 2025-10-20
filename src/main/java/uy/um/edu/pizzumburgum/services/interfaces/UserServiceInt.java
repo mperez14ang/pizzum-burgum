@@ -3,18 +3,18 @@ package uy.um.edu.pizzumburgum.services.interfaces;
 import org.springframework.http.ResponseEntity;
 import uy.um.edu.pizzumburgum.dto.request.UserCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.UserUpdateRequest;
-import uy.um.edu.pizzumburgum.dto.response.UserDtoResponse;
+import uy.um.edu.pizzumburgum.dto.response.UserResponse;
 
 import java.util.List;
 
 public interface UserServiceInt {
-    UserDtoResponse createUser(UserCreateRequest userCreateRequest);
+    UserResponse createUser(UserCreateRequest userCreateRequest);
 
-    UserDtoResponse getUserByEmail(String email);
+    UserResponse getUserByEmail(String email);
 
-    List<UserDtoResponse> getUsers();
+    List<UserResponse> getUsers();
 
-    UserDtoResponse updateUser(UserUpdateRequest userUpdateRequest);
+    UserResponse updateUser(UserUpdateRequest userUpdateRequest);
 
     ResponseEntity<String> deleteUser(String email);
 }

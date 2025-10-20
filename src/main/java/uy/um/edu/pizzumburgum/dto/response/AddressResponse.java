@@ -1,4 +1,4 @@
-package uy.um.edu.pizzumburgum.dto.shared;
+package uy.um.edu.pizzumburgum.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddressDto {
+public class AddressResponse {
+    private Long id;
+
     private String street;
 
     private String city;

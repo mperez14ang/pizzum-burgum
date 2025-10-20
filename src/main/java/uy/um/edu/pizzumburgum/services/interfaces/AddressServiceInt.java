@@ -1,13 +1,14 @@
 package uy.um.edu.pizzumburgum.services.interfaces;
 
-import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
+import uy.um.edu.pizzumburgum.dto.request.AddressRequest;
+import uy.um.edu.pizzumburgum.dto.response.AddressResponse;
 
 public interface AddressServiceInt {
-    AddressDto createAddress(AddressDto addressDto, String clientEmail);
+    AddressResponse createAddress(AddressRequest addressRequest, String clientEmail);
 
-    AddressDto getAddress(Long addressId);
+    AddressResponse getAddress(Long addressId);
 
-    AddressDto updateAddress(Long id, AddressDto addressDto);
+    AddressResponse updateAddress(Long id, AddressResponse addressResponse);
 
     void deleteAddress(String clientEmail, Long addressId);
 }

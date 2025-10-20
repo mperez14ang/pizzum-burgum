@@ -1,8 +1,8 @@
 package uy.um.edu.pizzumburgum.mapper;
 
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
-import uy.um.edu.pizzumburgum.dto.response.ClientDtoResponse;
-import uy.um.edu.pizzumburgum.dto.shared.AddressDto;
+import uy.um.edu.pizzumburgum.dto.response.AddressResponse;
+import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
 import uy.um.edu.pizzumburgum.dto.shared.FavoritesDto;
 import uy.um.edu.pizzumburgum.entities.Client;
 
@@ -24,11 +24,11 @@ public class ClientMapper {
     }
 
     // Client Entity -> Client Response
-    public static ClientDtoResponse toClientResponse(Client client) {
-        Set<AddressDto> addressDtos = null;
+    public static ClientResponse toClientResponse(Client client) {
+        Set<AddressResponse> addressDtos = null;
         if (client.getAddresses() != null) {
             addressDtos = client.getAddresses().stream()
-                    .map(AddressMapper::toAddressDto)
+                    .map(AddressMapper::toAddressResponse)
                     .collect(Collectors.toSet());
         }
 
@@ -39,7 +39,7 @@ public class ClientMapper {
                     .collect(Collectors.toSet());
         }
 
-        return ClientDtoResponse.builder()
+        return ClientResponse.builder()
                 .email(client.getEmail())
                 .firstName(client.getFirstName())
                 .lastName(client.getLastName())

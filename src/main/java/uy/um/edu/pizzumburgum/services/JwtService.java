@@ -9,8 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import uy.um.edu.pizzumburgum.dto.response.ClientDtoResponse;
-import uy.um.edu.pizzumburgum.dto.response.UserDtoResponse;
+import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
 import uy.um.edu.pizzumburgum.entities.User;
 
 import java.security.Key;
@@ -44,8 +43,8 @@ public class JwtService {
         return generateToken(new HashMap<>(), user.getEmail());
     }
 
-    public String generateToken(ClientDtoResponse clientDtoResponse) {
-        return generateToken(new HashMap<>(), clientDtoResponse.getEmail());
+    public String generateToken(ClientResponse clientResponse) {
+        return generateToken(new HashMap<>(), clientResponse.getEmail());
     }
 
     public String generateToken(Map<String, Object> extraClaims, String id) {

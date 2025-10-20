@@ -55,6 +55,9 @@ public class SecurityConfig {
                         // Users endpoints
                         .requestMatchers("/api/users/**").hasAnyRole(CLIENT, ADMIN)
 
+                        // Order endpoints
+                        .requestMatchers("/api/order/**").hasAnyRole(CLIENT, ADMIN)
+
                         // Deny any other request
                         .anyRequest().authenticated()
                 )

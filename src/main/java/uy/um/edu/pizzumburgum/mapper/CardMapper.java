@@ -1,30 +1,38 @@
 package uy.um.edu.pizzumburgum.mapper;
 
-import uy.um.edu.pizzumburgum.dto.shared.CardDto;
+import com.stripe.model.PaymentMethod;
+import uy.um.edu.pizzumburgum.dto.response.CardResponse;
 import uy.um.edu.pizzumburgum.entities.Card;
+import uy.um.edu.pizzumburgum.entities.Client;
 
 public class CardMapper {
 
-    public static CardDto toCardDto(Card card) {
-        return CardDto.builder()
-                .id(card.getId())
-                .stripeId(card.getStripeId())
-                .brand(card.getBrand())
-                .last4Digits(card.getLast4Digits())
-                .expirationYear(card.getExpirationYear())
-                .expirationMonth(card.getExpirationMonth())
-                .clientId(card.getClient() != null ? card.getClient().getEmail() : null)
+    // From stripe's PaymentMethod -> Card
+    public static Card toCard(PaymentMethod paymentMethod, Client client) {
+        PaymentMethod.Card cardData = paymentMethod.getCard();
+
+        return Card.builder()
+                .brand(cardData.getBrand())
+                .stripeId(paymentMethod.getId())
+                .client(client)
+                .expirationMonth(cardData.getExpMonth())
+                .expirationYear(cardData.getExpYear())
+                .last4Digits(cardData.getLast4())
+                .country(cardData.getCountry())
+                .funding(cardData.getFunding())
+                .fingerprint(cardData.getFingerprint())
                 .build();
     }
 
-    public static Card toCard(CardDto cardDto) {
-        return Card.builder()
-                .id(cardDto.getId())
-                .stripeId(cardDto.getStripeId())
-                .brand(cardDto.getBrand())
-                .last4Digits(cardDto.getLast4Digits())
-                .expirationYear(cardDto.getExpirationYear())
-                .expirationMonth(cardDto.getExpirationMonth())
+    // From Card -> CardResponse
+    public static CardResponse toCardResponse(Card card) {
+        return CardResponse.builder()
+                .id(card.getId())
+                .brand(card.getBrand())
+                .protectedNumber(card.getCardProtectedNumber())
+                .expirationYear(card.getExpirationYear())
+                .expirationMonth(card.getExpirationMonth())
+                .clientId(card.getClient().getEmail())
                 .build();
     }
 }

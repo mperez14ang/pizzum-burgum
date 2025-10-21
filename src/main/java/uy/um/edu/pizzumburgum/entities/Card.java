@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -35,15 +36,34 @@ public class Card {
     @Min(0)
     @Max(9999)
     @Column(name = "exp_year", nullable = false)
-    private int expirationYear;
+    private long expirationYear;
 
     @Min(1)
     @Max(12)
     @Column(name = "exp_month", nullable = false)
-    private int expirationMonth;
+    private long expirationMonth;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Column(name = "fingerprint")
+    private String fingerprint;
+
+    @Column(name = "funding")
+    private String funding; // Credito, debito, prepaga
+
+    @Column(name = "country", length = 2)
+    private String country; // El codigo ISO
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "has_cards", nullable = false)
     private Client client;
+
+    public boolean isExpired() {
+        LocalDate now = LocalDate.now();
+        return now.getYear() > expirationYear ||
+                (now.getYear() == expirationYear && now.getMonthValue() > expirationMonth);
+    }
+
+    public String getCardProtectedNumber() {
+        return "**** **** **** " + stripeId;
+    }
 
 }

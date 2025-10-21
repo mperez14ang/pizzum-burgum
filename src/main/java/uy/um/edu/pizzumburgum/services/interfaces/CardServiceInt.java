@@ -1,18 +1,19 @@
 package uy.um.edu.pizzumburgum.services.interfaces;
 
+import com.stripe.model.PaymentMethod;
 import org.springframework.http.ResponseEntity;
-import uy.um.edu.pizzumburgum.dto.shared.CardDto;
+import uy.um.edu.pizzumburgum.dto.response.CardResponse;
 
 import java.util.List;
 
 public interface CardServiceInt {
-    CardDto createCard(CardDto cardDto);
+    CardResponse createCard(PaymentMethod paymentMethod, String clientId);
 
-    CardDto getCardById(Long id);
+    CardResponse getCardById(Long id);
 
-    List<CardDto> getCardsFromClient(String clientEmail);
+    List<CardResponse> getCardsFromClient(String clientEmail);
 
-    CardDto updateCard(Long id, CardDto cardDto);
+    CardResponse updateCard(Long id, PaymentMethod paymentMethod);
 
     ResponseEntity<String> deleteCard(Long id);
 }

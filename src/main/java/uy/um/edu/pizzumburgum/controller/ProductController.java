@@ -47,21 +47,50 @@ public class ProductController {
     }
     @GetMapping("/ingredients")
     public ResponseEntity<Map<String, List<ProductDto>>> getIngredientsGrouped() {
+        List<ProductDto> allProducts = productService.getAllProducts();
+
         Map<String, List<ProductDto>> ingredients = new HashMap<>();
 
-        // Ingredientes para Hamburguesa (ProductCategory.BURGER)
-        ingredients.put("BREAD_OPTIONS", productService.getProductsByType(ProductType.BREAD));
-        ingredients.put("MEAT_OPTIONS", productService.getProductsByType(ProductType.MEAT));
-        ingredients.put("BURGER_CHEESE", productService.getProductsByType(ProductType.BURGER_CHEESE));
-        ingredients.put("BURGER_TOPPINGS", productService.getProductsByType(ProductType.BURGER_TOPPINGS));
-        ingredients.put("BURGER_SAUCES", productService.getProductsByType(ProductType.SAUCE));
+        ingredients.put("BREAD_OPTIONS", allProducts.stream()
+                .filter(p -> p.getProductType().equals(ProductType.BREAD))
+                .toList());
 
-        // Ingredientes para Pizza (ProductCategory.PIZZA)
-        ingredients.put("PIZZA_DOUGH", productService.getProductsByType(ProductType.DOUGH));
-        ingredients.put("PIZZA_SIZES", productService.getProductsByType(ProductType.PIZZA_SIZE));
-        ingredients.put("PIZZA_SAUCE", productService.getProductsByType(ProductType.SAUCE));
-        ingredients.put("PIZZA_CHEESE", productService.getProductsByType(ProductType.PIZZA_CHEESE));
-        ingredients.put("PIZZA_TOPPINGS", productService.getProductsByType(ProductType.PIZZA_TOPPINGS));
+        ingredients.put("MEAT_OPTIONS", allProducts.stream()
+                .filter(p -> p.getProductType().equals(ProductType.MEAT))
+                .toList());
+
+        ingredients.put("BURGER_CHEESE", allProducts.stream()
+                .filter(p -> p.getProductType().equals(ProductType.BURGER_CHEESE))
+                .toList());
+
+        ingredients.put("BURGER_TOPPINGS", allProducts.stream()
+                .filter(p -> p.getProductType().equals(ProductType.BURGER_TOPPINGS))
+                .toList());
+
+        ingredients.put("BURGER_SAUCES", allProducts.stream()
+                .filter(p -> p.getProductType().equals(ProductType.SAUCE))
+                .toList());
+
+        ingredients.put("PIZZA_DOUGH", allProducts.stream()
+                .filter(p -> p.getProductType().equals(ProductType.DOUGH))
+                .toList());
+
+        ingredients.put("PIZZA_SIZES", allProducts.stream()
+                .filter(p -> p.getProductType().equals(ProductType.PIZZA_SIZE))
+                .toList());
+
+        ingredients.put("PIZZA_SAUCE", allProducts.stream()
+                .filter(p -> p.getProductType().equals(ProductType.SAUCE))
+                .toList());
+
+        ingredients.put("PIZZA_CHEESE", allProducts.stream()
+                .filter(p -> p.getProductType().equals(ProductType.PIZZA_CHEESE))
+                .toList());
+
+        ingredients.put("PIZZA_TOPPINGS", allProducts.stream()
+                .filter(p -> p.getProductType().equals(ProductType.PIZZA_TOPPINGS))
+                .toList());
+
 
         return ResponseEntity.ok(ingredients);
     }

@@ -6,6 +6,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
+    private static final Logger logger = LoggerFactory.getLogger(JwtService.class);
+
     private final String secretKey;
 
     @Value("${security.jwt.expiration-time}")
@@ -73,10 +77,10 @@ public class JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
 
-        System.out.println("--Token--");
-        System.out.println("Username del token: " + username);
-        System.out.println("Username del UserDetails: " + userDetails.getUsername());
-        System.out.println("Token expirado? " + isTokenExpired(token));
+        logger.debug("Username del token: {}", username);
+        logger.debug("Username del UserDetails: {}", userDetails.getUsername());
+        logger.debug("Token expirado: {}", isTokenExpired(token));
+        logger.debug("Fecha de expiracion: {}", extractExpiration(token));
 
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }

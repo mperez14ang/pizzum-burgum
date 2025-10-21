@@ -3,8 +3,10 @@ package uy.um.edu.pizzumburgum.services;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentMethod;
-import io.github.cdimascio.dotenv.Dotenv;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,18 +26,26 @@ import java.util.List;
 @Service
 public class CardService implements CardServiceInt {
 
-    @Autowired
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final CardRepository cardRepository;
 
     private final ClientRepository clientRepository;
 
-    String stripePrivateKey = Dotenv.load().get("PRIVATE_STRIPE_KEY");
+    @Value("${stripe.api.key}")
+    String stripePrivateKey;
+
+    @PostConstruct
+    public void init(){
+        if (stripePrivateKey != null) Stripe.apiKey = stripePrivateKey;
+        else{
+            logger.error("No se encontro PRIVATE_STRIPE_KEY, no se pueden realizar pagos");
+        }
+    }
 
     public CardService(CardRepository cardRepository, ClientRepository clientRepository) {
         this.cardRepository = cardRepository;
         this.clientRepository = clientRepository;
-        if (stripePrivateKey != null) Stripe.apiKey = stripePrivateKey;
-        else System.out.println("No se encontro PRIVATE_STRIPE_KEY, no se pueden realizar pagos");
     }
 
     @Override

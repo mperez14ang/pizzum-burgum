@@ -1,0 +1,30 @@
+package uy.um.edu.pizzumburgum.controller;
+
+import org.springframework.web.bind.annotation.*;
+import uy.um.edu.pizzumburgum.dto.request.CardRequest;
+import uy.um.edu.pizzumburgum.dto.response.CardResponse;
+import uy.um.edu.pizzumburgum.services.CardService;
+
+@RestController
+@RequestMapping("/api/card/v1")
+public class CardController {
+    private final CardService cardService;
+
+    public CardController(CardService cardService) {
+        this.cardService = cardService;
+    }
+
+    @PostMapping
+    public CardResponse createCard(@RequestBody CardRequest cardRequest) {
+        return this.cardService.createCard(cardRequest);
+    }
+
+    @GetMapping("{id}")
+    public CardResponse getCard(Long id) {
+        return this.cardService.getCardById(id);
+    }
+
+    public CardResponse updateCard(Long id, CardRequest cardRequest) {
+        return this.cardService.updateCard(id, cardRequest);
+    }
+}

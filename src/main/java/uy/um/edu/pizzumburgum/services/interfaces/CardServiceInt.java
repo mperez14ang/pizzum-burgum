@@ -1,18 +1,19 @@
 package uy.um.edu.pizzumburgum.services.interfaces;
 
 import org.springframework.http.ResponseEntity;
-import uy.um.edu.pizzumburgum.dto.shared.CardDto;
+import uy.um.edu.pizzumburgum.dto.request.CardRequest;
+import uy.um.edu.pizzumburgum.dto.response.CardResponse;
 
 import java.util.List;
 
 public interface CardServiceInt {
-    CardDto createCard(CardDto cardDto);
+    CardResponse createCard(CardRequest cardRequest);
 
-    CardDto getCardById(Long id);
+    CardResponse getCardById(Long id);
 
-    List<CardDto> getCardsFromClient(String clientEmail);
+    List<CardResponse> getCardsFromClient(String clientEmail);
 
-    CardDto updateCard(Long id, CardDto cardDto);
+    CardResponse updateCard(Long id, CardRequest cardRequest);
 
     ResponseEntity<String> deleteCard(Long id);
 }

@@ -1,7 +1,8 @@
 package uy.um.edu.pizzumburgum.configuration;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,8 @@ import java.time.LocalDate;
  * **/
 @Component
 public class AdminInitializer implements CommandLineRunner {
+    private static final Logger logger = LoggerFactory.getLogger(AdminInitializer.class);
+
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -37,11 +40,11 @@ public class AdminInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode(dotenv.get("ADMIN_PASSWORD")))
                     .build();
             adminRepository.save(admin);
-            System.out.println("Se creo un admin por defecto");
-            System.out.println("Nombre del admin: " + admin.getFirstName() + " " + admin.getLastName());
+            logger.debug("Se creo un admin por defecto");
+            logger.debug("Nombre del admin: {} {}", admin.getFirstName(), admin.getLastName());
         }
         else  {
-            System.out.println("Admin con correo " + adminEmail +" ya existe!");
+            logger.debug("Admin con correo {} ya existe!", adminEmail);
         }
     }
 }

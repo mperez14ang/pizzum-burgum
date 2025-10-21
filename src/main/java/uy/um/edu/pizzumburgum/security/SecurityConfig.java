@@ -64,6 +64,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/favorites/my").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers("/api/favorites/**").hasAnyRole(CLIENT, ADMIN)
 
+                        // Cards endpoints
+                        .requestMatchers("/api/card/**").hasAnyRole(CLIENT, ADMIN)
+
                         // Deny any other request
                         .anyRequest().authenticated()
                 )

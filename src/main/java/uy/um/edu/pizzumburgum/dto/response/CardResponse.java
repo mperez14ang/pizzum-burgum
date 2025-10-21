@@ -1,4 +1,4 @@
-package uy.um.edu.pizzumburgum.dto.shared;
+package uy.um.edu.pizzumburgum.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,19 +9,18 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CardDto {
-
+public class CardResponse {
     private Long id;
-
-    private String stripeId;
 
     private String brand;
 
-    private String last4Digits;
+    private String protectedNumber;
 
-    private int expirationYear;
+    private long expirationYear;
 
-    private int expirationMonth;
+    private long expirationMonth;
 
     private String clientId;
+
+    private boolean isDefault;
 }

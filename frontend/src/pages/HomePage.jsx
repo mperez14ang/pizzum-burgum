@@ -52,6 +52,11 @@ export const HomePage = ({ onNavigate }) => {
                         </div>
                     </div>
                 </div>
+                {/* Prueba tarjeta */}
+                <div
+                    onClick={() => onNavigate('card')}
+                    className="relative h-10 rounded-2xl overflow-hidden cursor-pointer group shadow-lg hover:shadow-2xl transition-all"
+                    >Card Prueba</div>
 
                 {/* Favorites Carousel - Dinámico desde el backend */}
                 <FavoritesCarousel />

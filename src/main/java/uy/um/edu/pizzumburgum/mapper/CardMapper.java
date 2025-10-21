@@ -33,6 +33,7 @@ public class CardMapper {
                 .expirationYear(card.getExpirationYear())
                 .expirationMonth(card.getExpirationMonth())
                 .clientId(card.getClient().getEmail())
+                .isDefault(card.isDefault())
                 .build();
     }
 }

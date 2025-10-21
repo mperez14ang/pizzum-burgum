@@ -52,6 +52,9 @@ public class Card {
     @Column(name = "country", length = 2)
     private String country; // El codigo ISO
 
+    @Column(name = "is_default")
+    private boolean isDefault = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "has_cards", nullable = false)
     private Client client;

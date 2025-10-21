@@ -21,4 +21,6 @@ public class CardResponse {
     private long expirationMonth;
 
     private String clientId;
+
+    private boolean isDefault;
 }

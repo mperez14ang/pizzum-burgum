@@ -36,6 +36,8 @@ public class SecurityConfig {
             HttpSecurity httpSecurity, AuthenticationProvider authenticationProvider,
             JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         return httpSecurity.authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         .requestMatchers("/api/login").permitAll()
 
                         .requestMatchers("/api/register").permitAll()
@@ -86,14 +88,15 @@ public class SecurityConfig {
         return provider;
     }
 
-    /** Permitir acceso desde React **/
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3001"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowCredentials(true);
-        configuration.addAllowedHeader("*");
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

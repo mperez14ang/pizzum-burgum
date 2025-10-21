@@ -161,8 +161,7 @@ export const FavoritesProvider = ({ children }) => {
             setIsLoading(true);
             setError(null);
 
-            const previousFavorites = [...favorites];
-            setFavorites(prev => prev.filter(id => id !== favoriteId));
+            console.log('🗑️ Intentando eliminar favorito con ID:', favoriteId); // 🔍 DEBUG
 
             const basicAuth = btoa(`${user.email}:${user.password}`);
 
@@ -175,14 +174,18 @@ export const FavoritesProvider = ({ children }) => {
                 credentials: 'include'
             });
 
+            console.log('📡 Respuesta del servidor:', response.status); // 🔍 DEBUG
+
             if (!response.ok) {
-                setFavorites(previousFavorites);
                 throw new Error('Error al eliminar de favoritos');
             }
 
+            // ✅ Recargar favoritos del backend después de eliminar
+            await loadFavorites();
+
             return { success: true };
         } catch (err) {
-            console.error('Error removing from favorites:', err);
+            console.error('❌ Error removing from favorites:', err);
             setError(err.message);
             return { success: false, error: err.message };
         } finally {

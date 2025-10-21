@@ -30,26 +30,39 @@ export const FavoritesCarousel = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Cargar favoritos cuando cambian
     useEffect(() => {
         if (favorites && favorites.length > 0) {
             console.log('Favoritos recibidos del backend:', favorites);
-            // Procesar los favoritos del backend
-            const processedFavorites = favorites.flatMap(fav => {
-                console.log('Procesando favorito:', fav);
-                return (fav.creations || []).map(creation => ({
-                    favoriteId: fav.id, // ID del favorito para poder eliminarlo
-                    id: creation.id, // ID de la creación
-                    name: creation.name || 'Sin nombre',
-                    type: creation.type,
-                    price: creation.price || 0,
-                    image: creation.type === 'PIZZA'
+
+            const processedFavorites = favorites.map(fav => {
+                console.log('Procesando favorito completo:', JSON.stringify(fav, null, 2)); // 🔍 VER TODO
+
+                const firstCreation = fav.creations && fav.creations.length > 0
+                    ? fav.creations[0]
+                    : null;
+
+                if (!firstCreation) return null;
+
+                const totalPrice = fav.creations.reduce((sum, creation) => sum + (creation.price || 0), 0);
+
+                const processed = {
+                    favoriteId: fav.id,
+                    id: firstCreation.id,
+                    name: firstCreation.name || 'Sin nombre',
+                    type: firstCreation.type,
+                    price: totalPrice,
+                    image: firstCreation.type === 'PIZZA'
                         ? 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop'
                         : 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop',
-                    description: `${creation.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'} personalizada`
-                }));
-            });
-            console.log('Favoritos procesados:', processedFavorites);
+                    description: `${firstCreation.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'} personalizada`,
+                    creationCount: fav.creations.length
+                };
+
+                console.log('Favorito procesado:', processed); // 🔍 VER EL PROCESADO
+                return processed;
+            }).filter(Boolean);
+
+            console.log('Favoritos procesados (final):', processedFavorites);
             setFavoritesData(processedFavorites);
         } else {
             setFavoritesData([]);
@@ -68,10 +81,15 @@ export const FavoritesCarousel = () => {
     };
 
     const handleRemove = async (favoriteId) => {
+        console.log('🗑️ handleRemove llamado con favoriteId:', favoriteId); // 🔍 DEBUG
+
         if (confirm('¿Eliminar este favorito?')) {
             const result = await removeFromFavorites(favoriteId);
             if (result.success) {
-                setFavoritesData(favoritesData.filter(fav => fav.favoriteId !== favoriteId));
+                console.log('✅ Favorito eliminado exitosamente');
+                // Ya no necesitas actualizar manualmente porque loadFavorites() se encarga
+            } else {
+                alert('Error al eliminar: ' + (result.error || 'Intenta de nuevo'));
             }
         }
     };

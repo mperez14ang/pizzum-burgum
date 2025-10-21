@@ -1,5 +1,7 @@
 import { Header } from '../components/common/Header';
 import { FavoritesCarousel } from '../components/FavoritesCarousel';
+import burgerImg from '../assets/burger.jpg';
+import pizzaImg from '../assets/pizza.jpg';
 
 export const HomePage = ({ onNavigate }) => {
 
@@ -25,7 +27,7 @@ export const HomePage = ({ onNavigate }) => {
                     >
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
                         <img
-                            src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop"
+                            src={burgerImg}
                             alt="Hamburger"
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
@@ -42,7 +44,7 @@ export const HomePage = ({ onNavigate }) => {
                     >
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
                         <img
-                            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&h=600&fit=crop"
+                            src={pizzaImg}
                             alt="Pizza"
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />

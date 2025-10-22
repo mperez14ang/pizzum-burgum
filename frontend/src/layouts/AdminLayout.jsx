@@ -41,9 +41,11 @@ export const AdminLayout = ({ children, currentSection, onSectionChange }) => {
 
             <div className="flex">
                 {/* Sidebar */}
-                <aside className={`fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out ${
-                    isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-                } mt-[57px] lg:mt-0`}>
+                <aside
+                    className={`fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out ${
+                        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+                    } h-[calc(100vh-57px)] lg:h-screen mt-[57px] lg:mt-0`}
+                >
                     <nav className="p-4 space-y-2">
                         {menuItems.map((item) => {
                             const Icon = item.icon;

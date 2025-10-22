@@ -1,5 +1,6 @@
-package uy.um.edu.pizzumburgum.dto.response;
+package uy.um.edu.pizzumburgum.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,14 +8,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponse {
+@NoArgsConstructor
+public class TokenRequest {
+    @NotBlank
     private String token;
-
-    private String email;
-
-    private String type;
-
-    private String message;
 }

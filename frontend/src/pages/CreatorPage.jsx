@@ -220,29 +220,29 @@ export const CreatorPage = ({ productType, onBack }) => {
 
         console.log('Guardando creación:', creationData);
 
-        const result = await addToFavorites(creationData);
+        if (isAuthenticated){
+            const result = await addToFavorites(creationData);
 
-        setIsSavingFavorite(false);
+            setIsSavingFavorite(false);
 
-        if (result.success) {
-            setFavoriteName('');
-            alert('¡Creación guardada en favoritos!');
-        } else {
-            if (result.needsAuth) {
-                setShowLoginPrompt(true);
+            if (result.success) {
+                setFavoriteName('');
+                alert('¡Creación guardada en favoritos!');
             } else {
-                alert('Error al guardar en favoritos: ' + (result.error || 'Intenta de nuevo'));
+                if (result.needsAuth) {
+                    setShowLoginPrompt(true);
+                } else {
+                    alert('Error al guardar en favoritos: ' + (result.error || 'Intenta de nuevo'));
+                }
             }
         }
+
+
     };
 //Login Forzado
     // Login rápido de prueba
     const handleQuickLogin = async () => {
-        const result = await login('usuario1@gmail.com', '12345678');
-        if (result.success) {
-            setShowLoginPrompt(false);
-            alert('¡Sesión iniciada correctamente!');
-        }
+
     };
 //
     // Agregar al carrito
@@ -779,7 +779,7 @@ export const CreatorPage = ({ productType, onBack }) => {
                                 onClick={handleQuickLogin}
                                 className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition font-semibold"
                             >
-                                Iniciar Sesión (Demo)
+                                Iniciar Sesión
                             </button>
                             <button
                                 onClick={() => setShowLoginPrompt(false)}
@@ -790,7 +790,7 @@ export const CreatorPage = ({ productType, onBack }) => {
                         </div>
 
                         <p className="text-xs text-gray-500 text-center mt-4">
-                            Demo: Haz click en "Iniciar Sesión" para usar un usuario de prueba
+                            Iniciar Sesión
                         </p>
                     </div>
                 </div>

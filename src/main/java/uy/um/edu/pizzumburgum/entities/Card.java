@@ -66,7 +66,7 @@ public class Card {
     }
 
     public String getCardProtectedNumber() {
-        return "**** **** **** " + stripeId;
+        return "**** **** **** " + last4Digits;
     }
 
 }

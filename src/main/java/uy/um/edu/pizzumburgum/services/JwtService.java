@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,20 +78,39 @@ public class JwtService {
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
 
-        logger.debug("Username del token: {}", username);
-        logger.debug("Username del UserDetails: {}", userDetails.getUsername());
-        logger.debug("Token expirado: {}", isTokenExpired(token));
-        logger.debug("Fecha de expiracion: {}", extractExpiration(token));
+        logger.info("Username del token: {}", username);
+        logger.info("Username del UserDetails: {}", userDetails.getUsername());
+        logger.info("Token expirado: {}", isTokenExpired(token));
+        logger.info("Fecha de expiracion: {}", extractExpiration(token));
 
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    public boolean isTokenExpired(String token) {
+        try {
+            Date expiration = extractExpiration(token);
+            if (expiration == null)return true;
+            return expiration.before(new Date());
+        } catch (Exception e) {
+            return true;
+        }
     }
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    public Date extractExpiration(String token) {
+        try {
+            return extractClaim(token, Claims::getExpiration);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Date extractEmisionDate(String token) {
+        try {
+            return extractClaim(token, Claims::getIssuedAt);
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 
     private Claims extractAllClaims(String token) {

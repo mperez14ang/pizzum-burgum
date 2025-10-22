@@ -2,12 +2,15 @@ import { Header } from '../components/common/Header';
 import { FavoritesCarousel } from '../components/FavoritesCarousel';
 import burgerImg from '../assets/burger.jpg';
 import pizzaImg from '../assets/pizza.jpg';
+import {useCreatorStore} from "../contexts/creatorcontext.jsx";
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 export const HomePage = ({ onNavigate }) => {
+    const { logout } = useAuth();
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header />
+            <Header onNavigate={onNavigate}/>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="text-center mb-12">
@@ -60,8 +63,26 @@ export const HomePage = ({ onNavigate }) => {
                     className="relative h-10 rounded-2xl overflow-hidden cursor-pointer group shadow-lg hover:shadow-2xl transition-all"
                     >Card Prueba</div>
 
+                {/* Prueba login */}
+                <div
+                    onClick={() => onNavigate('login')}
+                    className="relative h-10 rounded-2xl overflow-hidden cursor-pointer group shadow-lg hover:shadow-2xl transition-all"
+                >Login</div>
+
+                {/* Prueba register */}
+                <div
+                    onClick={() => onNavigate('register')}
+                    className="relative h-10 rounded-2xl overflow-hidden cursor-pointer group shadow-lg hover:shadow-2xl transition-all"
+                >Register</div>
+
+                {/* Prueba logout */}
+                <div
+                    onClick={() => logout()}
+                    className="relative h-10 rounded-2xl overflow-hidden cursor-pointer group shadow-lg hover:shadow-2xl transition-all"
+                >Logout</div>
+
                 {/* Favorites Carousel - Dinámico desde el backend */}
-                <FavoritesCarousel />
+                <FavoritesCarousel onNavigate={onNavigate}/>
             </main>
         </div>
     );

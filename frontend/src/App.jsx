@@ -6,6 +6,7 @@ import { HomePage } from './pages/HomePage';
 import { CreatorPage } from './pages/CreatorPage';
 import { CardPage } from "./pages/CardPage";
 import {CardProvider} from "./contexts/CardContext.jsx";
+import {AuthPage} from "./pages/AuthPage.jsx";
 
 function App() {
     const [currentPage, setCurrentPage] = useState('home');
@@ -14,6 +15,14 @@ function App() {
     const handleNavigate = (type) => {
         if (type === 'card'){
             setCurrentPage('card');
+            return;
+        }
+        if (type === 'login'){
+            setCurrentPage('login');
+            return;
+        }
+        if (type === 'register'){
+            setCurrentPage('register');
             return;
         }
 
@@ -33,6 +42,12 @@ function App() {
                     <CardPage onBack={handleBack}/>
                 )}
             </CardProvider>
+            {(currentPage === 'login') && (
+                <AuthPage type={'login'} onBack={handleBack} onNavigate={handleNavigate} ></AuthPage>
+                )}
+            {(currentPage === 'register') && (
+                <AuthPage type={'register'} onBack={handleBack} onNavigate={handleNavigate} ></AuthPage>
+            )}
 
             <FavoritesProvider>
                 <CreatorProvider>

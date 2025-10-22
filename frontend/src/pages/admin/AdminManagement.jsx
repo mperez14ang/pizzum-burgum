@@ -34,7 +34,7 @@ export const AdminManagement = () => {
             const data = await adminService.getAllAdmins();
             setAdmins(data);
         } catch (error) {
-            toast.error('Error al cargar administradores');
+            toast.error('Error al cargar administradores', { duration: 2000 });
             console.error(error);
         } finally {
             setLoading(false);
@@ -114,11 +114,11 @@ export const AdminManagement = () => {
             };
 
             await adminService.createAdmin(payload);
-            toast.success('Administrador creado correctamente');
+            toast.success('Administrador creado correctamente', { duration: 2000 });
             setIsFormModalOpen(false);
             loadAdmins();
         } catch (error) {
-            toast.error('Error al crear administrador. El email o DNI ya podrían estar registrados.');
+            toast.error('Error al crear administrador. El email o DNI ya podrían estar registrados.', { duration: 2000 });
             console.error(error);
         } finally {
             setSubmitting(false);

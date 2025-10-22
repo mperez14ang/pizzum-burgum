@@ -90,14 +90,14 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                 console.log('✅ Favorito eliminado exitosamente');
                 // Ya no necesitas actualizar manualmente porque loadFavorites() se encarga
             } else {
-                toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'));
+                toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'), { duration: 2000 });
             }
         }
     };
 
     const handleAddToCart = (favorite) => {
         console.log('Agregando al carrito:', favorite);
-        toast.success(`${favorite.name} agregado al carrito`)
+        toast.success(`${favorite.name} agregado al carrito`, { duration: 2000 })
     };
 
     // Si el usuario no está autenticado, mostrar prompt de login

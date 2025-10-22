@@ -132,7 +132,7 @@ export const CreatorPage = ({ productType, onBack }) => {
             if (selectedToppings.length < MAX_TOPPINGS) {
                 setSelectedToppings([...selectedToppings, topping]);
             } else {
-                toast.error("Puedes seleccionar hasta ${MAX_TOPPINGS} toppings")
+                toast.error("Puedes seleccionar hasta ${MAX_TOPPINGS} toppings", { duration: 2000 })
             }
         }
     };
@@ -187,13 +187,13 @@ export const CreatorPage = ({ productType, onBack }) => {
             : selectedBread || selectedMeat || selectedBurgerCheese || selectedBurgerToppings.length > 0;
 
         if (!hasSelection) {
-            toast.error("Selecciona al menos un ingrediente para guardar en favoritos")
+            toast.error("Selecciona al menos un ingrediente para guardar en favoritos", { duration: 2000 })
             return;
         }
 
         // Validar que haya un nombre
         if (!favoriteName.trim()) {
-            toast.error('Por favor ingresa un nombre para tu favorito')
+            toast.error('Por favor ingresa un nombre para tu favorito', { duration: 2000 })
             return;
         }
 
@@ -229,9 +229,9 @@ export const CreatorPage = ({ productType, onBack }) => {
 
             if (result.success) {
                 setFavoriteName('');
-                toast.success('¡Creación guardada en favoritos!')
+                toast.success('¡Creación guardada en favoritos!', { duration: 2000 })
             } else {
-                toast.error('Error al guardar en favoritos: ' + (result.error || 'Intenta de nuevo'))
+                toast.error('Error al guardar en favoritos: ' + (result.error || 'Intenta de nuevo'), { duration: 2000 })
             }
         }
 
@@ -265,7 +265,7 @@ export const CreatorPage = ({ productType, onBack }) => {
         };
 
         console.log('Agregado al carrito:', creationData);
-        toast.success('¡Agregado al carrito!')
+        toast.success('¡Agregado al carrito!', { duration: 2000 })
     };
 
     // Estados de carga y error

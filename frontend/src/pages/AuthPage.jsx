@@ -105,17 +105,17 @@ export const AuthPage = ({type, onToggleAuthType}) => {
             if (!response.success) {
                 let errorLog = response.error;
                 if (errorLog == null) errorLog = "Error desconocido"
-                toast.error(errorLog);
+                toast.error(errorLog, { duration: 2000 });
                 setIsLoading(false);
                 return;
             }
 
             if (response && response.token) {
                 if (isRegister){
-                    toast.success('Registro de usuario exitoso');
+                    toast.success('Registro de usuario exitoso', { duration: 2000 });
                 }
                 else{
-                    toast.success('Inicio de sesión exitoso');
+                    toast.success('Inicio de sesión exitoso', { duration: 2000 });
                 }
                 setIsLoading(false);
             }
@@ -129,7 +129,7 @@ export const AuthPage = ({type, onToggleAuthType}) => {
 
     return (
         <div>
-            <form className="flex flex-col gap-6">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                         {isRegister && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <InputField
@@ -195,8 +195,7 @@ export const AuthPage = ({type, onToggleAuthType}) => {
                         )}
 
                 <button
-                    type="button"
-                    onClick={handleSubmit}
+                    type="submit"
                     disabled={isLoading}
                     className={`w-full px-8 py-3 text-base rounded-lg transition-colors flex items-center justify-center ${
                         isLoading

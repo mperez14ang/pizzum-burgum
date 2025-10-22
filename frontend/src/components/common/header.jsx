@@ -19,7 +19,7 @@ export const Header = forwardRef((props, ref) => {
 
     const handleLogout = () => {
         logout();
-        toast.success('Sesión cerrada');
+        toast.success('Sesión cerrada', { duration: 2000 });
     };
 
     const handleOpenLogin = () => {

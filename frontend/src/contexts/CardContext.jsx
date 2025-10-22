@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import toast from "react-hot-toast";
 
 const CardContext = createContext();
 
@@ -72,6 +73,7 @@ export const CardProvider = ({ children }) => {
             });
 
             if (response.ok) {
+                toast.success("La tarjeta se guardo con exito")
                 setSuccess(true);
                 setCardholderName('');
                 setEmail('');

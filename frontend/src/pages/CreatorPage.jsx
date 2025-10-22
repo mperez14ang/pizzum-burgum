@@ -8,11 +8,12 @@ import { useCreatorStore } from '../contexts/CreatorContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { ingredientsService } from '../services/api';
+import toast from "react-hot-toast";
 
 export const CreatorPage = ({ productType, onBack }) => {
     const { creation, updateCreation, resetCreation } = useCreatorStore();
-    const { addToFavorites, isLoading: favoritesLoading, isAuthenticated } = useFavorites();
-    const { login } = useAuth();
+    const { addToFavorites, isLoading: favoritesLoading } = useFavorites();
+    const { login, isAuthenticated } = useAuth();
 
     const [favoriteName, setFavoriteName] = useState('');
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
@@ -131,7 +132,7 @@ export const CreatorPage = ({ productType, onBack }) => {
             if (selectedToppings.length < MAX_TOPPINGS) {
                 setSelectedToppings([...selectedToppings, topping]);
             } else {
-                alert(`Puedes seleccionar hasta ${MAX_TOPPINGS} toppings`);
+                toast.error("Puedes seleccionar hasta ${MAX_TOPPINGS} toppings")
             }
         }
     };
@@ -174,6 +175,7 @@ export const CreatorPage = ({ productType, onBack }) => {
     // Guardar creación en favoritos
     const handleSaveFavorite = async () => {
         // Validar autenticación
+        console.log(isAuthenticated)
         if (!isAuthenticated) {
             setShowLoginPrompt(true);
             return;
@@ -185,13 +187,13 @@ export const CreatorPage = ({ productType, onBack }) => {
             : selectedBread || selectedMeat || selectedBurgerCheese || selectedBurgerToppings.length > 0;
 
         if (!hasSelection) {
-            alert('Selecciona al menos un ingrediente para guardar en favoritos');
+            toast.error("Selecciona al menos un ingrediente para guardar en favoritos")
             return;
         }
 
         // Validar que haya un nombre
         if (!favoriteName.trim()) {
-            alert('Por favor ingresa un nombre para tu favorito');
+            toast.error('Por favor ingresa un nombre para tu favorito')
             return;
         }
 
@@ -227,13 +229,9 @@ export const CreatorPage = ({ productType, onBack }) => {
 
             if (result.success) {
                 setFavoriteName('');
-                alert('¡Creación guardada en favoritos!');
+                toast.success('¡Creación guardada en favoritos!')
             } else {
-                if (result.needsAuth) {
-                    setShowLoginPrompt(true);
-                } else {
-                    alert('Error al guardar en favoritos: ' + (result.error || 'Intenta de nuevo'));
-                }
+                toast.error('Error al guardar en favoritos: ' + (result.error || 'Intenta de nuevo'))
             }
         }
 
@@ -267,7 +265,7 @@ export const CreatorPage = ({ productType, onBack }) => {
         };
 
         console.log('Agregado al carrito:', creationData);
-        alert('¡Agregado al carrito!');
+        toast.success('¡Agregado al carrito!')
     };
 
     // Estados de carga y error

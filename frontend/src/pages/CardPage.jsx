@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { AlertCircle, CreditCard, Check, Loader2, ChevronLeft } from 'lucide-react';
 import { useCard } from '../contexts/CardContext.jsx';
+import toast from "react-hot-toast";
 
 export const CardPage = ({ onBack }) => {
     const {
@@ -39,7 +40,9 @@ export const CardPage = ({ onBack }) => {
         setCardElement(card);
 
         card.on('change', (event) => {
-            if (event.error) console.error(event.error.message);
+            if (event.error) {
+                toast.error(event.error.message)
+            }
         });
 
         return () => card.destroy();

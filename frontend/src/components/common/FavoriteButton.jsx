@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Heart } from 'lucide-react';
 import { useFavorites } from '../../contexts/FavoritesContext';
+import toast from "react-hot-toast";
 
 
 export const FavoriteButton = ({ creationData, size = 'md', className = '' }) => {
@@ -26,7 +27,7 @@ export const FavoriteButton = ({ creationData, size = 'md', className = '' }) =>
         e.stopPropagation();
 
         if (!creationData) {
-            alert('Debes crear una pizza o hamburguesa primero');
+            toast.error("Debes crear una pizza o hamburguesa primero")
             return;
         }
 
@@ -38,7 +39,7 @@ export const FavoriteButton = ({ creationData, size = 'md', className = '' }) =>
         if (result.success) {
             setTimeout(() => setIsAnimating(false), 300);
         } else {
-            alert(result.error || 'Error al actualizar favoritos');
+            toast.error(result.error || 'Error al actualizar favoritos')
             setIsAnimating(false);
         }
 

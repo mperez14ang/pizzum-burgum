@@ -63,7 +63,7 @@ public class FavoritesController {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
+        System.out.println(authentication.getPrincipal());
         String userEmail = authentication.getName();
         return ResponseEntity.ok(favoritesService.getFavoritesByClientEmail(userEmail));
     }

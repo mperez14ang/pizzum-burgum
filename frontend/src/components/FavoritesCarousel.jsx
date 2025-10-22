@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Heart, ShoppingCart, Trash2, LogIn } from 'lucide-react';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
+import toast from "react-hot-toast";
 
 export const FavoritesCarousel = ( { onNavigate } ) => {
     const { favorites, loadFavorites, removeFromFavorites, isLoading } = useFavorites();
@@ -89,14 +90,14 @@ export const FavoritesCarousel = ( { onNavigate } ) => {
                 console.log('✅ Favorito eliminado exitosamente');
                 // Ya no necesitas actualizar manualmente porque loadFavorites() se encarga
             } else {
-                alert('Error al eliminar: ' + (result.error || 'Intenta de nuevo'));
+                toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'));
             }
         }
     };
 
     const handleAddToCart = (favorite) => {
         console.log('Agregando al carrito:', favorite);
-        alert(`${favorite.name} agregado al carrito`);
+        toast.success(`${favorite.name} agregado al carrito`)
     };
 
     // Si el usuario no está autenticado, mostrar prompt de login

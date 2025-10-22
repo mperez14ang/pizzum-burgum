@@ -111,4 +111,14 @@ public class OrderByService implements OrderByInt {
 
         return ResponseEntity.ok(body);
     }
+
+    public OrderByResponse updateOrderState(Long id, OrderState state) {
+        OrderBy orderBy = orderByRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Orden " + id + " no encontrada"));
+
+        orderBy.setState(state);
+        orderByRepository.save(orderBy);
+
+        return OrderByMapper.toOrderByDto(orderBy);
+    }
 }

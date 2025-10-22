@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CreatorProvider } from './contexts/CreatorContext';
 import { FavoritesProvider } from './contexts/FavoritesContext';
 import { HomePage } from './pages/HomePage';
 import { CreatorPage } from './pages/CreatorPage';
+import { AdminPage } from './pages/admin/AdminPage';
 import { CardPage } from "./pages/CardPage";
-import {CardProvider} from "./contexts/CardContext.jsx";
+import { CardProvider } from "./contexts/CardContext.jsx";
 
-function App() {
+function AppContent() {
+    const { user, isAuthenticated } = useAuth();
     const [currentPage, setCurrentPage] = useState('home');
     const [productType, setProductType] = useState(null);
 
@@ -26,23 +28,33 @@ function App() {
         setProductType(null);
     };
 
-    return (
-        <AuthProvider>
-            <CardProvider>
-                {(currentPage === 'card') && (
-                    <CardPage onBack={handleBack}/>
-                )}
-            </CardProvider>
+    // Si el usuario es ADMIN, mostrar panel de admin
+    if (isAuthenticated && user?.role === 'ADMIN') {
+        return <AdminPage />;
+    }
 
+    // Para clientes o usuarios no autenticados, mantener funcionalidad original
+    return (
+        <CardProvider>
             <FavoritesProvider>
                 <CreatorProvider>
                     {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
-                    {(currentPage === 'creator') && (
+                    {currentPage === 'creator' && (
                         <CreatorPage productType={productType} onBack={handleBack} />
+                    )}
+                    {currentPage === 'card' && (
+                        <CardPage onBack={handleBack}/>
                     )}
                 </CreatorProvider>
             </FavoritesProvider>
+        </CardProvider>
+    );
+}
 
+function App() {
+    return (
+        <AuthProvider>
+            <AppContent />
         </AuthProvider>
     );
 }

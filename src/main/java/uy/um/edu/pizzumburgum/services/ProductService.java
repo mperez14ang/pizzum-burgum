@@ -32,13 +32,31 @@ public class ProductService implements ProductServiceInt {
     @Transactional
     @Override
     public ProductDto createProduct(ProductDto productDto) {
-        Product product = ProductMapper.toProduct(productDto);
+        // Validar que el tipo sea compatible con la categoría
+        if (productDto.getProductType() != null &&
+            productDto.getProductCategory() != null &&
+            productDto.getProductType().getCategory() != productDto.getProductCategory()) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "El tipo '" + productDto.getProductType() + "' no es compatible con la categoría '" + productDto.getProductCategory() + "'"
+            );
+        }
 
+        System.out.println("=== CREANDO PRODUCTO ===");
+        System.out.println("DTO recibido: " + productDto);
+
+        Product product = ProductMapper.toProduct(productDto);
+        System.out.println("Producto mapeado: " + product);
 
         product.setCreations(new HashSet<>());
 
         product = productRepository.save(product);
-        return ProductMapper.toProductDto(product);
+        System.out.println("Producto guardado con ID: " + product.getId());
+
+        ProductDto result = ProductMapper.toProductDto(product);
+        System.out.println("DTO retornado: " + result);
+
+        return result;
     }
 
     @Transactional
@@ -47,9 +65,23 @@ public class ProductService implements ProductServiceInt {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Producto con id : " + id + " no encontrado"));
 
+        // Validar que el tipo sea compatible con la categoría
+        if (dto.getProductType() != null &&
+            dto.getProductCategory() != null &&
+            dto.getProductType().getCategory() != dto.getProductCategory()) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "El tipo '" + dto.getProductType() + "' no es compatible con la categoría '" + dto.getProductCategory() + "'"
+            );
+        }
+
         product.setName(dto.getName());
         product.setPrice(dto.getPrice());
         product.setCategory(dto.getProductCategory());
+        product.setType(dto.getProductType());
+        if (dto.getAvailable() != null) {
+            product.setAvailable(dto.getAvailable());
+        }
 
         product = productRepository.save(product);
         return ProductMapper.toProductDto(product);
@@ -94,6 +126,16 @@ public class ProductService implements ProductServiceInt {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Producto con id : " + id + " no encontrado");
         }
         productRepository.deleteById(id);
+    }
+
+    @Transactional
+    public ProductDto toggleAvailability(Long id, Boolean available) throws ResponseStatusException {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Producto con id : " + id + " no encontrado"));
+
+        product.setAvailable(available);
+        product = productRepository.save(product);
+        return ProductMapper.toProductDto(product);
     }
 
 }

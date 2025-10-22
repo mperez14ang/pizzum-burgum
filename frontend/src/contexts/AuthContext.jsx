@@ -2,6 +2,8 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
+const API_BASE_URL = 'http://localhost:8080/api';
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -9,8 +11,9 @@ export const AuthProvider = ({ children }) => {
 
     // Cargar usuario desde localStorage al iniciar
     useEffect(() => {
+        const token = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
-        if (storedUser) {
+        if (token && storedUser) {
             const userData = JSON.parse(storedUser);
             setUser(userData);
             setIsAuthenticated(true);
@@ -19,34 +22,47 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     /**
-     * Login simulado (en producción conectar con el backend)
+     * Login with backend
      */
     const login = async (email, password) => {
         try {
-            // Por ahora, login simulado
-            const mockUser = {
-                email: email,
-                password: password, // TEMPORAL: Solo para desarrollo con Basic Auth
-                firstName: 'Usuario',
-                lastName: 'Demo',
-                role: 'CLIENT'
+            const response = await fetch(`${API_BASE_URL}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error || 'Error al iniciar sesión');
+            }
+
+            const data = await response.json();
+
+            const userData = {
+                email: data.userEmail,
+                role: data.userType,
+                token: data.token
             };
 
-            setUser(mockUser);
+            setUser(userData);
             setIsAuthenticated(true);
-            localStorage.setItem('user', JSON.stringify(mockUser));
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(userData));
 
-            return { success: true, user: mockUser };
+            return { success: true, user: userData };
         } catch (error) {
             console.error('Error en login:', error);
             return { success: false, error: error.message };
         }
     };
 
-
     const logout = () => {
         setUser(null);
         setIsAuthenticated(false);
+        localStorage.removeItem('token');
         localStorage.removeItem('user');
     };
 

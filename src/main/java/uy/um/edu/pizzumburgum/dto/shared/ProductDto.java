@@ -23,4 +23,6 @@ public class ProductDto {
 
     private ProductCategory productCategory;
 
+    private Boolean available;
+
 }

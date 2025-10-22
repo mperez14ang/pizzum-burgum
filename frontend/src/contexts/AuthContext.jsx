@@ -26,12 +26,10 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const addUser = (userData) => {
-        // userData ya es el objeto parseado de la respuesta JSON
         setUser(userData);
         setIsAuthenticated(true);
         setTokenAuth(userData.token);
         localStorage.setItem('user', JSON.stringify(userData));
-
         return { success: true, token: userData.token, user: userData };
     };
 

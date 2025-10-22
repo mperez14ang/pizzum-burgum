@@ -38,7 +38,12 @@ public class ProductController {
 
     @GetMapping("/category/{category}")
     public ResponseEntity<List<ProductDto>> getProductsByCategory(@PathVariable ProductCategory category) {
-        return ResponseEntity.ok(productService.getProductsByCategory(category));
+        List<ProductDto> products = productService.getProductsByCategory(category);
+        // Filter only available products for public access
+        List<ProductDto> availableProducts = products.stream()
+                .filter(p -> p.getAvailable() != null && p.getAvailable())
+                .toList();
+        return ResponseEntity.ok(availableProducts);
     }
 
     @GetMapping("/type/{type}")
@@ -49,45 +54,50 @@ public class ProductController {
     public ResponseEntity<Map<String, List<ProductDto>>> getIngredientsGrouped() {
         List<ProductDto> allProducts = productService.getAllProducts();
 
+        // Filter only available products
+        List<ProductDto> availableProducts = allProducts.stream()
+                .filter(p -> p.getAvailable() != null && p.getAvailable())
+                .toList();
+
         Map<String, List<ProductDto>> ingredients = new HashMap<>();
 
-        ingredients.put("BREAD_OPTIONS", allProducts.stream()
+        ingredients.put("BREAD_OPTIONS", availableProducts.stream()
                 .filter(p -> p.getProductType().equals(ProductType.BREAD))
                 .toList());
 
-        ingredients.put("MEAT_OPTIONS", allProducts.stream()
+        ingredients.put("MEAT_OPTIONS", availableProducts.stream()
                 .filter(p -> p.getProductType().equals(ProductType.MEAT))
                 .toList());
 
-        ingredients.put("BURGER_CHEESE", allProducts.stream()
+        ingredients.put("BURGER_CHEESE", availableProducts.stream()
                 .filter(p -> p.getProductType().equals(ProductType.BURGER_CHEESE))
                 .toList());
 
-        ingredients.put("BURGER_TOPPINGS", allProducts.stream()
+        ingredients.put("BURGER_TOPPINGS", availableProducts.stream()
                 .filter(p -> p.getProductType().equals(ProductType.BURGER_TOPPINGS))
                 .toList());
 
-        ingredients.put("BURGER_SAUCES", allProducts.stream()
+        ingredients.put("BURGER_SAUCES", availableProducts.stream()
                 .filter(p -> p.getProductType().equals(ProductType.SAUCE))
                 .toList());
 
-        ingredients.put("PIZZA_DOUGH", allProducts.stream()
+        ingredients.put("PIZZA_DOUGH", availableProducts.stream()
                 .filter(p -> p.getProductType().equals(ProductType.DOUGH))
                 .toList());
 
-        ingredients.put("PIZZA_SIZES", allProducts.stream()
+        ingredients.put("PIZZA_SIZES", availableProducts.stream()
                 .filter(p -> p.getProductType().equals(ProductType.PIZZA_SIZE))
                 .toList());
 
-        ingredients.put("PIZZA_SAUCE", allProducts.stream()
+        ingredients.put("PIZZA_SAUCE", availableProducts.stream()
                 .filter(p -> p.getProductType().equals(ProductType.SAUCE))
                 .toList());
 
-        ingredients.put("PIZZA_CHEESE", allProducts.stream()
+        ingredients.put("PIZZA_CHEESE", availableProducts.stream()
                 .filter(p -> p.getProductType().equals(ProductType.PIZZA_CHEESE))
                 .toList());
 
-        ingredients.put("PIZZA_TOPPINGS", allProducts.stream()
+        ingredients.put("PIZZA_TOPPINGS", availableProducts.stream()
                 .filter(p -> p.getProductType().equals(ProductType.PIZZA_TOPPINGS))
                 .toList());
 

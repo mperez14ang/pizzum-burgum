@@ -30,9 +30,14 @@ function App() {
         setProductType(null);
     };
 
-    // Si el usuario es ADMIN, mostrar panel de admin
+    // Si el usuario es ADMIN, mostrar panel de admin (sin providers de cliente)
     if (isAuthenticated && user?.role === 'ADMIN') {
-        return <AdminPage />;
+        return (
+            <>
+                <Toaster position="top-right" />
+                <AdminPage />
+            </>
+        );
     }
 
     // Para clientes o usuarios no autenticados, mantener funcionalidad original

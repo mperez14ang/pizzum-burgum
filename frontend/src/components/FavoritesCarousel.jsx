@@ -4,9 +4,9 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
 import toast from "react-hot-toast";
 
-export const FavoritesCarousel = ( { onNavigate } ) => {
+export const FavoritesCarousel = ( { onOpenLogin } ) => {
     const { favorites, loadFavorites, removeFromFavorites, isLoading } = useFavorites();
-    const { login, isAuthenticated } = useAuth();
+    const { isAuthenticated } = useAuth();
     const [favoritesData, setFavoritesData] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const carouselRef = useRef(null);
@@ -115,7 +115,7 @@ export const FavoritesCarousel = ( { onNavigate } ) => {
                         Inicia sesión para guardar tus creaciones favoritas y acceder a ellas en cualquier momento
                     </p>
                     <button
-                        onClick={() => onNavigate('login')}
+                        onClick={onOpenLogin}
                         className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition font-semibold inline-flex items-center gap-2"
                     >
                         <LogIn size={20} />

@@ -1,10 +1,8 @@
 import {useState} from "react";
-import {ChevronLeft} from 'lucide-react';
 import {useAuth} from "../contexts/AuthContext.jsx";
-import toast, {Toaster} from "react-hot-toast";
-import {Card, CardBody} from "../components/common/Card.jsx";
+import toast from "react-hot-toast";
 
-export const AuthPage = ({type}) => {
+export const AuthPage = ({type, onToggleAuthType}) => {
     const { login, register } = useAuth();
 
     const [formData, setFormData] = useState({
@@ -89,31 +87,25 @@ export const AuthPage = ({type}) => {
         if (!validateForm()) return;
 
         setIsLoading(true);
-        console.log("hola")
         try{
             let response = null
             if (isRegister){
                 response = await Promise.race([
-                    // email, password, firstName, lastName, birthDate, dni
                     register(formData.email, formData.password, formData.firstName, formData.lastName, formData.birthDate, formData.dni),
-                    timeout(5000), // 5 segundos
+                    timeout(5000),
                 ]);
             }
             else {
                 response = await Promise.race([
                     login(formData.email, formData.password),
-                    timeout(5000), // 5 segundos
+                    timeout(5000),
                 ]);
             }
-
-            console.log(response)
 
             if (!response.success) {
                 let errorLog = response.error;
                 if (errorLog == null) errorLog = "Error desconocido"
-
                 toast.error(errorLog);
-
                 setIsLoading(false);
                 return;
             }
@@ -132,27 +124,12 @@ export const AuthPage = ({type}) => {
                 setErrors(prev => ({ ...prev, email: "El servidor tardó demasiado en responder (timeout)" }));
             }
             setIsLoading(false);
-
         }
     }
 
     return (
         <div>
-            <Card>
-                <CardBody className="p-6">
-
-                    <div className="flex flex-col items-center mb-10">
-                        <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2">
-                            {isRegister ? "Registro" : "Login"}
-                        </h2>
-                        <p className="text-gray-500 text-sm sm:text-base">
-                            {isRegister
-                                ? "Crea tu cuenta para continuar"
-                                : "Inicia sesión para acceder"}
-                        </p>
-                    </div>
-
-                    <form className="flex flex-col gap-6">
+            <form className="flex flex-col gap-6">
                         {isRegister && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <InputField
@@ -217,46 +194,71 @@ export const AuthPage = ({type}) => {
                             </>
                         )}
 
-                        <button
-                            type="button"
-                            onClick={handleSubmit}
-                            disabled={isLoading}
-                            className={`w-full px-8 py-3 text-base rounded-lg transition-colors flex items-center justify-center ${
-                                isLoading
-                                    ? 'bg-orange-400 cursor-not-allowed'
-                                    : 'bg-orange-500 hover:bg-orange-600'
-                            } text-white`}
-                        >
-                            {isLoading ? (
-                                <>
-                                    <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                            fill="none"
-                                        />
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                        />
-                                    </svg>
-                                    {isRegister ? 'Registrando...' : 'Iniciando sesión...'}
-                                </>
-                            ) : (
-                                isRegister ? 'Registrar' : 'Iniciar sesión'
-                            )}
-                        </button>
-                    </form>
-                </CardBody>
-            </Card>
+                <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={isLoading}
+                    className={`w-full px-8 py-3 text-base rounded-lg transition-colors flex items-center justify-center ${
+                        isLoading
+                            ? 'bg-orange-400 cursor-not-allowed'
+                            : 'bg-orange-500 hover:bg-orange-600'
+                    } text-white`}
+                >
+                    {isLoading ? (
+                        <>
+                            <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                    fill="none"
+                                />
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                />
+                            </svg>
+                            {isRegister ? 'Registrando...' : 'Iniciando sesión...'}
+                        </>
+                    ) : (
+                        isRegister ? 'Registrar' : 'Iniciar sesión'
+                    )}
+                </button>
+
+                {/* Toggle between Login and Register */}
+                <div className="text-center pt-4 border-t border-gray-200">
+                    <p className="text-sm text-gray-600">
+                        {isRegister ? (
+                            <>
+                                ¿Ya tienes cuenta?{' '}
+                                <button
+                                    type="button"
+                                    onClick={onToggleAuthType}
+                                    className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
+                                >
+                                    Inicia sesión
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                ¿No tienes cuenta?{' '}
+                                <button
+                                    type="button"
+                                    onClick={onToggleAuthType}
+                                    className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
+                                >
+                                    Regístrate aquí
+                                </button>
+                            </>
+                        )}
+                    </p>
+                </div>
+            </form>
         </div>
-
-
     );
 };
 

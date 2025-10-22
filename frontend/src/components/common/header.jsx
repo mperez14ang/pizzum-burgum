@@ -1,34 +1,40 @@
 import {LogOut, ShoppingCart, User} from 'lucide-react';
 import {useAuth} from '../../contexts/AuthContext';
-import {useState} from 'react';
+import {useState, useEffect, forwardRef, useImperativeHandle} from 'react';
 import {Modal} from './Modal';
 import toast from 'react-hot-toast';
 import {AuthPage} from "../../pages/AuthPage.jsx";
 
-export const Header = () => {
-    const { user, isAuthenticated, login, logout } = useAuth();
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+export const Header = forwardRef((props, ref) => {
+    const { user, isAuthenticated, logout } = useAuth();
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [authType, setAuthType] = useState('login'); // 'login' or 'register'
 
+    // Close modal when user becomes authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            setIsAuthModalOpen(false);
+        }
+    }, [isAuthenticated]);
 
     const handleLogout = () => {
         logout();
         toast.success('Sesión cerrada');
     };
 
-    const pages = [
-        {
-            id: 1,
-            title: "Login",
-            content: <AuthPage type="login" />,
-            onClose: (id) => console.log("Cerrar modal", id)
-        },
-        {
-            id: 2,
-            title: "Register",
-            content: <AuthPage type="register" />,
-            onClose: (id) => console.log("Cerrar modal", id)
-        }
-    ];
+    const handleOpenLogin = () => {
+        setAuthType('login');
+        setIsAuthModalOpen(true);
+    };
+
+    const handleToggleAuthType = () => {
+        setAuthType(prev => prev === 'login' ? 'register' : 'login');
+    };
+
+    // Expose handleOpenLogin to parent via ref
+    useImperativeHandle(ref, () => ({
+        openLoginModal: handleOpenLogin
+    }));
 
     return (
         <>
@@ -56,9 +62,9 @@ export const Header = () => {
                                 </div>
                             ) : (
                                 <button
-                                    onClick={() => setIsLoginModalOpen(true)}
+                                    onClick={handleOpenLogin}
                                     className="p-2 hover:bg-gray-100 rounded-full"
-                                    title="Registrarse"
+                                    title="Iniciar sesión"
                                 >
                                     <User className="w-6 h-6" />
                                 </button>
@@ -71,14 +77,16 @@ export const Header = () => {
             {/* Login & Register Modal */}
             {!isAuthenticated && (
                 <Modal
-                    isOpen={isLoginModalOpen}
-                    onClose={() => setIsLoginModalOpen(false)}
-                    pages={pages}
+                    isOpen={isAuthModalOpen}
+                    onClose={() => setIsAuthModalOpen(false)}
+                    title={authType === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
                     size="md"
                 >
-                    <AuthPage type={'login'} />
+                    <AuthPage type={authType} onToggleAuthType={handleToggleAuthType} />
                 </Modal>
             )}
         </>
     );
-};
+});
+
+Header.displayName = 'Header';

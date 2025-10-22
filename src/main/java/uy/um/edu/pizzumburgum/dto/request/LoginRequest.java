@@ -1,4 +1,4 @@
-package uy.um.edu.pizzumburgum.dto.shared;
+package uy.um.edu.pizzumburgum.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginDto {
+public class LoginRequest {
 
     @Email
     private String email;

@@ -4,12 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
+import uy.um.edu.pizzumburgum.dto.request.LoginRequest;
+import uy.um.edu.pizzumburgum.dto.request.TokenRequest;
 import uy.um.edu.pizzumburgum.dto.response.AuthResponse;
 import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
-import uy.um.edu.pizzumburgum.dto.shared.LoginDto;
 import uy.um.edu.pizzumburgum.entities.User;
 import uy.um.edu.pizzumburgum.repository.UserRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.AuthServiceInt;
+
+import java.util.Date;
 
 @Service
 public class AuthService implements AuthServiceInt {
@@ -39,7 +42,7 @@ public class AuthService implements AuthServiceInt {
     }
 
     @Override
-    public AuthResponse login(LoginDto request) {
+    public AuthResponse login(LoginRequest request) {
         User user = userRepository.findById(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -50,5 +53,24 @@ public class AuthService implements AuthServiceInt {
         String jwtToken = jwtService.generateToken(user);
 
         return new AuthResponse(jwtToken, user.getEmail(), user.getUserType(), "Usuario " + user.getEmail() + " logueado correctamente");
+    }
+
+    @Override
+    public boolean verifyToken(TokenRequest request) {
+        String jwtToken = request.getToken();
+        if (jwtToken == null || jwtToken.isEmpty()) {return false;}
+        return !jwtService.isTokenExpired(jwtToken);
+    }
+
+    @Override
+    public Date getTokenExpirationDate(TokenRequest request) {
+        String jwtToken = request.getToken();
+        return jwtService.extractExpiration(jwtToken);
+    }
+
+    @Override
+    public Date getTokenEmissionDate(TokenRequest request) {
+        String jwtToken = request.getToken();
+        return jwtService.extractEmisionDate(jwtToken);
     }
 }

@@ -1,68 +1,138 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import {createContext, useContext, useEffect, useState} from 'react';
 
 const AuthContext = createContext();
-
-const API_BASE_URL = 'http://localhost:8080/api';
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [tokenAuth, setTokenAuth] = useState(null);
 
-    // Cargar usuario desde localStorage al iniciar
+    // Comprobar si hay un usuario guardado al cargar
     useEffect(() => {
-        const token = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
-        if (token && storedUser) {
-            const userData = JSON.parse(storedUser);
-            setUser(userData);
-            setIsAuthenticated(true);
+        if (storedUser) {
+            try {
+                const userData = JSON.parse(storedUser);
+                setUser(userData);
+                setIsAuthenticated(true);
+                setTokenAuth(userData.token);
+            } catch (error) {
+                console.error('Error parsing stored user:', error);
+                localStorage.removeItem('user');
+            }
         }
         setIsLoading(false);
     }, []);
 
-    /**
-     * Login with backend
-     */
+    const addUser = (userData) => {
+        // userData ya es el objeto parseado de la respuesta JSON
+        setUser(userData);
+        setIsAuthenticated(true);
+        setTokenAuth(userData.token);
+        localStorage.setItem('user', JSON.stringify(userData));
+
+        return { success: true, token: userData.token, user: userData };
+    };
+
     const login = async (email, password) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/login`, {
+            const response = await fetch('http://localhost:8080/api/auth/v1/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({
+                    email,
+                    password
+                }),
             });
-
-            if (!response.ok) {
-                const error = await response.text();
-                throw new Error(error || 'Error al iniciar sesión');
-            }
 
             const data = await response.json();
 
-            const userData = {
-                email: data.userEmail,
-                role: data.userType,
-                token: data.token
-            };
+            if (!response.ok) {
+                return {
+                    success: false,
+                    error: data.message || data.error || 'Error al iniciar sesión'
+                };
+            }
 
-            setUser(userData);
-            setIsAuthenticated(true);
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(userData));
-
-            return { success: true, user: userData };
+            return addUser(data);
         } catch (error) {
             console.error('Error en login:', error);
-            return { success: false, error: error.message };
+            return { success: false, error: 'Error de conexión. Intente nuevamente.' };
+        }
+    };
+
+    const register = async (email, password, firstName, lastName, birthDate, dni) => {
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/v1/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    firstName,
+                    lastName,
+                    birthDate,
+                    dni,
+                    email,
+                    password,
+                    addresses: [],
+                    favorites: [],
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                return {
+                    success: false,
+                    error: data.message || data.error || 'Error al registrar usuario'
+                };
+            }
+
+            return addUser(data);
+
+        } catch (error) {
+            console.error('Error en register:', error);
+            return { success: false, error: 'Error de conexión. Intente nuevamente.' };
+        }
+    };
+
+    const validate = async () => {
+        if (!tokenAuth) {
+            return { success: false, error: 'No hay token' };
+        }
+
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/v1/validate', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${tokenAuth}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                logout(); // Token invalido
+                return { success: false, error: 'Token inválido' };
+            }
+
+            return { success: true, data };
+
+        } catch (error) {
+            console.error('Error validando token:', error);
+            return { success: false, error: 'Error de conexión' };
         }
     };
 
     const logout = () => {
         setUser(null);
         setIsAuthenticated(false);
-        localStorage.removeItem('token');
+        setTokenAuth(null);
         localStorage.removeItem('user');
     };
 
@@ -70,8 +140,11 @@ export const AuthProvider = ({ children }) => {
         user,
         isAuthenticated,
         isLoading,
+        tokenAuth,
         login,
-        logout
+        logout,
+        register,
+        validate
     };
 
     return (

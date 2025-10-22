@@ -2,12 +2,15 @@ import { Header } from '../components/common/Header';
 import { FavoritesCarousel } from '../components/FavoritesCarousel';
 import burgerImg from '../assets/burger.jpg';
 import pizzaImg from '../assets/pizza.jpg';
+import {useCreatorStore} from "../contexts/creatorcontext.jsx";
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 export const HomePage = ({ onNavigate }) => {
+    const { logout } = useAuth();
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header />
+            <Header onNavigate={onNavigate}/>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="text-center mb-12">
@@ -61,7 +64,7 @@ export const HomePage = ({ onNavigate }) => {
                     >Card Prueba</div>
 
                 {/* Favorites Carousel - Dinámico desde el backend */}
-                <FavoritesCarousel />
+                <FavoritesCarousel onNavigate={onNavigate}/>
             </main>
         </div>
     );

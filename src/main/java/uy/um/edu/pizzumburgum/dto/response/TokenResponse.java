@@ -5,16 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponse {
-    private String token;
+@NoArgsConstructor
+public class TokenResponse {
+    private boolean verified;
 
-    private String email;
+    private Date emittedDate;
 
-    private String role;
-
-    private String message;
+    private Date expirationDate;
 }

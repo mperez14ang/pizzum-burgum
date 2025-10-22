@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import {AuthProvider, useAuth} from './contexts/AuthContext';
 import { CreatorProvider } from './contexts/CreatorContext';
 import { FavoritesProvider } from './contexts/FavoritesContext';
 import { HomePage } from './pages/HomePage';
@@ -7,11 +7,13 @@ import { CreatorPage } from './pages/CreatorPage';
 import { AdminPage } from './pages/admin/AdminPage';
 import { CardPage } from "./pages/CardPage";
 import { CardProvider } from "./contexts/CardContext.jsx";
+import {AuthPage} from "./pages/AuthPage.jsx";
+import {Toaster} from "react-hot-toast";
 
-function AppContent() {
-    const { user, isAuthenticated } = useAuth();
+function App() {
     const [currentPage, setCurrentPage] = useState('home');
     const [productType, setProductType] = useState(null);
+    const { user, isAuthenticated } = useAuth()
 
     const handleNavigate = (type) => {
         if (type === 'card'){
@@ -36,6 +38,7 @@ function AppContent() {
     // Para clientes o usuarios no autenticados, mantener funcionalidad original
     return (
         <CardProvider>
+            <Toaster position="top-right" />
             <FavoritesProvider>
                 <CreatorProvider>
                     {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
@@ -48,14 +51,6 @@ function AppContent() {
                 </CreatorProvider>
             </FavoritesProvider>
         </CardProvider>
-    );
-}
-
-function App() {
-    return (
-        <AuthProvider>
-            <AppContent />
-        </AuthProvider>
     );
 }
 

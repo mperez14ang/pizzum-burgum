@@ -57,7 +57,7 @@ export const CardProvider = ({ children }) => {
 
             console.log('PaymentMethod ID:', paymentMethod.id);
 
-            const basicAuth = btoa(`${user.email}:${user.password}`); // Usuario simulado
+            const basicAuth = btoa(`${user.email}:${user.password}`);
 
             const response = await fetch('http://localhost:8080/api/card/v1', {
                 method: 'POST',

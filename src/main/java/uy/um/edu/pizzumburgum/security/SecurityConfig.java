@@ -38,9 +38,7 @@ public class SecurityConfig {
         return httpSecurity.authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        .requestMatchers("/api/login").permitAll()
-
-                        .requestMatchers("/api/register").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
 
                         // Endpoints para todos
                         .requestMatchers("/api/public/**").permitAll()
@@ -70,12 +68,12 @@ public class SecurityConfig {
                         // Deny any other request
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults()) // TODO Basic Auth, esto hay que sacarlo para produccion porque lo ideal es dejar solo tokens
-                .formLogin(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .build();
     }
 

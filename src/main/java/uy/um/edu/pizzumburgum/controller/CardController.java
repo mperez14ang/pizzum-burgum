@@ -20,7 +20,7 @@ public class CardController {
     }
 
     @GetMapping("{id}")
-    public CardResponse getCard(Long id) {
+    public CardResponse getCard(@PathVariable Long id) {
         return this.cardService.getCardById(id);
     }
 

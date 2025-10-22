@@ -3,9 +3,9 @@ import { ChevronLeft, ChevronRight, Heart, ShoppingCart, Trash2, LogIn } from 'l
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
 
-export const FavoritesCarousel = () => {
-    const { favorites, loadFavorites, removeFromFavorites, isLoading, isAuthenticated } = useFavorites();
-    const { login } = useAuth();
+export const FavoritesCarousel = ( { onNavigate } ) => {
+    const { favorites, loadFavorites, removeFromFavorites, isLoading } = useFavorites();
+    const { login, isAuthenticated } = useAuth();
     const [favoritesData, setFavoritesData] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const carouselRef = useRef(null);
@@ -99,13 +99,6 @@ export const FavoritesCarousel = () => {
         alert(`${favorite.name} agregado al carrito`);
     };
 
-    const handleQuickLogin = async () => {
-        const result = await login('usuario1@gmail.com', '12345678');
-        if (result.success) {
-            alert('¡Sesión iniciada correctamente!');
-        }
-    };
-
     // Si el usuario no está autenticado, mostrar prompt de login
     if (!isAuthenticated) {
         return (
@@ -121,11 +114,11 @@ export const FavoritesCarousel = () => {
                         Inicia sesión para guardar tus creaciones favoritas y acceder a ellas en cualquier momento
                     </p>
                     <button
-                        onClick={handleQuickLogin}
+                        onClick={() => onNavigate('login')}
                         className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition font-semibold inline-flex items-center gap-2"
                     >
                         <LogIn size={20} />
-                        Iniciar Sesión (Demo)
+                        Iniciar Sesión
                     </button>
                 </div>
             </div>

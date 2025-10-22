@@ -1,8 +1,10 @@
 import {useState} from "react";
 import {ChevronLeft} from 'lucide-react';
 import {useAuth} from "../contexts/AuthContext.jsx";
+import toast, {Toaster} from "react-hot-toast";
+import {Card, CardBody} from "../components/common/Card.jsx";
 
-export const AuthPage = ({type, onBack, onNavigate}) => {
+export const AuthPage = ({type}) => {
     const { login, register } = useAuth();
 
     const [formData, setFormData] = useState({
@@ -82,7 +84,8 @@ export const AuthPage = ({type, onBack, onNavigate}) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         if (!validateForm()) return;
 
         setIsLoading(true);
@@ -109,14 +112,20 @@ export const AuthPage = ({type, onBack, onNavigate}) => {
                 let errorLog = response.error;
                 if (errorLog == null) errorLog = "Error desconocido"
 
-                setErrors(prev => ({ ...prev, email: errorLog }));
+                toast.error(errorLog);
+
                 setIsLoading(false);
                 return;
             }
 
             if (response && response.token) {
+                if (isRegister){
+                    toast.success('Registro de usuario exitoso');
+                }
+                else{
+                    toast.success('Inicio de sesión exitoso');
+                }
                 setIsLoading(false);
-                onNavigate(onBack);
             }
         } catch (err) {
             if (err.message === "timeout") {
@@ -125,136 +134,129 @@ export const AuthPage = ({type, onBack, onNavigate}) => {
             setIsLoading(false);
 
         }
-        // Cambiar la pagina a lo que estaba haciendo antes
-        onNavigate(onBack);
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-200 px-4">
-            <div className="bg-white shadow-2xl rounded-3xl w-full max-w-md p-10 sm:p-12">
-                <div className="flex flex-col items-center mb-10">
-                    <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2">
-                        {isRegister ? "Registro" : "Login"}
-                    </h2>
-                    <p className="text-gray-500 text-sm sm:text-base">
-                        {isRegister
-                            ? "Crea tu cuenta para continuar"
-                            : "Inicia sesión para acceder"}
-                    </p>
-                </div>
+        <div>
+            <Card>
+                <CardBody className="p-6">
 
-                <button
-                    onClick={onBack}
-                    className="flex items-center text-gray-600 hover:text-gray-900 mb-6 transition-colors duration-200"
-                    disabled={isLoading}
-                >
-                    <ChevronLeft size={20} />
-                    <span className="ml-1">Volver</span>
-                </button>
+                    <div className="flex flex-col items-center mb-10">
+                        <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2">
+                            {isRegister ? "Registro" : "Login"}
+                        </h2>
+                        <p className="text-gray-500 text-sm sm:text-base">
+                            {isRegister
+                                ? "Crea tu cuenta para continuar"
+                                : "Inicia sesión para acceder"}
+                        </p>
+                    </div>
 
-                <form onNavigate={onNavigate} className="flex flex-col gap-6">
-                    {isRegister && (
-                        <>
-                            <InputField
-                                label="Nombre"
-                                id="firstName"
-                                value={formData.firstName}
-                                onChange={(e) => handleInputChange("firstName", e.target.value)}
-                                error={errors.firstName}
-                                isLoading={isLoading}
-                            />
-                            <InputField
-                                label="Apellido"
-                                id="lastName"
-                                value={formData.lastName}
-                                onChange={(e) => handleInputChange("lastName", e.target.value)}
-                                error={errors.lastName}
-                                isLoading={isLoading}
-                            />
-                        </>
-                    )}
-
-                    <InputField
-                        label="Correo electrónico"
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange("email", e.target.value)}
-                        error={errors.email}
-                        isLoading={isLoading}
-                    />
-
-                    <InputField
-                        label="Contraseña"
-                        id="password"
-                        type="password"
-                        value={formData.password}
-                        onChange={(e) => handleInputChange("password", e.target.value)}
-                        error={errors.password}
-                        isLoading={isLoading}
-                    />
-
-                    {isRegister && (
-                        <>
-                            <InputField
-                                label="Cédula"
-                                id="dni"
-                                value={formData.dni}
-                                onChange={(e) => handleInputChange("dni", e.target.value)}
-                                error={errors.dni}
-                                isLoading={isLoading}
-                            />
-
-                            <InputField
-                                label="Fecha de nacimiento"
-                                id="birthDate"
-                                type="date"
-                                value={formData.birthDate}
-                                onChange={(e) => handleInputChange("birthDate", e.target.value)}
-                                error={errors.birthDate}
-                                isLoading={isLoading}
-                            />
-                        </>
-                    )}
-
-                    <button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={isLoading}
-                        className={`w-full px-8 py-3 text-base rounded-lg transition-colors flex items-center justify-center ${
-                            isLoading
-                                ? 'bg-orange-400 cursor-not-allowed'
-                                : 'bg-orange-500 hover:bg-orange-600'
-                        } text-white`}
-                    >
-                        {isLoading ? (
-                            <>
-                                <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                                    <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                        fill="none"
-                                    />
-                                    <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    />
-                                </svg>
-                                {isRegister ? 'Registrando...' : 'Iniciando sesión...'}
-                            </>
-                        ) : (
-                            isRegister ? 'Registrar' : 'Iniciar sesión'
+                    <form className="flex flex-col gap-6">
+                        {isRegister && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <InputField
+                                    label="Nombre"
+                                    id="firstName"
+                                    value={formData.firstName}
+                                    onChange={(e) => handleInputChange("firstName", e.target.value)}
+                                    error={errors.firstName}
+                                    isLoading={isLoading}
+                                />
+                                <InputField
+                                    label="Apellido"
+                                    id="lastName"
+                                    value={formData.lastName}
+                                    onChange={(e) => handleInputChange("lastName", e.target.value)}
+                                    error={errors.lastName}
+                                    isLoading={isLoading}
+                                />
+                            </div>
                         )}
-                    </button>
-                </form>
-            </div>
 
+                        <InputField
+                            label="Correo electrónico"
+                            id="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => handleInputChange("email", e.target.value)}
+                            error={errors.email}
+                            isLoading={isLoading}
+                        />
+
+                        <InputField
+                            label="Contraseña"
+                            id="password"
+                            type="password"
+                            value={formData.password}
+                            onChange={(e) => handleInputChange("password", e.target.value)}
+                            error={errors.password}
+                            isLoading={isLoading}
+                        />
+
+                        {isRegister && (
+                            <>
+                                <InputField
+                                    label="Cédula"
+                                    id="dni"
+                                    value={formData.dni}
+                                    onChange={(e) => handleInputChange("dni", e.target.value)}
+                                    error={errors.dni}
+                                    isLoading={isLoading}
+                                />
+
+                                <InputField
+                                    label="Fecha de nacimiento"
+                                    id="birthDate"
+                                    type="date"
+                                    value={formData.birthDate}
+                                    onChange={(e) => handleInputChange("birthDate", e.target.value)}
+                                    error={errors.birthDate}
+                                    isLoading={isLoading}
+                                />
+                            </>
+                        )}
+
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={isLoading}
+                            className={`w-full px-8 py-3 text-base rounded-lg transition-colors flex items-center justify-center ${
+                                isLoading
+                                    ? 'bg-orange-400 cursor-not-allowed'
+                                    : 'bg-orange-500 hover:bg-orange-600'
+                            } text-white`}
+                        >
+                            {isLoading ? (
+                                <>
+                                    <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                            fill="none"
+                                        />
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        />
+                                    </svg>
+                                    {isRegister ? 'Registrando...' : 'Iniciando sesión...'}
+                                </>
+                            ) : (
+                                isRegister ? 'Registrar' : 'Iniciar sesión'
+                            )}
+                        </button>
+                    </form>
+                </CardBody>
+            </Card>
         </div>
+
+
     );
 };
 

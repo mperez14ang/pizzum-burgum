@@ -1,28 +1,23 @@
 import { useState } from 'react';
-import { AuthProvider } from './contexts/AuthContext';
+import {AuthProvider, useAuth} from './contexts/AuthContext';
 import { CreatorProvider } from './contexts/CreatorContext';
 import { FavoritesProvider } from './contexts/FavoritesContext';
 import { HomePage } from './pages/HomePage';
 import { CreatorPage } from './pages/CreatorPage';
+import { AdminPage } from './pages/admin/AdminPage';
 import { CardPage } from "./pages/CardPage";
-import {CardProvider} from "./contexts/CardContext.jsx";
+import { CardProvider } from "./contexts/CardContext.jsx";
 import {AuthPage} from "./pages/AuthPage.jsx";
+import {Toaster} from "react-hot-toast";
 
 function App() {
     const [currentPage, setCurrentPage] = useState('home');
     const [productType, setProductType] = useState(null);
+    const { user, isAuthenticated } = useAuth()
 
     const handleNavigate = (type) => {
         if (type === 'card'){
             setCurrentPage('card');
-            return;
-        }
-        if (type === 'login'){
-            setCurrentPage('login');
-            return;
-        }
-        if (type === 'register'){
-            setCurrentPage('register');
             return;
         }
 
@@ -35,30 +30,27 @@ function App() {
         setProductType(null);
     };
 
-    return (
-        <AuthProvider>
-            <CardProvider>
-                {(currentPage === 'card') && (
-                    <CardPage onBack={handleBack}/>
-                )}
-            </CardProvider>
-            {(currentPage === 'login') && (
-                <AuthPage type={'login'} onBack={handleBack} onNavigate={handleNavigate} ></AuthPage>
-                )}
-            {(currentPage === 'register') && (
-                <AuthPage type={'register'} onBack={handleBack} onNavigate={handleNavigate} ></AuthPage>
-            )}
+    // Si el usuario es ADMIN, mostrar panel de admin
+    if (isAuthenticated && user?.role === 'ADMIN') {
+        return <AdminPage />;
+    }
 
+    // Para clientes o usuarios no autenticados, mantener funcionalidad original
+    return (
+        <CardProvider>
+            <Toaster position="top-right" />
             <FavoritesProvider>
                 <CreatorProvider>
                     {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
-                    {(currentPage === 'creator') && (
+                    {currentPage === 'creator' && (
                         <CreatorPage productType={productType} onBack={handleBack} />
+                    )}
+                    {currentPage === 'card' && (
+                        <CardPage onBack={handleBack}/>
                     )}
                 </CreatorProvider>
             </FavoritesProvider>
-
-        </AuthProvider>
+        </CardProvider>
     );
 }
 

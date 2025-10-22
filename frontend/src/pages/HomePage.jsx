@@ -63,24 +63,6 @@ export const HomePage = ({ onNavigate }) => {
                     className="relative h-10 rounded-2xl overflow-hidden cursor-pointer group shadow-lg hover:shadow-2xl transition-all"
                     >Card Prueba</div>
 
-                {/* Prueba login */}
-                <div
-                    onClick={() => onNavigate('login')}
-                    className="relative h-10 rounded-2xl overflow-hidden cursor-pointer group shadow-lg hover:shadow-2xl transition-all"
-                >Login</div>
-
-                {/* Prueba register */}
-                <div
-                    onClick={() => onNavigate('register')}
-                    className="relative h-10 rounded-2xl overflow-hidden cursor-pointer group shadow-lg hover:shadow-2xl transition-all"
-                >Register</div>
-
-                {/* Prueba logout */}
-                <div
-                    onClick={() => logout()}
-                    className="relative h-10 rounded-2xl overflow-hidden cursor-pointer group shadow-lg hover:shadow-2xl transition-all"
-                >Logout</div>
-
                 {/* Favorites Carousel - Dinámico desde el backend */}
                 <FavoritesCarousel onNavigate={onNavigate}/>
             </main>

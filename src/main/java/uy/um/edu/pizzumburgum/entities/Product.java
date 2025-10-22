@@ -40,6 +40,10 @@ public class Product {
     @Column(nullable = false, length = 50)
     private ProductCategory category;
 
+    @Column(name = "available", nullable = false)
+    @Builder.Default
+    private Boolean available = true;
+
     @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @ToString.Exclude
     private Set<CreationHasProducts> creations = new HashSet<>();

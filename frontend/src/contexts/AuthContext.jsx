@@ -58,7 +58,6 @@ export const AuthProvider = ({ children }) => {
             }
 
             return addUser(data);
-
         } catch (error) {
             console.error('Error en login:', error);
             return { success: false, error: 'Error de conexión. Intente nuevamente.' };

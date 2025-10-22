@@ -104,4 +104,40 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/availability")
+    public ResponseEntity<ProductDto> toggleAvailability(@PathVariable Long id, @RequestBody Map<String, Boolean> body) {
+        Boolean available = body.get("available");
+        if (available == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(productService.toggleAvailability(id, available));
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<String>> getCategories() {
+        return ResponseEntity.ok(
+                java.util.Arrays.stream(ProductCategory.values())
+                        .map(Enum::name)
+                        .toList()
+        );
+    }
+
+    @GetMapping("/types")
+    public ResponseEntity<List<String>> getTypes() {
+        return ResponseEntity.ok(
+                java.util.Arrays.stream(ProductType.values())
+                        .map(Enum::name)
+                        .toList()
+        );
+    }
+
+    @GetMapping("/types/{category}")
+    public ResponseEntity<List<String>> getTypesByCategory(@PathVariable ProductCategory category) {
+        return ResponseEntity.ok(
+                ProductType.getByCategory(category).stream()
+                        .map(Enum::name)
+                        .toList()
+        );
+    }
 }

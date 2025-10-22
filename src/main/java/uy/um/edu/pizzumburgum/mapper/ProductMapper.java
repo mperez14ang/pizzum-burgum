@@ -12,6 +12,7 @@ public class ProductMapper {
                 .productType(product.getType())
                 .price(product.getPrice())
                 .productCategory(product.getCategory())
+                .available(product.getAvailable())
                 .build();
     }
 
@@ -22,6 +23,7 @@ public class ProductMapper {
                 .type(productDto.getProductType())
                 .price(productDto.getPrice())
                 .category(productDto.getProductCategory())
+                .available(productDto.getAvailable() != null ? productDto.getAvailable() : true)
                 .build();
     }
 }

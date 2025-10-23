@@ -41,7 +41,7 @@ export const CardPage = ({ onBack }) => {
 
         card.on('change', (event) => {
             if (event.error) {
-                toast.error(event.error.message)
+                toast.error(event.error.message, { duration: 2000 })
             }
         });
 

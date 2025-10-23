@@ -13,7 +13,7 @@ import {Toaster} from "react-hot-toast";
 function App() {
     const [currentPage, setCurrentPage] = useState('home');
     const [productType, setProductType] = useState(null);
-    const { user, isAuthenticated } = useAuth()
+    const { user, isAuthenticated, isLoading } = useAuth();
 
     const handleNavigate = (type) => {
         if (type === 'card'){

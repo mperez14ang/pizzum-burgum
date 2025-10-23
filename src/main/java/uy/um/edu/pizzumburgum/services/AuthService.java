@@ -37,7 +37,7 @@ public class AuthService implements AuthServiceInt {
         ClientResponse clientResponse = clientService.createClient(request);
 
         String jwtToken = jwtService.generateToken(clientResponse);
-        return new AuthResponse(jwtToken, clientResponse.getEmail(), clientResponse.getUserType() , "Usuario " + clientResponse.getEmail() + " registrado correctamente");
+        return new AuthResponse(jwtToken, clientResponse.getEmail(), clientResponse.getFirstName(), clientResponse.getUserType() , "Usuario " + clientResponse.getEmail() + " registrado correctamente");
 
     }
 
@@ -52,7 +52,7 @@ public class AuthService implements AuthServiceInt {
 
         String jwtToken = jwtService.generateToken(user);
 
-        return new AuthResponse(jwtToken, user.getEmail(), user.getUserType(), "Usuario " + user.getEmail() + " logueado correctamente");
+        return new AuthResponse(jwtToken, user.getEmail(), user.getFirstName(), user.getUserType(), "Usuario " + user.getEmail() + " logueado correctamente");
     }
 
     @Override

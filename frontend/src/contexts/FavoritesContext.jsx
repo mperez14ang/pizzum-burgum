@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 
 const FavoritesContext = createContext();
@@ -10,9 +10,15 @@ export const FavoritesProvider = ({ children }) => {
     const [error, setError] = useState(null);
 
 
-    const loadFavorites = async () => {
+    const loadFavorites = useCallback(async () => {
+        console.log('📥 loadFavorites llamada');
+        console.log('   isAuthenticated:', isAuthenticated);
+        console.log('   user:', user);
+        console.log('   user?.token:', user?.token ? 'exists' : 'null');
+
         // Si no hay usuario autenticado, no cargar favoritos
-        if (!isAuthenticated) {
+        if (!isAuthenticated || !user || !user.token) {
+            console.log('⚠️ No se puede cargar favoritos - falta autenticación');
             setFavorites([]);
             return;
         }
@@ -21,14 +27,11 @@ export const FavoritesProvider = ({ children }) => {
             setIsLoading(true);
             setError(null);
 
-            const basicAuth = btoa(`${user.email}:${user.password}`);
-
             const response = await fetch('http://localhost:8080/api/favorites/my', {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Basic ${basicAuth}`
-                },
-                credentials: 'include'
+                    'Authorization': `Bearer ${user.token}`
+                }
             });
 
             if (!response.ok) {
@@ -40,8 +43,19 @@ export const FavoritesProvider = ({ children }) => {
                 throw new Error('Error al cargar favoritos');
             }
 
-            const data = await response.json();
+            // Verificar si hay contenido antes de parsear
+            const text = await response.text();
+            let data = [];
+            if (text && text.trim() !== '') {
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    console.error('Error parsing favorites JSON:', e);
+                }
+            }
+
             // Los datos vienen como un array de objetos Favorites
+            console.log('✅ Favoritos cargados:', data?.length || 0);
             setFavorites(data || []);
         } catch (err) {
             console.error('Error loading favorites:', err);
@@ -50,7 +64,7 @@ export const FavoritesProvider = ({ children }) => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [isAuthenticated, user]);
 
     const transformCreationData = (creationData) => {
         const products = [];
@@ -117,16 +131,12 @@ export const FavoritesProvider = ({ children }) => {
 
             console.log('Payload enviado al backend:', JSON.stringify(payload, null, 2));
 
-            // Para desarrollo: usar Basic Auth con credenciales del usuario autenticado
-            const basicAuth = btoa(`${user.email}:${user.password}`);
-
             const response = await fetch('http://localhost:8080/api/favorites', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Basic ${basicAuth}`
+                    'Authorization': `Bearer ${user.token}`
                 },
-                credentials: 'include',
                 body: JSON.stringify(payload)
             });
 
@@ -161,31 +171,24 @@ export const FavoritesProvider = ({ children }) => {
             setIsLoading(true);
             setError(null);
 
-            console.log('🗑️ Intentando eliminar favorito con ID:', favoriteId); // 🔍 DEBUG
-
-            const basicAuth = btoa(`${user.email}:${user.password}`);
-
             const response = await fetch(`http://localhost:8080/api/favorites/${favoriteId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Basic ${basicAuth}`
-                },
-                credentials: 'include'
+                    'Authorization': `Bearer ${user.token}`
+                }
             });
-
-            console.log('📡 Respuesta del servidor:', response.status); // 🔍 DEBUG
 
             if (!response.ok) {
                 throw new Error('Error al eliminar de favoritos');
             }
 
-            // ✅ Recargar favoritos del backend después de eliminar
+            // Recargar favoritos del backend después de eliminar
             await loadFavorites();
 
             return { success: true };
         } catch (err) {
-            console.error('❌ Error removing from favorites:', err);
+            console.error('Error removing from favorites:', err);
             setError(err.message);
             return { success: false, error: err.message };
         } finally {
@@ -208,12 +211,20 @@ export const FavoritesProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        if (isAuthenticated) {
+        console.log('🔄 FavoritesContext useEffect disparado');
+        console.log('   isAuthenticated:', isAuthenticated);
+        console.log('   user:', user);
+        console.log('   user?.email:', user?.email);
+        console.log('   user?.token:', user?.token ? 'exists' : 'null');
+
+        if (isAuthenticated && user && user.token) {
+            console.log('✅ Condiciones cumplidas - Llamando loadFavorites para:', user.email);
             loadFavorites();
         } else {
+            console.log('❌ Condiciones NO cumplidas - Limpiando favoritos');
             setFavorites([]);
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, user, loadFavorites]);
 
     const value = {
         favorites,

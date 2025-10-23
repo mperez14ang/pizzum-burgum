@@ -21,7 +21,7 @@ public class Client extends User {
     private Set<Address> addresses = new HashSet<>();
 
     // Cada cliente tiene una tabla de favoritos
-    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<Favorites> favorites = new HashSet<>();
 
     // El atributo esta en la tabla order_by
@@ -31,6 +31,15 @@ public class Client extends User {
     // El atributo esta en la tabla card
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Card> cards;
+
+    // Helper method to add favorite with proper bidirectional sync
+    public void addFavorite(Favorites favorite) {
+        if (this.favorites == null) {
+            this.favorites = new HashSet<>();
+        }
+        this.favorites.add(favorite);
+        favorite.setClient(this);
+    }
 
     @Override
     public String getUserType() {return UserType.CLIENT;}

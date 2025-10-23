@@ -1,6 +1,6 @@
-import {LogOut, ShoppingCart, User} from 'lucide-react';
+import {LogOut, ShoppingCart, User, ChevronDown, History, UserCircle, MapPin, CreditCard, Star} from 'lucide-react';
 import {useAuth} from '../../contexts/AuthContext';
-import {useState, useEffect, forwardRef, useImperativeHandle} from 'react';
+import {useState, useEffect, forwardRef, useImperativeHandle, useRef} from 'react';
 import {Modal} from './Modal';
 import toast from 'react-hot-toast';
 import {AuthPage} from "../../pages/AuthPage.jsx";
@@ -9,6 +9,8 @@ export const Header = forwardRef((props, ref) => {
     const { user, isAuthenticated, logout } = useAuth();
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [authType, setAuthType] = useState('login'); // 'login' or 'register'
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
     // Close modal when user becomes authenticated
     useEffect(() => {
@@ -17,9 +19,28 @@ export const Header = forwardRef((props, ref) => {
         }
     }, [isAuthenticated]);
 
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
     const handleLogout = () => {
+        setIsDropdownOpen(false);
         logout();
-        toast.success('Sesión cerrada');
+        toast.success('Sesión cerrada', { duration: 2000 });
+    };
+
+    const handleMenuItemClick = (action) => {
+        setIsDropdownOpen(false);
+        // TODO: Implementar navegación a las páginas correspondientes
+        toast.info(`Función "${action}" pendiente de implementar`, { duration: 2000 });
     };
 
     const handleOpenLogin = () => {
@@ -48,17 +69,70 @@ export const Header = forwardRef((props, ref) => {
                             </button>
 
                             {isAuthenticated ? (
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm text-gray-600 hidden sm:inline">
-                                        {user?.email}
-                                    </span>
+                                <div className="relative" ref={dropdownRef}>
                                     <button
-                                        onClick={handleLogout}
-                                        className="p-2 hover:bg-gray-100 rounded-full"
-                                        title="Cerrar sesión"
+                                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                        className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                                     >
-                                        <LogOut className="w-6 h-6" />
+                                        <span className="text-sm font-medium text-gray-700">
+                                            {user?.firstName || user?.email}
+                                        </span>
+                                        <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                                     </button>
+
+                                    {isDropdownOpen && (
+                                        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                                            <button
+                                                onClick={() => handleMenuItemClick('Historial de Pedidos')}
+                                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+                                            >
+                                                <History className="w-4 h-4" />
+                                                Historial de Pedidos
+                                            </button>
+
+                                            <button
+                                                onClick={() => handleMenuItemClick('Mi Perfil')}
+                                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+                                            >
+                                                <UserCircle className="w-4 h-4" />
+                                                Mi Perfil
+                                            </button>
+
+                                            <button
+                                                onClick={() => handleMenuItemClick('Mis Direcciones')}
+                                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+                                            >
+                                                <MapPin className="w-4 h-4" />
+                                                Mis Direcciones
+                                            </button>
+
+                                            <button
+                                                onClick={() => handleMenuItemClick('Métodos de Pago')}
+                                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+                                            >
+                                                <CreditCard className="w-4 h-4" />
+                                                Métodos de Pago
+                                            </button>
+
+                                            <button
+                                                onClick={() => handleMenuItemClick('Mis Favoritos')}
+                                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+                                            >
+                                                <Star className="w-4 h-4" />
+                                                Mis Favoritos
+                                            </button>
+
+                                            <div className="border-t border-gray-200 my-1"></div>
+
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
+                                            >
+                                                <LogOut className="w-4 h-4" />
+                                                Cerrar Sesión
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <button

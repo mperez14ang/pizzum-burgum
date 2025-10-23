@@ -1,7 +1,16 @@
 const API_BASE_URL = 'http://localhost:8080/api';
 
 const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    let token = null;
+    if (userStr) {
+        try {
+            const user = JSON.parse(userStr);
+            token = user.token;
+        } catch (e) {
+            console.error('Error parsing user from localStorage:', e);
+        }
+    }
     return {
         'Content-Type': 'application/json',
         ...(token && { 'Authorization': `Bearer ${token}` })

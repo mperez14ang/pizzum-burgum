@@ -33,12 +33,17 @@ public class FavoritesService implements FavoritesServiceInt {
     @Transactional
     @Override
     public FavoritesDto createFavorites(FavoritesDto favoritesDto) {
+        System.out.println("=== INICIO createFavorites ===");
+        System.out.println("Client email: " + favoritesDto.getClientEmail());
+
         Favorites favorites = FavoritesMapper.toFavorites(favoritesDto);
         // Buscar cliente
         Client client = null;
         if (favoritesDto.getClientEmail() != null) {
             client = clientRepository.findById(favoritesDto.getClientEmail())
                     .orElseThrow(() -> new RuntimeException("No se encontró el cliente de favoritos"));
+            System.out.println("Cliente encontrado: " + client.getEmail());
+            System.out.println("Favoritos actuales del cliente: " + (client.getFavorites() != null ? client.getFavorites().size() : "null"));
         }
 
         // Pasar de creationDto a creation
@@ -88,14 +93,16 @@ public class FavoritesService implements FavoritesServiceInt {
 
         favorites.setCreations(creations);
 
-        // Use helper method to ensure proper bidirectional sync
+        // Usar el helper method para sincronizar la relación bidireccional
         client.addFavorite(favorites);
 
-        // Save the favorites first
-        Favorites savedFavorites = favoritesRepository.save(favorites);
+        System.out.println("Antes de guardar - client_id del favorito: " + (favorites.getClient() != null ? favorites.getClient().getEmail() : "null"));
 
-        // Then save the client to persist the relationship
-        clientRepository.save(client);
+        // Save the favorites with the client reference - JPA handles the foreign key
+        Favorites savedFavorites = favoritesRepository.save(favorites);
+        System.out.println("Favorito guardado con ID: " + savedFavorites.getId());
+        System.out.println("Favoritos del cliente después de guardar: " + client.getFavorites().size());
+        System.out.println("=== FIN createFavorites ===");
 
         return FavoritesMapper.toFavoritesDto(savedFavorites);
 

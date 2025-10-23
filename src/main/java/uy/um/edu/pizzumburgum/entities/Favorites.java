@@ -12,6 +12,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
+@EqualsAndHashCode(exclude = {"client", "creations"})
+@ToString(exclude = "client")
 public class Favorites {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +24,6 @@ public class Favorites {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
-    @ToString.Exclude
     private Client client;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)

@@ -74,11 +74,16 @@ public class ClientService implements ClientServiceInt {
     @Transactional
     @Override
     public ClientResponse getClientByEmail(String email) {
+        System.out.println("=== getClientByEmail: " + email + " ===");
         Client client =  clientRepository.findById(email).orElse(null);
         if (client == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Cliente con id " + email + " no fue encontrado"
             );
+        }
+        System.out.println("Cliente encontrado - Favoritos: " + (client.getFavorites() != null ? client.getFavorites().size() : "null"));
+        if (client.getFavorites() != null && !client.getFavorites().isEmpty()) {
+            System.out.println("IDs de favoritos: " + client.getFavorites().stream().map(f -> f.getId()).toList());
         }
         return ClientMapper.toClientResponse(client);
     }

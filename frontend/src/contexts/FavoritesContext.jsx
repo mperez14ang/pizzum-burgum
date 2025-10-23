@@ -49,13 +49,15 @@ export const FavoritesProvider = ({ children }) => {
             if (text && text.trim() !== '') {
                 try {
                     data = JSON.parse(text);
+                    console.log('✅ Favoritos parseados del backend:', data);
                 } catch (e) {
                     console.error('Error parsing favorites JSON:', e);
                 }
             }
 
             // Los datos vienen como un array de objetos Favorites
-            console.log('✅ Favoritos cargados:', data?.length || 0);
+            console.log('✅ Favoritos cargados:', data?.length || 0, 'favoritos');
+            console.log('Datos completos:', data);
             setFavorites(data || []);
         } catch (err) {
             console.error('Error loading favorites:', err);
@@ -221,8 +223,8 @@ export const FavoritesProvider = ({ children }) => {
             console.log('✅ Condiciones cumplidas - Llamando loadFavorites para:', user.email);
             loadFavorites();
         } else {
-            console.log('❌ Condiciones NO cumplidas - Limpiando favoritos');
-            setFavorites([]);
+            console.log('⏸️ No autenticado - esperando auth (NO limpiamos favoritos)');
+            // NO limpiamos los favoritos aquí, solo cuando el usuario hace logout explícitamente
         }
     }, [isAuthenticated, user, loadFavorites]);
 

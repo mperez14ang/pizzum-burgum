@@ -1,13 +1,14 @@
 package uy.um.edu.pizzumburgum.services;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.LoginRequest;
-import uy.um.edu.pizzumburgum.dto.request.TokenRequest;
 import uy.um.edu.pizzumburgum.dto.response.AuthResponse;
 import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
+import uy.um.edu.pizzumburgum.dto.response.TokenResponse;
 import uy.um.edu.pizzumburgum.entities.User;
 import uy.um.edu.pizzumburgum.repository.UserRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.AuthServiceInt;
@@ -56,21 +57,48 @@ public class AuthService implements AuthServiceInt {
     }
 
     @Override
-    public boolean verifyToken(TokenRequest request) {
-        String jwtToken = request.getToken();
+    public TokenResponse verifyToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        boolean verified = false;
+        Date expirationDate = null;
+        Date emmissionDate = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = this.getToken(request);
+            verified = this.verifyToken(token);
+            expirationDate = this.getTokenExpirationDate(token);
+            emmissionDate = this.getTokenEmissionDate(token);
+        }
+
+        return TokenResponse.builder()
+                .verified(verified)
+                .expirationDate(expirationDate)
+                .emittedDate(emmissionDate)
+                .build();
+    }
+
+    @Override
+    public boolean verifyToken(String jwtToken) {
         if (jwtToken == null || jwtToken.isEmpty()) {return false;}
         return !jwtService.isTokenExpired(jwtToken);
     }
 
     @Override
-    public Date getTokenExpirationDate(TokenRequest request) {
-        String jwtToken = request.getToken();
+    public Date getTokenExpirationDate(String jwtToken) {
         return jwtService.extractExpiration(jwtToken);
     }
 
     @Override
-    public Date getTokenEmissionDate(TokenRequest request) {
-        String jwtToken = request.getToken();
+    public Date getTokenEmissionDate(String jwtToken) {
         return jwtService.extractEmisionDate(jwtToken);
+    }
+
+    @Override
+    public String getTokenUsername(String jwtToken) {
+        return jwtService.extractUsername(jwtToken);
+    }
+
+    public String getToken(HttpServletRequest request){
+        return request.getHeader("Authorization").substring(7);
     }
 }

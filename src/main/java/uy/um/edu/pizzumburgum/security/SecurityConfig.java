@@ -38,7 +38,7 @@ public class SecurityConfig {
         return httpSecurity.authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll() // Permite a los usuarios sin token
 
                         // Endpoints para todos
                         .requestMatchers("/api/public/**").permitAll()
@@ -59,8 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/order/**").hasAnyRole(CLIENT, ADMIN)
 
                         // Favorites endpoints
-                        .requestMatchers("/api/favorites/my").hasAnyRole(CLIENT, ADMIN)
-                        .requestMatchers("/api/favorites/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers("/api/favorites/**").permitAll()
 
                         // Cards endpoints
                         .requestMatchers("/api/card/**").hasAnyRole(CLIENT, ADMIN)
@@ -69,10 +68,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(Customizer.withDefaults())
                 .cors(Customizer.withDefaults())
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .build();
     }
@@ -93,10 +92,11 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3001", "http://localhost:5173"));
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
+        configuration.setExposedHeaders(List.of("Authorization"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

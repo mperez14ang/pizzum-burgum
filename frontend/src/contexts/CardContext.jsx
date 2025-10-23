@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 const CardContext = createContext();
 
 export const CardProvider = ({ children }) => {
-    const { isAuthenticated, user, logout } = useAuth();
+    const { isAuthenticated, user, logout, tokenAuth } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
     const [stripe, setStripe] = useState(null);
     const [cardElement, setCardElement] = useState(null);
@@ -58,13 +58,11 @@ export const CardProvider = ({ children }) => {
 
             console.log('PaymentMethod ID:', paymentMethod.id);
 
-            const basicAuth = btoa(`${user.email}:${user.password}`);
-
             const response = await fetch('http://localhost:8080/api/card/v1', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Basic ${basicAuth}`,
+                    'Authorization': `Bearer ${tokenAuth}`
                 },
                 body: JSON.stringify({
                     clientEmail: user.email,

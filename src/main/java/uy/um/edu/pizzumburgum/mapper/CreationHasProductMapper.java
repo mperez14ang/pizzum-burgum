@@ -7,8 +7,8 @@ public class CreationHasProductMapper {
     public static CreationHasProductsDto toCreationHasProductsDto(CreationHasProducts creationHasProducts) {
         return CreationHasProductsDto.builder()
                 .id(creationHasProducts.getId())
-                .creation(creationHasProducts.getCreation().getId())
-                .product(creationHasProducts.getProduct().getId())
+                .creationId(creationHasProducts.getCreation().getId())
+                .productId(creationHasProducts.getProduct().getId())
                 .quantity(creationHasProducts.getQuantity())
                 .build();
     }

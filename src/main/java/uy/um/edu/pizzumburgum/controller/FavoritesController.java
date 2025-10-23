@@ -1,11 +1,15 @@
 package uy.um.edu.pizzumburgum.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import uy.um.edu.pizzumburgum.dto.response.TokenResponse;
 import uy.um.edu.pizzumburgum.dto.shared.FavoritesDto;
+import uy.um.edu.pizzumburgum.services.AuthService;
 import uy.um.edu.pizzumburgum.services.FavoritesService;
 
 import java.util.List;
@@ -15,7 +19,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FavoritesController {
 
+    Logger log = LoggerFactory.getLogger(FavoritesController.class);
+
     private final FavoritesService favoritesService;
+
+    private final AuthService authService;
 
     /**
      * Crear un nuevo favorito
@@ -59,13 +67,16 @@ public class FavoritesController {
      * GET /api/favorites/my
      */
     @GetMapping("/my")
-    public ResponseEntity<List<FavoritesDto>> getMyFavorites(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public List<FavoritesDto> getMyFavorites(HttpServletRequest request) {
+        log.info("GET MY FAVORITES");
+        TokenResponse tokenResponse = authService.verifyToken(request);
+        if (!tokenResponse.isVerified()){
+            log.error("Token invalido");
+            return null;
         }
-        System.out.println(authentication.getPrincipal());
-        String userEmail = authentication.getName();
-        return ResponseEntity.ok(favoritesService.getFavoritesByClientEmail(userEmail));
+
+        String userEmail = authService.getTokenUsername(authService.getToken(request));
+        return favoritesService.getFavoritesByClientEmail(userEmail);
     }
 
     /**

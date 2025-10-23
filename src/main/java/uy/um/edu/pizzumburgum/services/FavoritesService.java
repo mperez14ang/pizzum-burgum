@@ -66,8 +66,8 @@ public class FavoritesService implements FavoritesServiceInt {
                     Set<CreationHasProducts> creationProducts = new HashSet<>();
                     for (CreationHasProductsDto productDto : creationDto.getProducts()) {
                         // Buscar el producto por ID
-                        Product product = productRepository.findById(productDto.getProduct())
-                                .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + productDto.getProduct()));
+                        Product product = productRepository.findById(productDto.getProductId())
+                                .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + productDto.getCreationId()));
 
                         // Crear la relación
                         CreationHasProducts creationHasProduct = CreationHasProducts.builder()

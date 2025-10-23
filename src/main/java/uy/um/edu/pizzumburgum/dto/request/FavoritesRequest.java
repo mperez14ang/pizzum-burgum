@@ -13,8 +13,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FavoritesRequest {
-    private LocalDate createdAt;
-
     private String clientEmail;
 
     private Set<Long> creationsIds;

@@ -6,14 +6,16 @@ import uy.um.edu.pizzumburgum.dto.shared.CreationDto;
 import uy.um.edu.pizzumburgum.entities.Creation;
 import uy.um.edu.pizzumburgum.entities.Favorites;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
 public class FavoritesMapper {
     public static Favorites toFavorites(FavoritesRequest favoritesDto) {
+        LocalDate currentDate = LocalDate.now();
 
         return Favorites.builder()
-                .dateCreated(favoritesDto.getCreatedAt())
+                .dateCreated(currentDate)
                 .build();
     }
 

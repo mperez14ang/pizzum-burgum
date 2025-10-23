@@ -35,11 +35,9 @@ public class FavoritesService implements FavoritesServiceInt {
     public FavoritesResponse createFavorites(FavoritesRequest favoritesDto) {
         Favorites favorites = FavoritesMapper.toFavorites(favoritesDto);
         // Buscar cliente
-        Client client = null;
-        if (favoritesDto.getClientEmail() != null) {
-            client = clientRepository.findById(favoritesDto.getClientEmail())
-                    .orElseThrow(() -> new RuntimeException("No se encontró el cliente de favoritos"));
-        }
+        Client client = clientRepository.findById(favoritesDto.getClientEmail())
+                .orElseThrow(() -> new RuntimeException("No se encontró el cliente de favoritos"));
+
 
         // Pasar de creationDto a creation
         Set<Creation> creations = new HashSet<>();
@@ -51,6 +49,7 @@ public class FavoritesService implements FavoritesServiceInt {
         }
 
         favorites.setCreations(creations);
+        favorites.setClient(client);
 
         // Agregar a cliente
         assert client != null;

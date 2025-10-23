@@ -18,7 +18,6 @@ export const FavoritesProvider = ({ children }) => {
 
         // Si no hay usuario autenticado, no cargar favoritos
         if (!isAuthenticated || !user || !user.token) {
-            console.log('⚠️ No se puede cargar favoritos - falta autenticación');
             setFavorites([]);
             console.log("No hay usuario autenticado!")
             return;
@@ -73,28 +72,28 @@ export const FavoritesProvider = ({ children }) => {
 
         if (creationData.type === 'PIZZA') {
             // Para pizzas
-            if (creationData.size) products.push({ quantity: 1, product: creationData.size.id });
-            if (creationData.dough) products.push({ quantity: 1, product: creationData.dough.id });
-            if (creationData.sauce) products.push({ quantity: 1, product: creationData.sauce.id });
-            if (creationData.cheese) products.push({ quantity: 1, product: creationData.cheese.id });
+            if (creationData.size) products.push({ quantity: 1, productId: creationData.size.id });
+            if (creationData.dough) products.push({ quantity: 1, productId: creationData.dough.id });
+            if (creationData.sauce) products.push({ quantity: 1, productId: creationData.sauce.id });
+            if (creationData.cheese) products.push({ quantity: 1, productId: creationData.cheese.id });
             if (creationData.toppings) {
                 creationData.toppings.forEach(topping => {
-                    products.push({ quantity: 1, product: topping.id });
+                    products.push({ quantity: 1, productId: topping.id });
                 });
             }
         } else if (creationData.type === 'HAMBURGER') {
             // Para hamburguesas
-            if (creationData.bread) products.push({ quantity: 1, product: creationData.bread.id });
-            if (creationData.meat) products.push({ quantity: creationData.meatQuantity || 1, product: creationData.meat.id });
-            if (creationData.cheese) products.push({ quantity: 1, product: creationData.cheese.id });
+            if (creationData.bread) products.push({ quantity: 1, productId: creationData.bread.id });
+            if (creationData.meat) products.push({ quantity: creationData.meatQuantity || 1, productId: creationData.meat.id });
+            if (creationData.cheese) products.push({ quantity: 1, productId: creationData.cheese.id });
             if (creationData.toppings) {
                 creationData.toppings.forEach(topping => {
-                    products.push({ quantity: 1, product: topping.id });
+                    products.push({ quantity: 1, productId: topping.id });
                 });
             }
             if (creationData.sauces) {
                 creationData.sauces.forEach(sauce => {
-                    products.push({ quantity: 1, product: sauce.id });
+                    products.push({ quantity: 1, productId: sauce.id });
                 });
             }
         }
@@ -106,6 +105,26 @@ export const FavoritesProvider = ({ children }) => {
             products: products
         };
     };
+
+    const addCreation = async (transformedCreationData) => {
+        if (!isAuthenticated || !user) {
+            return {
+                success: false,
+                error: 'Debes iniciar sesión para guardar favoritos'
+            };
+        }
+
+        const response = await fetch('http://localhost:8080/api/creation/v1', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user.token}`
+            },
+            body: JSON.stringify(transformedCreationData)
+        });
+
+        return await response.json();
+    }
 
 
     const addToFavorites = async (creationData) => {
@@ -124,10 +143,13 @@ export const FavoritesProvider = ({ children }) => {
             // Transformar los datos al formato del backend
             const transformedCreation = transformCreationData(creationData);
 
+            // Obtener la id de la creation
+            const creation = await addCreation(transformedCreation);
+
             // Crear el payload para el backend
             const payload = {
                 clientEmail: user.email,
-                creations: [transformedCreation]
+                creationsIds: [creation["id"]]
             };
 
             console.log('Payload enviado al backend:', JSON.stringify(payload, null, 2));

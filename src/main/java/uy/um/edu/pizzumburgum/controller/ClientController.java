@@ -9,10 +9,12 @@ import uy.um.edu.pizzumburgum.dto.request.ClientUpdateRequest;
 import uy.um.edu.pizzumburgum.dto.response.AddressResponse;
 import uy.um.edu.pizzumburgum.dto.response.CardResponse;
 import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
+import uy.um.edu.pizzumburgum.dto.response.FavoritesResponse;
 import uy.um.edu.pizzumburgum.exception.ResourceNotFoundException;
 import uy.um.edu.pizzumburgum.services.AddressService;
 import uy.um.edu.pizzumburgum.services.CardService;
 import uy.um.edu.pizzumburgum.services.ClientService;
+import uy.um.edu.pizzumburgum.services.FavoritesService;
 
 import java.util.List;
 import java.util.Map;
@@ -23,11 +25,13 @@ public class ClientController {
     private final ClientService clientService;
     private final AddressService addressService;
     private final CardService cardService;
+    private final FavoritesService favoritesService;
 
-    public ClientController(ClientService clientService, AddressService addressService,  CardService cardService) {
+    public ClientController(ClientService clientService, AddressService addressService, CardService cardService, FavoritesService favoritesService) {
         this.clientService = clientService;
         this.addressService = addressService;
         this.cardService = cardService;
+        this.favoritesService = favoritesService;
     }
 
     @PostMapping
@@ -56,6 +60,8 @@ public class ClientController {
         return clientService.getClients();
     }
 
+    // Address endpoints
+
     @PostMapping("{clientEmail}/address")
     public AddressResponse createAddress(@PathVariable String clientEmail, @RequestBody AddressRequest addressRequest) throws ResourceNotFoundException {
         return addressService.createAddress(addressRequest, clientEmail);
@@ -64,6 +70,15 @@ public class ClientController {
     @GetMapping("{clientEmail}/cards")
     public List<CardResponse> getCardFromClient(@PathVariable String clientEmail) {
         return this.cardService.getCardsFromClient(clientEmail);
+    }
+
+    /**
+     * Obtener favoritos de un cliente específico
+     * GET /api/favorites/client/{clientEmail}
+     */
+    @GetMapping("/favorites/{clientEmail}")
+    public ResponseEntity<List<FavoritesResponse>> getFavoritesByClient(@PathVariable String clientEmail) {
+        return ResponseEntity.ok(favoritesService.getFavoritesByClientEmail(clientEmail));
     }
 
 }

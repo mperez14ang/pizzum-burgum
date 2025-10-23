@@ -14,6 +14,8 @@ import uy.um.edu.pizzumburgum.repository.AddressRepository;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.AddressServiceInt;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +53,19 @@ public class AddressService implements AddressServiceInt {
         ));
 
         return AddressMapper.toAddressResponse(address);
+    }
+
+    @Transactional
+    @Override
+    public List<AddressResponse> getClientAddresses(String clientEmail) {
+        Client client = clientRepository.findById(clientEmail)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST, "No se pudo encontrar un cliente con email " + clientEmail)
+                );
+
+        return client.getAddresses().stream()
+                .map(AddressMapper::toAddressResponse).toList();
     }
 
     @Transactional

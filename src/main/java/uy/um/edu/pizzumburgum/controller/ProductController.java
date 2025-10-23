@@ -9,6 +9,7 @@ import uy.um.edu.pizzumburgum.entities.ProductCategory;
 import uy.um.edu.pizzumburgum.entities.ProductType;
 import uy.um.edu.pizzumburgum.services.ProductService;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,12 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDto>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    public ResponseEntity<List<ProductDto>> getFilteredProducts(
+            @RequestParam(required = false) ProductType type,
+            @RequestParam(required = false) ProductCategory category,
+            @RequestParam(required = false) Boolean available
+    ) {
+        return ResponseEntity.ok(productService.getFilteredProducts(type, category, available));
     }
 
     @GetMapping("/{id}")
@@ -36,20 +41,6 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
-    @GetMapping("/category/{category}")
-    public ResponseEntity<List<ProductDto>> getProductsByCategory(@PathVariable ProductCategory category) {
-        List<ProductDto> products = productService.getProductsByCategory(category);
-        // Filter only available products for public access
-        List<ProductDto> availableProducts = products.stream()
-                .filter(p -> p.getAvailable() != null && p.getAvailable())
-                .toList();
-        return ResponseEntity.ok(availableProducts);
-    }
-
-    @GetMapping("/type/{type}")
-    public ResponseEntity<List<ProductDto>> getProductsByType(@PathVariable ProductType type) {
-        return ResponseEntity.ok(productService.getProductsByType(type));
-    }
     @GetMapping("/ingredients")
     public ResponseEntity<Map<String, List<ProductDto>>> getIngredientsGrouped() {
         List<ProductDto> allProducts = productService.getAllProducts();
@@ -104,6 +95,20 @@ public class ProductController {
 
         return ResponseEntity.ok(ingredients);
     }
+
+    @PutMapping
+    public ResponseEntity<ProductDto> updateProduct(
+            @RequestParam Long id,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) BigDecimal price,
+            @RequestParam(required = false) ProductType productType,
+            @RequestParam(required = false) ProductCategory productCategory,
+            @RequestParam(required = false) Boolean available) {
+        return ResponseEntity.ok(productService.updateProduct(
+                id, name, price, productType, productCategory, available
+        ));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto) {
         return ResponseEntity.ok(productService.updateProduct(id, productDto));
@@ -113,15 +118,6 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/{id}/availability")
-    public ResponseEntity<ProductDto> toggleAvailability(@PathVariable Long id, @RequestBody Map<String, Boolean> body) {
-        Boolean available = body.get("available");
-        if (available == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(productService.toggleAvailability(id, available));
     }
 
     @GetMapping("/categories")

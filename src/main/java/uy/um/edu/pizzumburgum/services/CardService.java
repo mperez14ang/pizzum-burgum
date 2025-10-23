@@ -21,7 +21,9 @@ import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.CardServiceInt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CardService implements CardServiceInt {
@@ -108,7 +110,12 @@ public class CardService implements CardServiceInt {
     }
 
     @Override
-    public ResponseEntity<String> deleteCard(Long id) {
-        return null;
+    public ResponseEntity<Map<String, Object>> deleteCard(Long id) {
+        cardRepository.deleteById(id);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Tarjeta " + id + " fue borrada");
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

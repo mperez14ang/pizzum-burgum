@@ -110,15 +110,12 @@ export const AuthPage = ({type, onToggleAuthType}) => {
                 return;
             }
 
-            if (response && response.token) {
-                if (isRegister){
-                    toast.success('Registro de usuario exitoso', { duration: 2000 });
-                }
-                else{
-                    toast.success('Inicio de sesión exitoso', { duration: 2000 });
-                }
-                setIsLoading(false);
+            // Solo mostrar toast en registro exitoso
+            // El login exitoso cierra el modal automáticamente sin necesidad de toast
+            if (response && response.token && isRegister) {
+                toast.success('Registro de usuario exitoso', { duration: 2000 });
             }
+            setIsLoading(false);
         } catch (err) {
             if (err.message === "timeout") {
                 setErrors(prev => ({ ...prev, email: "El servidor tardó demasiado en responder (timeout)" }));

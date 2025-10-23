@@ -181,14 +181,25 @@ export const CreatorPage = ({ productType, onBack }) => {
             return;
         }
 
-        // Validar que haya al menos un ingrediente seleccionado
-        const hasSelection = productType === 'pizza'
-            ? selectedSize || selectedDough || selectedSauce || selectedCheese || selectedToppings.length > 0
-            : selectedBread || selectedMeat || selectedBurgerCheese || selectedBurgerToppings.length > 0;
-
-        if (!hasSelection) {
-            toast.error("Selecciona al menos un ingrediente para guardar en favoritos", { duration: 2000 })
-            return;
+        // Validar campos obligatorios
+        if (productType === 'pizza') {
+            if (!selectedSize) {
+                toast.error("El tamaño de la pizza es obligatorio", { duration: 2000 })
+                return;
+            }
+            if (!selectedDough) {
+                toast.error("El tipo de masa es obligatorio", { duration: 2000 })
+                return;
+            }
+        } else {
+            if (!selectedBread) {
+                toast.error("El tipo de pan es obligatorio", { duration: 2000 })
+                return;
+            }
+            if (!selectedMeat) {
+                toast.error("Debe seleccionar al menos un tipo de carne", { duration: 2000 })
+                return;
+            }
         }
 
         // Validar que haya un nombre
@@ -245,6 +256,27 @@ export const CreatorPage = ({ productType, onBack }) => {
 //
     // Agregar al carrito
     const handleAddToCart = () => {
+        // Validar campos obligatorios
+        if (productType === 'pizza') {
+            if (!selectedSize) {
+                toast.error("El tamaño de la pizza es obligatorio", { duration: 2000 })
+                return;
+            }
+            if (!selectedDough) {
+                toast.error("El tipo de masa es obligatorio", { duration: 2000 })
+                return;
+            }
+        } else {
+            if (!selectedBread) {
+                toast.error("El tipo de pan es obligatorio", { duration: 2000 })
+                return;
+            }
+            if (!selectedMeat) {
+                toast.error("Debe seleccionar al menos un tipo de carne", { duration: 2000 })
+                return;
+            }
+        }
+
         const creationData = productType === 'pizza' ? {
             type: 'pizza',
             size: selectedSize,
@@ -328,7 +360,7 @@ export const CreatorPage = ({ productType, onBack }) => {
                             {productType === 'pizza' && (
                                 <div className="space-y-4">
                                     {/* Tamaño */}
-                                    <Accordion title="1. Tamaño" isOpen={true}>
+                                    <Accordion title={<span>1. Tamaño <span className="text-red-500">*</span></span>} isOpen={true}>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                             {ingredients.PIZZA_SIZES.map((size) => (
                                                 <button
@@ -348,7 +380,7 @@ export const CreatorPage = ({ productType, onBack }) => {
                                     </Accordion>
 
                                     {/* Masa */}
-                                    <Accordion title="2. Tipo de Masa">
+                                    <Accordion title={<span>2. Tipo de Masa <span className="text-red-500">*</span></span>}>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                             {ingredients.PIZZA_DOUGH.map((dough) => (
                                                 <button
@@ -445,7 +477,7 @@ export const CreatorPage = ({ productType, onBack }) => {
                             {productType === 'burger' && (
                                 <div className="space-y-4">
                                     {/* Pan */}
-                                    <Accordion title="1. Tipo de Pan" isOpen={true}>
+                                    <Accordion title={<span>1. Tipo de Pan <span className="text-red-500">*</span></span>} isOpen={true}>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                             {ingredients.BREAD_OPTIONS.map((bread) => (
                                                 <button
@@ -467,7 +499,7 @@ export const CreatorPage = ({ productType, onBack }) => {
                                     </Accordion>
 
                                     {/* Carne */}
-                                    <Accordion title="2. Tipo de Carne">
+                                    <Accordion title={<span>2. Tipo de Carne <span className="text-red-500">*</span></span>}>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                             {ingredients.MEAT_OPTIONS.map((meat) => (
                                                 <button

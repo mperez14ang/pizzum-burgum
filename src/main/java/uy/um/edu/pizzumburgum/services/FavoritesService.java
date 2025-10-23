@@ -86,11 +86,18 @@ public class FavoritesService implements FavoritesServiceInt {
             creations.add(creation);
         }
 
-        favorites.setClient(client);
         favorites.setCreations(creations);
 
-        favoritesRepository.save(favorites);
-        return FavoritesMapper.toFavoritesDto(favorites);
+        // Use helper method to ensure proper bidirectional sync
+        client.addFavorite(favorites);
+
+        // Save the favorites first
+        Favorites savedFavorites = favoritesRepository.save(favorites);
+
+        // Then save the client to persist the relationship
+        clientRepository.save(client);
+
+        return FavoritesMapper.toFavoritesDto(savedFavorites);
 
     }
 
@@ -116,8 +123,16 @@ public class FavoritesService implements FavoritesServiceInt {
     @Override
     public List<FavoritesDto> getFavoritesByClientEmail(String email) {
         // Buscar cliente por email
-        Client client = clientRepository.findById(email)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+        Client client = clientRepository.findById(email).orElse(null);
+
+        if (client == null) {
+            return List.of();
+        }
+
+        // Si el cliente no existe o no tiene favoritos, devolver lista vacía
+        if (client.getFavorites() == null || client.getFavorites().isEmpty()) {
+            return List.of(); // Lista vacía inmutable
+        }
 
         // Obtener favoritos del cliente
         return client.getFavorites().stream()

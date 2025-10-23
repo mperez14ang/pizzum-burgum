@@ -5,6 +5,7 @@ import uy.um.edu.pizzumburgum.dto.request.CardRequest;
 import uy.um.edu.pizzumburgum.dto.response.CardResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CardServiceInt {
     CardResponse createCard(CardRequest cardRequest);
@@ -15,5 +16,5 @@ public interface CardServiceInt {
 
     CardResponse updateCard(Long id, CardRequest cardRequest);
 
-    ResponseEntity<String> deleteCard(Long id);
+    ResponseEntity<Map<String, Object>> deleteCard(Long id);
 }

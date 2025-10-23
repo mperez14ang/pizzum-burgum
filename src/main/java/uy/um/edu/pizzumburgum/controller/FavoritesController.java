@@ -55,15 +55,6 @@ public class FavoritesController {
     }
 
     /**
-     * Obtener favoritos de un cliente específico
-     * GET /api/favorites/client/{clientId}
-     */
-    @GetMapping("/client/{clientId}")
-    public ResponseEntity<List<FavoritesResponse>> getFavoritesByClient(@PathVariable Long clientId) {
-        return ResponseEntity.ok(favoritesService.getFavoritesByClientId(clientId));
-    }
-
-    /**
      * Obtener favoritos del usuario autenticado
      * GET /api/favorites/my
      */

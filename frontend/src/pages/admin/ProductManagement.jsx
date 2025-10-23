@@ -64,6 +64,7 @@ export const ProductManagement = () => {
         try {
             setLoading(true);
             const data = await adminService.getAllProducts();
+            console.log(data)
             setProducts(data);
             setFilteredProducts(data);
         } catch (error) {

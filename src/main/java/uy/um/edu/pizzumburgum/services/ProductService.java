@@ -6,20 +6,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import uy.um.edu.pizzumburgum.dto.shared.CreationHasProductsDto;
 import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
-import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
 import uy.um.edu.pizzumburgum.entities.Product;
 import uy.um.edu.pizzumburgum.entities.ProductCategory;
 import uy.um.edu.pizzumburgum.entities.ProductType;
 import uy.um.edu.pizzumburgum.mapper.ProductMapper;
-import uy.um.edu.pizzumburgum.repository.CreationHasProductsRepository;
 import uy.um.edu.pizzumburgum.repository.ProductRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.ProductServiceInt;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,20 +24,12 @@ import java.util.stream.Collectors;
 public class ProductService implements ProductServiceInt {
 
     private final ProductRepository productRepository;
-    private final CreationHasProductsRepository creationHasProductsRepository;
 
     @Transactional
     @Override
     public ProductDto createProduct(ProductDto productDto) {
         // Validar que el tipo sea compatible con la categoría
-        if (productDto.getProductType() != null &&
-            productDto.getProductCategory() != null &&
-            productDto.getProductType().getCategory() != productDto.getProductCategory()) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "El tipo '" + productDto.getProductType() + "' no es compatible con la categoría '" + productDto.getProductCategory() + "'"
-            );
-        }
+        this.checkCompatibility(productDto.getProductType(), productDto.getProductCategory());
 
         System.out.println("=== CREANDO PRODUCTO ===");
         System.out.println("DTO recibido: " + productDto);
@@ -59,34 +48,6 @@ public class ProductService implements ProductServiceInt {
         return result;
     }
 
-    @Transactional
-    @Override
-    public ProductDto updateProduct(Long id, ProductDto dto) throws ResponseStatusException {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Producto con id : " + id + " no encontrado"));
-
-        // Validar que el tipo sea compatible con la categoría
-        if (dto.getProductType() != null &&
-            dto.getProductCategory() != null &&
-            dto.getProductType().getCategory() != dto.getProductCategory()) {
-            throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "El tipo '" + dto.getProductType() + "' no es compatible con la categoría '" + dto.getProductCategory() + "'"
-            );
-        }
-
-        product.setName(dto.getName());
-        product.setPrice(dto.getPrice());
-        product.setCategory(dto.getProductCategory());
-        product.setType(dto.getProductType());
-        if (dto.getAvailable() != null) {
-            product.setAvailable(dto.getAvailable());
-        }
-
-        product = productRepository.save(product);
-        return ProductMapper.toProductDto(product);
-    }
-
     @Transactional(readOnly = true)
     @Override
     public ProductDto getProductById(Long id) throws ResponseStatusException {
@@ -97,24 +58,19 @@ public class ProductService implements ProductServiceInt {
 
     @Transactional(readOnly = true)
     @Override
+    public List<ProductDto> getFilteredProducts(ProductType type, ProductCategory category, Boolean available) {
+        return productRepository.findAll().stream()
+                .filter(product -> type == null || product.getType() == type)
+                .filter(product -> category == null || product.getCategory() == category)
+                .filter(product -> available == null || product.getAvailable() == available)
+                .map(ProductMapper::toProductDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    @Override
     public List<ProductDto> getAllProducts() {
         return productRepository.findAll().stream()
-                .map(ProductMapper::toProductDto)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<ProductDto> getProductsByCategory(ProductCategory category) {
-        return productRepository.findByCategory(category).stream()
-                .map(ProductMapper::toProductDto)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<ProductDto> getProductsByType(ProductType type) {
-        return productRepository.findByType(type).stream()
                 .map(ProductMapper::toProductDto)
                 .collect(Collectors.toList());
     }
@@ -128,14 +84,42 @@ public class ProductService implements ProductServiceInt {
         productRepository.deleteById(id);
     }
 
-    @Transactional
-    public ProductDto toggleAvailability(Long id, Boolean available) throws ResponseStatusException {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Producto con id : " + id + " no encontrado"));
+    @Override
+    public ProductDto updateProduct(Long id, String name, BigDecimal price,
+                                ProductType productType, ProductCategory productCategory, Boolean available) {
 
-        product.setAvailable(available);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Producto con id : " + id + " no encontrado"));
+
+        this.checkCompatibility(productType, productCategory);
+
+        if (name != null) product.setName(name);
+        if (price != null) product.setPrice(price);
+        if (productType != null) product.setType(productType);
+        if (productCategory != null) product.setCategory(productCategory);
+        if (available != null) product.setAvailable(available);
+
         product = productRepository.save(product);
         return ProductMapper.toProductDto(product);
+    }
+
+    @Transactional
+    @Override
+    public ProductDto updateProduct(Long id, ProductDto dto) throws ResponseStatusException {
+        return this.updateProduct(dto.getId(), dto.getName(), dto.getPrice(), dto.getProductType(), dto.getProductCategory(), dto.getAvailable());
+    }
+
+    private void checkCompatibility(ProductType productType, ProductCategory productCategory) throws ResponseStatusException {
+        // Validar que el tipo sea compatible con la categoría
+        if (productType != null &&
+                productCategory != null &&
+                productType.getCategory() != productCategory) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El tipo '" + productType + "' no es compatible con la categoría '" + productCategory + "'"
+            );
+        }
     }
 
 }

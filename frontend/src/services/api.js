@@ -88,7 +88,9 @@ export const ingredientsService = {
 export const adminService = {
     // Products
     getAllProducts: async () => {
-        return fetchFromAPI('/products');
+        return fetchFromAPI('/products', {
+            method: 'GET'
+        });
     },
 
     createProduct: async (product) => {
@@ -112,9 +114,8 @@ export const adminService = {
     },
 
     toggleProductAvailability: async (id, available) => {
-        return fetchFromAPI(`/products/${id}/availability`, {
-            method: 'PATCH',
-            body: JSON.stringify({ available })
+        return fetchFromAPI(`/products?id=${id}&available=${available}`, {
+            method: 'PUT'
         });
     },
 

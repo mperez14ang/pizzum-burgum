@@ -27,7 +27,7 @@ export const FavoriteButton = ({ creationData, size = 'md', className = '' }) =>
         e.stopPropagation();
 
         if (!creationData) {
-            toast.error("Debes crear una pizza o hamburguesa primero")
+            toast.error("Debes crear una pizza o hamburguesa primero", { duration: 2000 })
             return;
         }
 
@@ -39,7 +39,7 @@ export const FavoriteButton = ({ creationData, size = 'md', className = '' }) =>
         if (result.success) {
             setTimeout(() => setIsAnimating(false), 300);
         } else {
-            toast.error(result.error || 'Error al actualizar favoritos')
+            toast.error(result.error || 'Error al actualizar favoritos', { duration: 2000 })
             setIsAnimating(false);
         }
 

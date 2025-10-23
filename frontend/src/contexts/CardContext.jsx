@@ -71,7 +71,7 @@ export const CardProvider = ({ children }) => {
             });
 
             if (response.ok) {
-                toast.success("La tarjeta se guardo con exito")
+                toast.success("La tarjeta se guardo con exito", { duration: 2000 })
                 setSuccess(true);
                 setCardholderName('');
                 setEmail('');

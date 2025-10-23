@@ -10,19 +10,25 @@ export const AuthProvider = ({ children }) => {
 
     // Comprobar si hay un usuario guardado al cargar
     useEffect(() => {
+        console.log('🔐 AuthContext: Iniciando carga desde localStorage');
         const storedUser = localStorage.getItem('user');
+        console.log('🔐 AuthContext: storedUser:', storedUser ? 'exists' : 'null');
+
         if (storedUser) {
             try {
                 const userData = JSON.parse(storedUser);
+                console.log('🔐 AuthContext: userData parseado:', userData.email);
                 setUser(userData);
                 setIsAuthenticated(true);
                 setTokenAuth(userData.token);
+                console.log('✅ AuthContext: Usuario restaurado correctamente');
             } catch (error) {
                 console.error('Error parsing stored user:', error);
                 localStorage.removeItem('user');
             }
         }
         setIsLoading(false);
+        console.log('🔐 AuthContext: isLoading = false');
     }, []);
 
     const addUser = (userData) => {

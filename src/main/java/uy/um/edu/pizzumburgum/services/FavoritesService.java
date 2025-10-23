@@ -50,7 +50,6 @@ public class FavoritesService implements FavoritesServiceInt {
 
         }
 
-        favorites.setClient(client);
         favorites.setCreations(creations);
 
         // Agregar a cliente
@@ -84,8 +83,16 @@ public class FavoritesService implements FavoritesServiceInt {
     @Override
     public List<FavoritesResponse> getFavoritesByClientEmail(String email) {
         // Buscar cliente por email
-        Client client = clientRepository.findById(email)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+        Client client = clientRepository.findById(email).orElse(null);
+
+        if (client == null) {
+            return List.of();
+        }
+
+        // Si el cliente no existe o no tiene favoritos, devolver lista vacía
+        if (client.getFavorites() == null || client.getFavorites().isEmpty()) {
+            return List.of(); // Lista vacía inmutable
+        }
 
         // Obtener favoritos del cliente
         return client.getFavorites().stream()

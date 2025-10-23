@@ -33,11 +33,7 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
 
     useEffect(() => {
         if (favorites && favorites.length > 0) {
-            console.log('Favoritos recibidos del backend:', favorites);
-
             const processedFavorites = favorites.map(fav => {
-                console.log('Procesando favorito completo:', JSON.stringify(fav, null, 2)); // 🔍 VER TODO
-
                 const firstCreation = fav.creations && fav.creations.length > 0
                     ? fav.creations[0]
                     : null;
@@ -46,7 +42,7 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
 
                 const totalPrice = fav.creations.reduce((sum, creation) => sum + (creation.price || 0), 0);
 
-                const processed = {
+                return {
                     favoriteId: fav.id,
                     id: firstCreation.id,
                     name: firstCreation.name || 'Sin nombre',
@@ -58,12 +54,8 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                     description: `${firstCreation.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'} personalizada`,
                     creationCount: fav.creations.length
                 };
-
-                console.log('Favorito procesado:', processed); // 🔍 VER EL PROCESADO
-                return processed;
             }).filter(Boolean);
 
-            console.log('Favoritos procesados (final):', processedFavorites);
             setFavoritesData(processedFavorites);
         } else {
             setFavoritesData([]);
@@ -82,22 +74,16 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
     };
 
     const handleRemove = async (favoriteId) => {
-        console.log('🗑️ handleRemove llamado con favoriteId:', favoriteId); // 🔍 DEBUG
-
         if (confirm('¿Eliminar este favorito?')) {
             const result = await removeFromFavorites(favoriteId);
-            if (result.success) {
-                console.log('✅ Favorito eliminado exitosamente');
-                // Ya no necesitas actualizar manualmente porque loadFavorites() se encarga
-            } else {
-                toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'));
+            if (!result.success) {
+                toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'), { duration: 2000 });
             }
         }
     };
 
     const handleAddToCart = (favorite) => {
-        console.log('Agregando al carrito:', favorite);
-        toast.success(`${favorite.name} agregado al carrito`)
+        toast.success(`${favorite.name} agregado al carrito`, { duration: 2000 })
     };
 
     // Si el usuario no está autenticado, mostrar prompt de login

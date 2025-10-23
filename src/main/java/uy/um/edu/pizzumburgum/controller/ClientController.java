@@ -1,5 +1,6 @@
 package uy.um.edu.pizzumburgum.controller;
 
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uy.um.edu.pizzumburgum.dto.request.AddressRequest;
@@ -34,12 +35,13 @@ public class ClientController {
         return clientService.createClient(client);
     }
 
-    @GetMapping("{clientEmail}")
+    @GetMapping("/{clientEmail}")
     public ClientResponse getClientByEmail(@PathVariable String clientEmail){
         return clientService.getClientByEmail(clientEmail);
     }
 
-    @PutMapping()
+    @Transactional
+    @PutMapping
     public ClientResponse updateClient(@RequestBody ClientUpdateRequest clientUpdateRequest){
         return clientService.updateClient(clientUpdateRequest);
     }
@@ -48,7 +50,7 @@ public class ClientController {
     public ResponseEntity<Map<String, Object>> deleteClient(@PathVariable String clientEmail) {
         return clientService.deleteClient(clientEmail);
     }
-
+    @Transactional
     @GetMapping
     public List<ClientResponse> getAllClients() {
         return clientService.getClients();

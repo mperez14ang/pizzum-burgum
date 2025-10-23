@@ -1,21 +1,17 @@
 package uy.um.edu.pizzumburgum.services.interfaces;
 
+import jakarta.servlet.http.HttpServletRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.LoginRequest;
-import uy.um.edu.pizzumburgum.dto.request.TokenRequest;
 import uy.um.edu.pizzumburgum.dto.response.AuthResponse;
-
-import java.util.Date;
+import uy.um.edu.pizzumburgum.dto.response.TokenResponse;
 
 public interface AuthServiceInt {
     AuthResponse register(ClientCreateRequest request);
 
     AuthResponse login(LoginRequest request);
 
-    boolean verifyToken(TokenRequest request);
+    TokenResponse verifyUser(HttpServletRequest request);
 
-    Date getTokenEmissionDate(TokenRequest request);
-
-    Date getTokenExpirationDate(TokenRequest request);
-
+    String getUserEmail(HttpServletRequest request);
 }

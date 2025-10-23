@@ -4,7 +4,7 @@ import { useAuth } from './AuthContext';
 const FavoritesContext = createContext();
 
 export const FavoritesProvider = ({ children }) => {
-    const { isAuthenticated, user, logout } = useAuth();
+    const { isAuthenticated, user, logout, tokenAuth } = useAuth();
     const [favorites, setFavorites] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -20,6 +20,7 @@ export const FavoritesProvider = ({ children }) => {
         if (!isAuthenticated || !user || !user.token) {
             console.log('⚠️ No se puede cargar favoritos - falta autenticación');
             setFavorites([]);
+            console.log("No hay usuario autenticado!")
             return;
         }
 
@@ -28,6 +29,7 @@ export const FavoritesProvider = ({ children }) => {
             setError(null);
 
             const response = await fetch('http://localhost:8080/api/favorites/my', {
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${user.token}`
@@ -111,8 +113,7 @@ export const FavoritesProvider = ({ children }) => {
         if (!isAuthenticated || !user) {
             return {
                 success: false,
-                error: 'Debes iniciar sesión para guardar favoritos',
-                needsAuth: true
+                error: 'Debes iniciar sesión para guardar favoritos'
             };
         }
 
@@ -144,8 +145,7 @@ export const FavoritesProvider = ({ children }) => {
                 if (response.status === 401 || response.status === 403) {
                     return {
                         success: false,
-                        error: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente',
-                        needsAuth: true
+                        error: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente'
                     };
                 }
                 throw new Error('Error al agregar a favoritos');

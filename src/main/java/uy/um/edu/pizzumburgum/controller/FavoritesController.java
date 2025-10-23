@@ -1,11 +1,16 @@
 package uy.um.edu.pizzumburgum.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import uy.um.edu.pizzumburgum.dto.shared.FavoritesDto;
+import uy.um.edu.pizzumburgum.dto.request.FavoritesRequest;
+import uy.um.edu.pizzumburgum.dto.response.FavoritesResponse;
+import uy.um.edu.pizzumburgum.dto.response.TokenResponse;
+import uy.um.edu.pizzumburgum.services.AuthService;
 import uy.um.edu.pizzumburgum.services.FavoritesService;
 
 import java.util.List;
@@ -15,15 +20,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FavoritesController {
 
+    Logger log = LoggerFactory.getLogger(FavoritesController.class);
+
     private final FavoritesService favoritesService;
+
+    private final AuthService authService;
 
     /**
      * Crear un nuevo favorito
      * POST /api/favorites
      */
     @PostMapping
-    public ResponseEntity<FavoritesDto> createFavorite(@RequestBody FavoritesDto favoritesDto) {
-        FavoritesDto created = favoritesService.createFavorites(favoritesDto);
+    public ResponseEntity<FavoritesResponse> createFavorite(@RequestBody FavoritesRequest favoritesDto) {
+        FavoritesResponse created = favoritesService.createFavorites(favoritesDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -32,7 +41,7 @@ public class FavoritesController {
      * GET /api/favorites
      */
     @GetMapping
-    public ResponseEntity<List<FavoritesDto>> getAllFavorites() {
+    public ResponseEntity<List<FavoritesResponse>> getAllFavorites() {
         return ResponseEntity.ok(favoritesService.getFavorites());
     }
 
@@ -41,7 +50,7 @@ public class FavoritesController {
      * GET /api/favorites/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<FavoritesDto> getFavoriteById(@PathVariable Long id) {
+    public ResponseEntity<FavoritesResponse> getFavoriteById(@PathVariable Long id) {
         return ResponseEntity.ok(favoritesService.getFavoritesById(id));
     }
 
@@ -50,7 +59,7 @@ public class FavoritesController {
      * GET /api/favorites/client/{clientId}
      */
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<List<FavoritesDto>> getFavoritesByClient(@PathVariable Long clientId) {
+    public ResponseEntity<List<FavoritesResponse>> getFavoritesByClient(@PathVariable Long clientId) {
         return ResponseEntity.ok(favoritesService.getFavoritesByClientId(clientId));
     }
 
@@ -59,13 +68,10 @@ public class FavoritesController {
      * GET /api/favorites/my
      */
     @GetMapping("/my")
-    public ResponseEntity<List<FavoritesDto>> getMyFavorites(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        System.out.println(authentication.getPrincipal());
-        String userEmail = authentication.getName();
-        return ResponseEntity.ok(favoritesService.getFavoritesByClientEmail(userEmail));
+    public List<FavoritesResponse> getMyFavorites(HttpServletRequest request) {
+        String userEmail = authService.getUserEmail(request);
+        log.info("User email: {}", userEmail);
+        return favoritesService.getFavoritesByClientEmail(userEmail);
     }
 
     /**
@@ -73,9 +79,9 @@ public class FavoritesController {
      * PUT /api/favorites/{id}
      */
     @PutMapping("/{id}")
-    public ResponseEntity<FavoritesDto> updateFavorite(
+    public ResponseEntity<FavoritesResponse> updateFavorite(
             @PathVariable Long id,
-            @RequestBody FavoritesDto favoritesDto) {
+            @RequestBody FavoritesRequest favoritesDto) {
         return ResponseEntity.ok(favoritesService.updateFavorites(id, favoritesDto));
     }
 

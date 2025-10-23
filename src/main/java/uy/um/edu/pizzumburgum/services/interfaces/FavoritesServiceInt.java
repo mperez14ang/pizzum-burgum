@@ -1,23 +1,28 @@
 package uy.um.edu.pizzumburgum.services.interfaces;
 
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
-import uy.um.edu.pizzumburgum.dto.shared.CreationDto;
-import uy.um.edu.pizzumburgum.dto.shared.FavoritesDto;
+import uy.um.edu.pizzumburgum.dto.request.FavoritesRequest;
+import uy.um.edu.pizzumburgum.dto.response.FavoritesResponse;
 
 import java.util.List;
 
 public interface FavoritesServiceInt {
-    FavoritesDto createFavorites(FavoritesDto favoritesDto);
 
-    FavoritesDto getFavoritesById(Long id);
+    @Transactional
+    FavoritesResponse createFavorites(FavoritesRequest favoritesDto);
 
-    List<FavoritesDto> getFavoritesByClientId(Long id);
+    FavoritesResponse getFavoritesById(Long id);
 
-    List<FavoritesDto> getFavoritesByClientEmail(String email);
+    List<FavoritesResponse> getFavoritesByClientId(Long id);
 
-    List<FavoritesDto> getFavorites();
+    List<FavoritesResponse> getFavoritesByClientEmail(String email);
 
-    FavoritesDto updateFavorites(Long id, FavoritesDto favoritesDto);
+    List<FavoritesResponse> getFavorites();
 
+    @Transactional
+    FavoritesResponse updateFavorites(Long id, FavoritesRequest favoritesDto);
+
+    @Transactional
     ResponseEntity<String> deleteFavorite(Long id);
 }

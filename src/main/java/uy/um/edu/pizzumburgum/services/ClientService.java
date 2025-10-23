@@ -2,12 +2,15 @@ package uy.um.edu.pizzumburgum.services;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import uy.um.edu.pizzumburgum.controller.CreationController;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientUpdateRequest;
 import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
@@ -18,6 +21,7 @@ import uy.um.edu.pizzumburgum.mapper.AddressMapper;
 import uy.um.edu.pizzumburgum.mapper.ClientMapper;
 import uy.um.edu.pizzumburgum.mapper.FavoritesMapper;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
+import uy.um.edu.pizzumburgum.repository.CreationRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.ClientServiceInt;
 
 import java.util.HashMap;
@@ -31,6 +35,8 @@ import java.util.stream.Collectors;
 public class ClientService implements ClientServiceInt {
 
     private final ClientRepository clientRepository;
+
+    private final CreationRepository creationRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -47,7 +53,7 @@ public class ClientService implements ClientServiceInt {
 
         Client client = ClientMapper.toClient(clientCreateRequest);
 
-        // Agregar addresses y favorites
+        // Agregar addresses
         Client finalClient = client;
         Set<Address> addresses = clientCreateRequest.getAddresses().stream()
                 .map(obj -> {
@@ -57,15 +63,10 @@ public class ClientService implements ClientServiceInt {
                 })
                 .collect(Collectors.toSet());
 
-        Set<Favorites> favorites = clientCreateRequest.getFavorites().stream()
-                .map(FavoritesMapper::toFavorites)
-                .collect(Collectors.toSet());
-
         // Encriptar contraseña
         client.setPassword(passwordEncoder.encode(clientCreateRequest.getPassword()));
 
         client.setAddresses(addresses);
-        client.setFavorites(favorites);
         client = clientRepository.save(client);
 
         return ClientMapper.toClientResponse(client);

@@ -39,11 +39,16 @@ public class CreationMapper {
     }
 
     public static Creation toCreation(CreationDto creationDto) {
-        return Creation.builder()
-                .id(creationDto.getId())
+        Creation creation = Creation.builder()
                 .name(creationDto.getName())
                 .price(creationDto.getPrice())
                 .type(creationDto.getType())
                 .build();
+
+        if (creation.getId() != null) {
+            creation.setId(creationDto.getId());
+        }
+
+        return creation;
     }
 }

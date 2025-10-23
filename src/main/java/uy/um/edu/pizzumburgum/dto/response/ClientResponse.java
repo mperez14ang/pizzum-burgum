@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import uy.um.edu.pizzumburgum.dto.shared.FavoritesDto;
 
 import java.util.Set;
 
@@ -15,6 +14,4 @@ import java.util.Set;
 public class ClientResponse extends UserResponse {
 
     private Set<AddressResponse> addresses;
-
-    private Set<FavoritesDto> favorites;
 }

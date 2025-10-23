@@ -3,7 +3,6 @@ package uy.um.edu.pizzumburgum.mapper;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.response.AddressResponse;
 import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
-import uy.um.edu.pizzumburgum.dto.shared.FavoritesDto;
 import uy.um.edu.pizzumburgum.entities.Client;
 
 import java.util.Set;
@@ -32,20 +31,12 @@ public class ClientMapper {
                     .collect(Collectors.toSet());
         }
 
-        Set<FavoritesDto> favoritesDtos = null;
-        if (client.getFavorites() != null) {
-            favoritesDtos = client.getFavorites().stream()
-                    .map(FavoritesMapper::toFavoritesDto)
-                    .collect(Collectors.toSet());
-        }
-
         return ClientResponse.builder()
                 .email(client.getEmail())
                 .firstName(client.getFirstName())
                 .lastName(client.getLastName())
                 .birthDate(client.getBirthDate())
                 .addresses(addressDtos)
-                .favorites(favoritesDtos)
                 .userType(client.getUserType())
                 .build();
 

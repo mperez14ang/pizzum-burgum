@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -33,45 +34,55 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity httpSecurity, AuthenticationProvider authenticationProvider,
+            HttpSecurity httpSecurity,
+            AuthenticationProvider authenticationProvider,
             JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-        return httpSecurity.authorizeHttpRequests(auth -> auth
+
+        return httpSecurity
+                .authorizeHttpRequests(auth -> auth
+                        // OPTIONS requests (CORS preflight)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        .requestMatchers("/api/auth/**").permitAll() // Permite a los usuarios sin token
+                        // ============ PUBLIC ENDPOINTS ============
+                        // Authentication
+                        .requestMatchers("/api/auth/**").permitAll()
 
-                        // Endpoints para todos
+                        // Public endpoints
                         .requestMatchers("/api/public/**").permitAll()
 
+                        // Products - READ ONLY public, WRITE requires ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                        .requestMatchers("/api/products/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole(ADMIN)
 
-                        // Admin endpoints
-                        .requestMatchers("/api/admin/**").hasRole(ADMIN)
-
-                        // Client endpoints
-                        .requestMatchers("/api/client/**").hasAnyRole(CLIENT, ADMIN)
-
-                        // Users endpoints
-                        .requestMatchers("/api/users/**").hasAnyRole(CLIENT, ADMIN)
-
-                        // Order endpoints
-                        .requestMatchers("/api/order/**").hasAnyRole(CLIENT, ADMIN)
-
-                        // Favorites endpoints
+                        // Favorites - public access
                         .requestMatchers("/api/favorites/**").permitAll()
 
-                        // Cards endpoints
-                        .requestMatchers("/api/card/**").hasAnyRole(CLIENT, ADMIN)
+                        // ============ ADMIN ONLY ============
+                        .requestMatchers("/api/admin/**").hasRole(ADMIN)
 
-                        // Deny any other request
+                        // ============ CLIENT + ADMIN ============
+                        // Client
+
+                        // Admin
+                        .requestMatchers("/api/client/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers("/api/users/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers("/api/order/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers("/api/card/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers("/api/creation/**").hasAnyRole(CLIENT, ADMIN)
+
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(Customizer.withDefaults())
                 .cors(Customizer.withDefaults())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .httpBasic(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .build();
     }
@@ -92,11 +103,15 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+        ));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
         configuration.setExposedHeaders(List.of("Authorization"));
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

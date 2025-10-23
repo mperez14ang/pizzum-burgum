@@ -3,6 +3,7 @@ package uy.um.edu.pizzumburgum.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -12,29 +13,32 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Favorites {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "date_created", nullable = false)
-    private LocalDateTime dateCreated;
+    private LocalDate dateCreated;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     @ToString.Exclude
     private Client client;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(
-        name = "favorites_creation",
-        joinColumns = @JoinColumn(name = "favorites_id"),
-        inverseJoinColumns = @JoinColumn(name = "creation_id")
+            name = "favorites_creations",
+            joinColumns = @JoinColumn(name = "favorite_id"),
+            inverseJoinColumns = @JoinColumn(name = "creation_id")
     )
+    @ToString.Exclude
     private Set<Creation> creations;
+
 
     @PrePersist
     protected void onCreate() {
-        dateCreated = LocalDateTime.now();
+        dateCreated = LocalDate.now();
     }
 }

@@ -48,8 +48,8 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public TokenResponse verifyToken(HttpServletRequest request) {
-        return authService.verifyToken(request);
+    public TokenResponse verifyUser(HttpServletRequest request) {
+        return authService.verifyUser(request);
     }
 
 }

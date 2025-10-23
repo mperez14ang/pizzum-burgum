@@ -85,7 +85,9 @@ public abstract class User implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + this.getUserType()));
+        String userType = this.getUserType();
+        String role = "ROLE_" + userType;
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override

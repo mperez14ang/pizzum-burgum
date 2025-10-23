@@ -16,6 +16,4 @@ public class CreationHasProductsDto {
 
     private Long productId;
 
-    private Long creationId;
-
 }

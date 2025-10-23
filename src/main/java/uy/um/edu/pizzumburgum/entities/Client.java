@@ -13,15 +13,16 @@ import java.util.Set;
 @NoArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(exclude = "addresses", callSuper = false)
-@ToString(exclude = "addresses")
 @DiscriminatorValue(UserType.CLIENT)
 public class Client extends User {
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private Set<Address> addresses = new HashSet<>();
 
     // Cada cliente tiene una tabla de favoritos
     @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @ToString.Exclude
     private Set<Favorites> favorites = new HashSet<>();
 
     // El atributo esta en la tabla order_by

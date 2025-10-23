@@ -1,20 +1,20 @@
 package uy.um.edu.pizzumburgum.services;
 
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uy.um.edu.pizzumburgum.dto.shared.CreationDto;
-import uy.um.edu.pizzumburgum.dto.shared.CreationHasProductsDto;
-import uy.um.edu.pizzumburgum.dto.shared.FavoritesDto;
-import uy.um.edu.pizzumburgum.entities.*;
+import uy.um.edu.pizzumburgum.dto.request.FavoritesRequest;
+import uy.um.edu.pizzumburgum.dto.response.FavoritesResponse;
+import uy.um.edu.pizzumburgum.entities.Client;
+import uy.um.edu.pizzumburgum.entities.Creation;
+import uy.um.edu.pizzumburgum.entities.Favorites;
 import uy.um.edu.pizzumburgum.mapper.FavoritesMapper;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
-import uy.um.edu.pizzumburgum.repository.CreationHasProductsRepository;
 import uy.um.edu.pizzumburgum.repository.CreationRepository;
 import uy.um.edu.pizzumburgum.repository.FavoritesRepository;
-import uy.um.edu.pizzumburgum.repository.ProductRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.FavoritesServiceInt;
 
 import java.util.HashSet;
@@ -24,15 +24,15 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class FavoritesService implements FavoritesServiceInt {
+    private static final Logger log = LoggerFactory.getLogger(FavoritesService.class);
+
     private final ClientRepository clientRepository;
     private final FavoritesRepository favoritesRepository;
     private final CreationRepository creationRepository;
-    private final ProductRepository productRepository;
-    private final CreationHasProductsRepository creationHasProductsRepository;
 
     @Transactional
     @Override
-    public FavoritesDto createFavorites(FavoritesDto favoritesDto) {
+    public FavoritesResponse createFavorites(FavoritesRequest favoritesDto) {
         Favorites favorites = FavoritesMapper.toFavorites(favoritesDto);
         // Buscar cliente
         Client client = null;
@@ -43,51 +43,19 @@ public class FavoritesService implements FavoritesServiceInt {
 
         // Pasar de creationDto a creation
         Set<Creation> creations = new HashSet<>();
-        for (CreationDto creationDto : favoritesDto.getCreations()){
-            Creation creation;
-
-            // Si la creación tiene ID, buscarla; si no, crear una nueva
-            if (creationDto.getId() != null) {
-                creation = creationRepository.findById(creationDto.getId())
-                        .orElseThrow(() -> new RuntimeException("No se encontró la creación de favoritos"));
-            } else {
-                // Crear nueva creación
-                creation = Creation.builder()
-                        .name(creationDto.getName())
-                        .type(creationDto.getType())
-                        .price(creationDto.getPrice())
-                        .build();
-
-                // Guardar la creación para obtener su ID
-                creation = creationRepository.save(creation);
-
-                // Crear las relaciones con productos
-                if (creationDto.getProducts() != null && !creationDto.getProducts().isEmpty()) {
-                    Set<CreationHasProducts> creationProducts = new HashSet<>();
-                    for (CreationHasProductsDto productDto : creationDto.getProducts()) {
-                        // Buscar el producto por ID
-                        Product product = productRepository.findById(productDto.getProductId())
-                                .orElseThrow(() -> new RuntimeException("Producto no encontrado: " + productDto.getCreationId()));
-
-                        // Crear la relación
-                        CreationHasProducts creationHasProduct = CreationHasProducts.builder()
-                                .creation(creation)
-                                .product(product)
-                                .quantity(productDto.getQuantity())
-                                .build();
-
-                        creationProducts.add(creationHasProduct);
-                        creationHasProductsRepository.save(creationHasProduct);
-                    }
-                    creation.setProducts(creationProducts);
-                }
-            }
-
+        for (Long creationId : favoritesDto.getCreationsIds()){
+            Creation creation = creationRepository.findById(creationId)
+                    .orElseThrow(() -> new RuntimeException("No se encontró la creacion"));
             creations.add(creation);
+
         }
 
         favorites.setClient(client);
         favorites.setCreations(creations);
+
+        // Agregar a cliente
+        assert client != null;
+        client.getFavorites().add(favorites);
 
         favoritesRepository.save(favorites);
         return FavoritesMapper.toFavoritesDto(favorites);
@@ -95,14 +63,14 @@ public class FavoritesService implements FavoritesServiceInt {
     }
 
     @Override
-    public FavoritesDto getFavoritesById(Long id) {
+    public FavoritesResponse getFavoritesById(Long id) {
         Favorites favorites = favoritesRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Favorito no encontrado con id: " + id));
         return FavoritesMapper.toFavoritesDto(favorites);
     }
 
     @Override
-    public List<FavoritesDto> getFavoritesByClientId(Long id) {
+    public List<FavoritesResponse> getFavoritesByClientId(Long id) {
         // Buscar cliente por email
         Client client = clientRepository.findById(String.valueOf(id))
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
@@ -114,7 +82,7 @@ public class FavoritesService implements FavoritesServiceInt {
     }
 
     @Override
-    public List<FavoritesDto> getFavoritesByClientEmail(String email) {
+    public List<FavoritesResponse> getFavoritesByClientEmail(String email) {
         // Buscar cliente por email
         Client client = clientRepository.findById(email)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
@@ -126,7 +94,7 @@ public class FavoritesService implements FavoritesServiceInt {
     }
 
     @Override
-    public List<FavoritesDto> getFavorites() {
+    public List<FavoritesResponse> getFavorites() {
         return favoritesRepository.findAll().stream()
                 .map(FavoritesMapper::toFavoritesDto)
                 .toList();
@@ -134,15 +102,15 @@ public class FavoritesService implements FavoritesServiceInt {
 
     @Transactional
     @Override
-    public FavoritesDto updateFavorites(Long id, FavoritesDto favoritesDto) {
+    public FavoritesResponse updateFavorites(Long id, FavoritesRequest favoritesDto) {
         Favorites favorites = favoritesRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Favorito no encontrado con id: " + id));
 
         // Actualizar creaciones
-        if (favoritesDto.getCreations() != null) {
+        if (favoritesDto.getCreationsIds() != null) {
             Set<Creation> creations = new HashSet<>();
-            for (CreationDto creationDto : favoritesDto.getCreations()) {
-                Creation creation = creationRepository.findById(creationDto.getId())
+            for (Long creationId : favoritesDto.getCreationsIds()) {
+                Creation creation = creationRepository.findById(creationId)
                         .orElseThrow(() -> new RuntimeException("Creación no encontrada"));
                 creations.add(creation);
             }

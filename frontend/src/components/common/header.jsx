@@ -4,11 +4,11 @@ import {useState, useEffect, forwardRef, useImperativeHandle, useRef} from 'reac
 import {Modal} from './Modal';
 import toast from 'react-hot-toast';
 import {AuthPage} from "../../pages/AuthPage.jsx";
+import {LoginAndRegisterModal} from "../../pages/modals/LoginAndRegisterModal.jsx";
 
 export const Header = forwardRef(({onNavigate}, ref) => {
     const { user, isAuthenticated, logout } = useAuth();
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-    const [authType, setAuthType] = useState('login'); // 'login' or 'register'
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -49,18 +49,8 @@ export const Header = forwardRef(({onNavigate}, ref) => {
     };
 
     const handleOpenLogin = () => {
-        setAuthType('login');
         setIsAuthModalOpen(true);
     };
-
-    const handleToggleAuthType = () => {
-        setAuthType(prev => prev === 'login' ? 'register' : 'login');
-    };
-
-    // Expose handleOpenLogin to parent via ref
-    useImperativeHandle(ref, () => ({
-        openLoginModal: handleOpenLogin
-    }));
 
     return (
         <>
@@ -159,14 +149,9 @@ export const Header = forwardRef(({onNavigate}, ref) => {
 
             {/* Login & Register Modal */}
             {!isAuthenticated && (
-                <Modal
+                <LoginAndRegisterModal
                     isOpen={isAuthModalOpen}
-                    onClose={() => setIsAuthModalOpen(false)}
-                    title={authType === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
-                    size="md"
-                >
-                    <AuthPage type={authType} onToggleAuthType={handleToggleAuthType} />
-                </Modal>
+                    onClose={() => setIsAuthModalOpen(false)}></LoginAndRegisterModal>
             )}
         </>
     );

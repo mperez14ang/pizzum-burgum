@@ -1,8 +1,8 @@
-import {MapPin, Plus, X} from 'lucide-react';
-import React, { useState } from 'react';
-import {Modal} from "../components/common/Modal.jsx";
+import {Plus} from 'lucide-react';
+import React, {useState} from 'react';
+import {Modal} from "../../components/common/Modal.jsx";
 
-export const AddAddressPage = ({ onSave, onBack}) => {
+export const AddAddressModal = ({ isOpen, onSave, onClose}) => {
     const [formData, setFormData] = useState({
         label: '',
         street: '',
@@ -28,8 +28,8 @@ export const AddAddressPage = ({ onSave, onBack}) => {
 
     return (
         <Modal
-            isOpen={true}
-            onClose={onBack}
+            isOpen={isOpen}
+            onClose={onClose}
             title="Agregar Dirección"
             size="md"
         >
@@ -149,7 +149,7 @@ export const AddAddressPage = ({ onSave, onBack}) => {
                 <div className="flex gap-3 pt-4">
                     <button
                         type="button"
-                        onClick={onBack}
+                        onClick={onClose}
                         className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
                     >
                         Cancelar

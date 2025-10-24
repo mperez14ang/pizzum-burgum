@@ -1,9 +1,9 @@
 import React, {useMemo, useState} from 'react';
 import {ChevronLeft, CreditCard, Edit3, KeyRound, MapPin, Plus, Trash2} from 'lucide-react';
 import {Header} from "../components/common/header.jsx";
-import CardPage from "./CardPage.jsx";
-import {AddAddressPage} from "./AddAddressPage.jsx";
-import {EditPasswordPage} from "./EditPasswordPage.jsx";
+import CardModal from "./modals/CardModal.jsx";
+import {AddAddressModal} from "./modals/AddAddressModal.jsx";
+import {EditPasswordModal} from "./modals/EditPasswordModal.jsx";
 
 // Skeleton-only Profile Page (no API calls). Prepared with props for future wiring.
 // Expected props (all optional for now):
@@ -191,9 +191,9 @@ export const ProfilePage = ({
                             ))}
                         </ul>
                     )}
-                    {showCardModal && <CardPage onBack={() => setShowCardModal(false)} />}
-                    {showAddressModal && <AddAddressPage onBack={() => setShowAddressModal(false)} />}
-                    {showPasswordModal && <EditPasswordPage onBack={() => setShowPasswordModal(false)} />}
+                    <CardModal isOpen={showCardModal} onClose={() => setShowCardModal(false)} />
+                    <AddAddressModal isOpen={showAddressModal} onClose={() => setShowAddressModal(false)} />
+                    <EditPasswordModal isOpen={showPasswordModal} onClose={() => setShowPasswordModal(false)} />
                 </section>
             </div>
         </div>

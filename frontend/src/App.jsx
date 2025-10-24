@@ -5,7 +5,7 @@ import { FavoritesProvider } from './contexts/FavoritesContext';
 import { HomePage } from './pages/HomePage';
 import { CreatorPage } from './pages/CreatorPage';
 import { AdminPage } from './pages/admin/AdminPage';
-import { CardPage } from "./pages/CardPage";
+import { CardModal } from "./pages/modals/CardModal.jsx";
 import { CardProvider } from "./contexts/CardContext.jsx";
 import {AuthPage} from "./pages/AuthPage.jsx";
 import {Toaster} from "react-hot-toast";
@@ -88,7 +88,7 @@ function App() {
                         <CreatorPage productType={"burger"} onBack={handleBack} onNavigate={handleNavigate}/>
                     )}
                     {currentPage === 'profile' && (
-                        <ProfilePage onBack={handleBack} user={user} onAddCard={CardPage} onNavigate={handleNavigate}/>
+                        <ProfilePage onBack={handleBack} user={user} onAddCard={CardModal} onNavigate={handleNavigate}/>
                     )}
                 </CreatorProvider>
             </FavoritesProvider>

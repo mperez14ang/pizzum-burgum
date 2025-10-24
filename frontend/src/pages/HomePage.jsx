@@ -4,17 +4,14 @@ import { FavoritesCarousel } from '../components/FavoritesCarousel';
 import burgerImg from '../assets/burger.jpg';
 import pizzaImg from '../assets/pizza.jpg';
 import {useAuth} from "../contexts/AuthContext.jsx";
-import {FavoritesLoginCard} from "./FavoritesLoginCard.jsx";
+import {FavoritesLoginModal} from "./modals/FavoritesLoginModal.jsx";
+import {LoginAndRegisterModal} from "./modals/LoginAndRegisterModal.jsx";
 
 export const HomePage = ({ onNavigate }) => {
     const { logout } = useAuth();
     const headerRef = useRef();
 
-    const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-
-    const handleOpenLogin = () => {
-        headerRef.current?.openLoginModal();
-    };
+    const [isShowLoginModal, setIsShowLoginModal] = useState(false);
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -67,12 +64,11 @@ export const HomePage = ({ onNavigate }) => {
                 </div>
 
                 {/* Favorites Carousel - Dinámico desde el backend */}
-                <FavoritesCarousel onOpenLogin={handleOpenLogin}/>
+                <FavoritesCarousel onOpenLogin={() => setIsShowLoginModal(true)}/>
 
                 {/* Modal de login prompt */}
-                {showLoginPrompt && (
-                    <FavoritesLoginCard onOpenLogin={true} onBack={(() => {setShowLoginPrompt(false)})} handleQuickLogin={handleOpenLogin}></FavoritesLoginCard>
-                )}
+                <LoginAndRegisterModal isOpen={isShowLoginModal}
+                                       onClose={() => {setIsShowLoginModal(false)}}/>
             </main>
         </div>
     );

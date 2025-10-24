@@ -3,6 +3,7 @@ import { AdminLayout } from '../../layouts/AdminLayout';
 import { OrderManagement } from './OrderManagement';
 import { ProductManagement } from './ProductManagement';
 import { AdminManagement } from './AdminManagement';
+import AdminProfilePage from './AdminProfilePage.jsx';
 
 export const AdminPage = () => {
     const [currentSection, setCurrentSection] = useState('orders');
@@ -15,6 +16,8 @@ export const AdminPage = () => {
                 return <ProductManagement />;
             case 'admins':
                 return <AdminManagement />;
+            case 'profile':
+                return <AdminProfilePage onBack={() => {}} onEditPassword={() => {}} />;
             default:
                 return <OrderManagement />;
         }

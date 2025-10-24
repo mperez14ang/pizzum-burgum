@@ -9,6 +9,7 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { ingredientsService } from '../services/api';
 import toast from "react-hot-toast";
+import {FavoritesLoginCard} from "./FavoritesLoginCard.jsx";
 
 export const CreatorPage = ({ productType, onBack, onNavigate}) => {
     const headerRef = useRef();
@@ -122,6 +123,11 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
 
         return total;
     };
+
+    // Handle Quick Login
+    const handleQuickLogin = () => {
+        headerRef.current?.openLoginModal();
+    }
 
     // Toggle topping para pizza
     const toggleTopping = (topping) => {
@@ -249,12 +255,6 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
 
 
     };
-//Login Forzado
-    // Login rápido de prueba
-    const handleQuickLogin = async () => {
-
-    };
-//
     // Agregar al carrito
     const handleAddToCart = () => {
         // Validar campos obligatorios
@@ -791,40 +791,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
 
             {/* Modal de login prompt */}
             {showLoginPrompt && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
-                        <div className="text-center mb-6">
-                            <div className="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
-                                <Heart className="text-orange-500" size={32} />
-                            </div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                                Inicia sesión para guardar favoritos
-                            </h3>
-                            <p className="text-gray-600">
-                                Crea una cuenta o inicia sesión para guardar tus creaciones favoritas
-                            </p>
-                        </div>
-
-                        <div className="space-y-3">
-                            <button
-                                onClick={handleQuickLogin}
-                                className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition font-semibold"
-                            >
-                                Iniciar Sesión
-                            </button>
-                            <button
-                                onClick={() => setShowLoginPrompt(false)}
-                                className="w-full border-2 border-gray-200 py-3 rounded-lg hover:bg-gray-50 transition"
-                            >
-                                Cancelar
-                            </button>
-                        </div>
-
-                        <p className="text-xs text-gray-500 text-center mt-4">
-                            Iniciar Sesión
-                        </p>
-                    </div>
-                </div>
+                <FavoritesLoginCard onOpenLogin={true} onBack={(() => {setShowLoginPrompt(false)})} handleQuickLogin={handleQuickLogin}></FavoritesLoginCard>
             )}
         </div>
     );

@@ -1,10 +1,8 @@
 package uy.um.edu.pizzumburgum.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uy.um.edu.pizzumburgum.dto.shared.CreationDto;
-import uy.um.edu.pizzumburgum.services.ClientService;
 import uy.um.edu.pizzumburgum.services.CreationService;
 
 import java.util.List;
@@ -31,5 +29,10 @@ public class CreationController {
     @GetMapping
     public List<CreationDto> getCreations() {
         return creationService.getCreations();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteCreation(Long id) {
+        return creationService.deleteCreation(id);
     }
 }

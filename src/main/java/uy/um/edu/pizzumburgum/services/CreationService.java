@@ -38,6 +38,7 @@ public class CreationService implements CreationServiceInt {
         log.info(creationDto.getName());
         log.info(String.valueOf(creationDto.getType()));
 
+        // Convertir a creation
         Creation creation = CreationMapper.toCreation(creationDto);
 
         // Convertir creationsHasProductsDto a creationsHasProducts
@@ -88,7 +89,9 @@ public class CreationService implements CreationServiceInt {
 
     @Override
     public CreationDto getCreationById(Long id) {
-        return null;
+        Creation creation = creationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return CreationMapper.toCreationDto(creation);
     }
 
     @Override
@@ -105,6 +108,14 @@ public class CreationService implements CreationServiceInt {
 
     @Override
     public ResponseEntity<String> deleteCreation(Long id) {
-        return null;
+        if (!creationRepository.existsById(id)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "No se encontro la creacion con id : " + id);
+        }
+
+        creationRepository.deleteById(id);
+
+        return ResponseEntity.ok("La creacion " + id + " ha sido eliminada.");
     }
 }

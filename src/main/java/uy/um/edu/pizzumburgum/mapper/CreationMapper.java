@@ -4,15 +4,14 @@ import uy.um.edu.pizzumburgum.dto.shared.CreationDto;
 import uy.um.edu.pizzumburgum.dto.shared.CreationHasProductsDto;
 import uy.um.edu.pizzumburgum.dto.shared.OrderHasCreationsDto;
 import uy.um.edu.pizzumburgum.entities.Creation;
-import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
-import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class CreationMapper {
+    private static Logger logger = Logger.getLogger(CreationMapper.class.getName());
+
     public static CreationDto toCreationDto(Creation creation) {
         // Convertir creationsHasProducts a creationsHasProductsDto
         Set<CreationHasProductsDto> creationsHasProductsDtos = creation.getProducts()
@@ -24,6 +23,9 @@ public class CreationMapper {
                 .stream()
                 .map(OrderHasCreationsMapper::toOrderHasCreationsDto)
                 .collect(Collectors.toSet());
+
+        logger.info("creationsHasProductsDtos: " + creationsHasProductsDtos);
+        logger.info("orderHasCreationsDtos: " + orderHasCreationsDtos);
 
 
         return CreationDto.builder()

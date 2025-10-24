@@ -4,6 +4,7 @@ import { ChevronLeft, Plus, Minus, ShoppingCart, Heart, X, Check } from 'lucide-
 import { Header } from '../components/common/Header';
 import { Accordion } from '../components/common/Accordion';
 import { QuantitySelector } from '../components/common/QuantitySelector';
+import { AddToCartModal } from '../components/common/AddToCartModal';
 import { useCreatorStore } from '../contexts/CreatorContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -19,6 +20,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
     const [favoriteName, setFavoriteName] = useState('');
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const [isSavingFavorite, setIsSavingFavorite] = useState(false);
+    const [showCartModal, setShowCartModal] = useState(false);
 
 
     const images = {
@@ -278,27 +280,20 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
             }
         }
 
-        const creationData = productType === 'pizza' ? {
-            type: 'pizza',
-            size: selectedSize,
-            dough: selectedDough,
-            sauce: selectedSauce,
-            cheese: selectedCheese,
-            toppings: selectedToppings,
-            total: calculateTotal()
-        } : {
-            type: 'burger',
-            bread: selectedBread,
-            meat: selectedMeat,
-            meatQuantity: meatQuantity,
-            cheese: selectedBurgerCheese,
-            toppings: selectedBurgerToppings,
-            sauces: selectedBurgerSauces,
-            total: calculateTotal()
-        };
+        // Mostrar modal de confirmación
+        setShowCartModal(true);
+    };
 
-        console.log('Agregado al carrito:', creationData);
-        toast.success('¡Agregado al carrito!', { duration: 2000 })
+    // Handler para continuar comprando - lleva a home
+    const handleContinueShopping = () => {
+        setShowCartModal(false);
+        resetCreation();
+        onNavigate('home');
+    };
+
+    // Handler para ir a productos extra - SIN FUNCIONALIDAD
+    const handleGoToExtras = () => {
+        toast.info('Funcionalidad en desarrollo', { duration: 2000 });
     };
 
     // Estados de carga y error
@@ -363,7 +358,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                     {/* Tamaño */}
                                     <Accordion title={<span>1. Tamaño <span className="text-red-500">*</span></span>} isOpen={true}>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                            {ingredients.PIZZA_SIZES.map((size) => (
+                                            {(ingredients.PIZZA_SIZES || []).map((size) => (
                                                 <button
                                                     key={size.id}
                                                     onClick={() => setSelectedSize(size)}
@@ -383,7 +378,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                     {/* Masa */}
                                     <Accordion title={<span>2. Tipo de Masa <span className="text-red-500">*</span></span>}>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                            {ingredients.PIZZA_DOUGH.map((dough) => (
+                                            {(ingredients.PIZZA_DOUGH || []).map((dough) => (
                                                 <button
                                                     key={dough.id}
                                                     onClick={() => setSelectedDough(dough)}
@@ -405,7 +400,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                     {/* Salsa */}
                                     <Accordion title="3. Salsa">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            {ingredients.PIZZA_SAUCE.map((sauce) => (
+                                            {(ingredients.PIZZA_SAUCE || []).map((sauce) => (
                                                 <button
                                                     key={sauce.id}
                                                     onClick={() => setSelectedSauce(sauce)}
@@ -427,7 +422,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                     {/* Queso */}
                                     <Accordion title="4. Queso">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            {ingredients.PIZZA_CHEESE.map((cheese) => (
+                                            {(ingredients.PIZZA_CHEESE || []).map((cheese) => (
                                                 <button
                                                     key={cheese.id}
                                                     onClick={() => setSelectedCheese(cheese)}
@@ -452,7 +447,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                             Seleccionados: {selectedToppings.length}/{MAX_TOPPINGS}
                                         </p>
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                            {ingredients.PIZZA_TOPPINGS.map((topping) => {
+                                            {(ingredients.PIZZA_TOPPINGS || []).map((topping) => {
                                                 const isSelected = selectedToppings.some(t => t.id === topping.id);
                                                 return (
                                                     <button
@@ -480,7 +475,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                     {/* Pan */}
                                     <Accordion title={<span>1. Tipo de Pan <span className="text-red-500">*</span></span>} isOpen={true}>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                            {ingredients.BREAD_OPTIONS.map((bread) => (
+                                            {(ingredients.BREAD_OPTIONS || []).map((bread) => (
                                                 <button
                                                     key={bread.id}
                                                     onClick={() => setSelectedBread(bread)}
@@ -502,7 +497,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                     {/* Carne */}
                                     <Accordion title={<span>2. Tipo de Carne <span className="text-red-500">*</span></span>}>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            {ingredients.MEAT_OPTIONS.map((meat) => (
+                                            {(ingredients.MEAT_OPTIONS || []).map((meat) => (
                                                 <button
                                                     key={meat.id}
                                                     onClick={() => setSelectedMeat(meat)}
@@ -537,7 +532,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                     {/* Queso */}
                                     <Accordion title="3. Queso">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            {ingredients.BURGER_CHEESE.map((cheese) => (
+                                            {(ingredients.BURGER_CHEESE || []).map((cheese) => (
                                                 <button
                                                     key={cheese.id}
                                                     onClick={() => setSelectedBurgerCheese(cheese)}
@@ -559,7 +554,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                     {/* Toppings */}
                                     <Accordion title="4. Toppings">
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                            {ingredients.BURGER_TOPPINGS.map((topping) => {
+                                            {(ingredients.BURGER_TOPPINGS || []).map((topping) => {
                                                 const isSelected = selectedBurgerToppings.some(t => t.id === topping.id);
                                                 return (
                                                     <button
@@ -584,7 +579,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                     {/* Salsas */}
                                     <Accordion title="5. Salsas">
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                            {ingredients.BURGER_SAUCES.map((sauce) => {
+                                            {(ingredients.BURGER_SAUCES || []).map((sauce) => {
                                                 const isSelected = selectedBurgerSauces.some(s => s.id === sauce.id);
                                                 return (
                                                     <button
@@ -826,6 +821,15 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                     </div>
                 </div>
             )}
+
+            {/* Modal de agregar al carrito */}
+            <AddToCartModal
+                isOpen={showCartModal}
+                onClose={() => setShowCartModal(false)}
+                onContinueShopping={handleContinueShopping}
+                onGoToExtras={handleGoToExtras}
+                productType={productType}
+            />
         </div>
     );
 };

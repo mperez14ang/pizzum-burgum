@@ -52,6 +52,8 @@ public class SecurityConfig {
 
                         // Products - READ ONLY public, WRITE requires ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/category/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/ingredients").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole(ADMIN)
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole(ADMIN)
                         .requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole(ADMIN)
@@ -108,7 +110,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
-        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

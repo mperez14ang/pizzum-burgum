@@ -85,6 +85,23 @@ export const ingredientsService = {
     }
 };
 
+export const productsService = {
+    // Obtener productos por categoría
+    getProductsByCategory: async (category) => {
+        try {
+            const data = await fetchFromAPI(`/products/category/${category}`);
+            // Convertir precios de BigDecimal a Number
+            return data.map(product => ({
+                ...product,
+                price: Number(product.price) || 0
+            }));
+        } catch (error) {
+            console.error('Error cargando productos por categoría:', error);
+            throw error;
+        }
+    }
+};
+
 export const adminService = {
     // Products
     getAllProducts: async () => {

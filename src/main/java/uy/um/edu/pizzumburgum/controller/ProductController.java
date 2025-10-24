@@ -146,4 +146,9 @@ public class ProductController {
                         .toList()
         );
     }
+
+    @GetMapping("/category/{category}")
+    public ResponseEntity<List<ProductDto>> getProductsByCategory(@PathVariable ProductCategory category) {
+        return ResponseEntity.ok(productService.getFilteredProducts(null, category, true));
+    }
 }

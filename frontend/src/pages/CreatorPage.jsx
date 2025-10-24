@@ -4,6 +4,7 @@ import { ChevronLeft, Plus, Minus, ShoppingCart, Heart, X, Check } from 'lucide-
 import { Header } from '../components/common/Header';
 import { Accordion } from '../components/common/Accordion';
 import { QuantitySelector } from '../components/common/QuantitySelector';
+import { AddToCartModal } from '../components/common/AddToCartModal';
 import { useCreatorStore } from '../contexts/CreatorContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -22,6 +23,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const [isSavingFavorite, setIsSavingFavorite] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [showCartModal, setShowCartModal] = useState(false);
 
 
     const images = {
@@ -258,6 +260,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
 
 
     };
+
     // Agregar al carrito
     const handleAddToCart = () => {
         // Validar campos obligatorios
@@ -281,6 +284,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
             }
         }
 
+        // TODO: Aquí se debe agregar la creación al carrito cuando esté implementado
         const creationData = productType === 'pizza' ? {
             type: 'pizza',
             size: selectedSize,
@@ -301,7 +305,24 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
         };
 
         console.log('Agregado al carrito:', creationData);
-        toast.success('¡Agregado al carrito!', { duration: 2000 })
+
+        // Mostrar modal de confirmación
+        setShowCartModal(true);
+    };
+
+    // Handler para continuar creando - lleva al homepage
+    const handleContinueShopping = () => {
+        setShowCartModal(false);
+        resetCreation();
+        onNavigate('home');
+    };
+
+    // Handler para ir a productos extra - SIN FUNCIONALIDAD (pendiente implementación)
+    const handleGoToExtras = () => {
+        setShowCartModal(false);
+        toast.info('Funcionalidad en desarrollo', { duration: 2000 });
+        // TODO: Implementar navegación a página de productos extra
+        // onNavigate('extras');
     };
 
     // Estados de carga y error
@@ -802,6 +823,15 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
             <LoginAndRegisterModal
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}></LoginAndRegisterModal>
+
+            {/* Modal de agregar al carrito */}
+            <AddToCartModal
+                isOpen={showCartModal}
+                onClose={() => setShowCartModal(false)}
+                onContinueShopping={handleContinueShopping}
+                onGoToExtras={handleGoToExtras}
+                productType={productType}
+            />
         </div>
     );
 };

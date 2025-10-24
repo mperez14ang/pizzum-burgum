@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { AlertCircle, CreditCard, Check, Loader2, ChevronLeft } from 'lucide-react';
+import { AlertCircle, CreditCard, Check, Loader2, X } from 'lucide-react';
 import { useCard } from '../contexts/CardContext.jsx';
 import toast from "react-hot-toast";
+import {Modal} from "../components/common/Modal.jsx";
 
 export const CardPage = ({ onBack }) => {
     const {
@@ -49,12 +50,13 @@ export const CardPage = ({ onBack }) => {
     }, [stripe]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
-                <button onClick={onBack} className="flex items-center text-gray-600 hover:text-gray-900 mb-6">
-                    <ChevronLeft size={20} />
-                    <span className="ml-1">Volver</span>
-                </button>
+        <>
+            <Modal
+                isOpen={true}
+                onClose={onBack}
+                title=""
+                size="md"
+            >
 
                 <div className="text-center mb-6">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-4">
@@ -132,9 +134,10 @@ export const CardPage = ({ onBack }) => {
                 <div className="mt-6 text-center">
                     <p className="text-xs text-gray-500">🔒 Tus datos están protegidos y encriptados por Stripe</p>
                 </div>
-            </div>
-        </div>
+            </Modal>
+        </>
     );
+
 };
 
 export default CardPage;

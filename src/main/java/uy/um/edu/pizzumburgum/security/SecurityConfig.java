@@ -57,14 +57,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole(ADMIN)
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole(ADMIN)
 
-                        // Favorites - public access
-                        .requestMatchers("/api/favorites/**").permitAll()
-
                         // ============ ADMIN ONLY ============
                         .requestMatchers("/api/admin/**").hasRole(ADMIN)
 
                         // ============ CLIENT + ADMIN ============
                         // Client
+                        .requestMatchers("/api/favorites/**").hasRole(CLIENT)
 
                         // Admin
                         .requestMatchers("/api/client/**").hasAnyRole(CLIENT, ADMIN)

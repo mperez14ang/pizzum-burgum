@@ -5,7 +5,7 @@ import {Modal} from './Modal';
 import toast from 'react-hot-toast';
 import {AuthPage} from "../../pages/AuthPage.jsx";
 
-export const Header = forwardRef((props, ref) => {
+export const Header = forwardRef(({onNavigate}, ref) => {
     const { user, isAuthenticated, logout } = useAuth();
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [authType, setAuthType] = useState('login'); // 'login' or 'register'
@@ -39,6 +39,11 @@ export const Header = forwardRef((props, ref) => {
 
     const handleMenuItemClick = (action) => {
         setIsDropdownOpen(false);
+
+        if (action === 'Mi Perfil'){
+            onNavigate('profile')
+        }
+
         // TODO: Implementar navegación a las páginas correspondientes
         toast.info(`Función "${action}" pendiente de implementar`, { duration: 2000 });
     };

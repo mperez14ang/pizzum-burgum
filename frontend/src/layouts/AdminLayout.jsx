@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Menu, X, ShoppingBag, Package, Users, LogOut } from 'lucide-react';
+import { Menu, X, ShoppingBag, Package, Users, LogOut, User as UserIcon } from 'lucide-react';
 
 export const AdminLayout = ({ children, currentSection, onSectionChange }) => {
     const { user, logout } = useAuth();
@@ -9,7 +9,8 @@ export const AdminLayout = ({ children, currentSection, onSectionChange }) => {
     const menuItems = [
         { id: 'orders', label: 'Pedidos', icon: ShoppingBag },
         { id: 'products', label: 'Productos', icon: Package },
-        { id: 'admins', label: 'Administradores', icon: Users }
+        { id: 'admins', label: 'Administradores', icon: Users },
+        { id: 'profile', label: 'Mi Perfil', icon: UserIcon }
     ];
 
     return (

@@ -82,13 +82,13 @@ function App() {
                 <CreatorProvider>
                     {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
                     {currentPage === 'creator-pizza' && (
-                        <CreatorPage productType={"pizza"} onNavigate={handleNavigate} onBack={handleBack} />
+                        <CreatorPage productType={"pizza"} onBack={handleBack} onNavigate={handleNavigate}/>
                     )}
                     {currentPage === 'creator-burger' && (
-                        <CreatorPage productType={"burger"} onNavigate={handleNavigate} onBack={handleBack} />
+                        <CreatorPage productType={"burger"} onBack={handleBack} onNavigate={handleNavigate}/>
                     )}
                     {currentPage === 'profile' && (
-                        <ProfilePage onBack={handleBack} onNavigate={handleNavigate} user={user} onAddCard={CardPage}/>
+                        <ProfilePage onBack={handleBack} user={user} onAddCard={CardPage} onNavigate={handleNavigate}/>
                     )}
                 </CreatorProvider>
             </FavoritesProvider>

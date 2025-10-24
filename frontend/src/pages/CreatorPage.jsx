@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, Plus, Minus, ShoppingCart, Heart, X, Check } from 'lucide-react';
 import { Header } from '../components/common/Header';
 import { Accordion } from '../components/common/Accordion';
@@ -11,7 +11,8 @@ import { ingredientsService } from '../services/api';
 import toast from "react-hot-toast";
 import {FavoritesLoginCard} from "./FavoritesLoginCard.jsx";
 
-export const CreatorPage = ({ onNavigate, productType, onBack }) => {
+export const CreatorPage = ({ productType, onBack, onNavigate}) => {
+    const headerRef = useRef();
     const { creation, updateCreation, resetCreation } = useCreatorStore();
     const { addToFavorites, isLoading: favoritesLoading } = useFavorites();
     const { login, isAuthenticated } = useAuth();
@@ -304,7 +305,7 @@ export const CreatorPage = ({ onNavigate, productType, onBack }) => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50">
-                <Header onNavigate={onNavigate}/>
+                <Header ref={headerRef} onNavigate={onNavigate}/>
                 <div className="flex justify-center items-center h-[calc(100vh-64px)]">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
@@ -318,7 +319,7 @@ export const CreatorPage = ({ onNavigate, productType, onBack }) => {
     if (error) {
         return (
             <div className="min-h-screen bg-gray-50">
-                <Header onNavigate={onNavigate}/>
+                <Header ref={headerRef} onNavigate={onNavigate} />
                 <div className="flex justify-center items-center h-[calc(100vh-64px)]">
                     <div className="text-center">
                         <p className="text-red-600 mb-4">{error}</p>
@@ -336,7 +337,7 @@ export const CreatorPage = ({ onNavigate, productType, onBack }) => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header onNavigate={onNavigate}/>
+            <Header ref={headerRef} onNavigate={onNavigate} />
 
             <div className="container mx-auto px-4 py-6">
                 {/* Botón volver */}

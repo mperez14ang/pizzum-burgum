@@ -20,6 +20,7 @@ import {EditPasswordPage} from "./EditPasswordPage.jsx";
 export const ProfilePage = ({
     user = {},
     onBack,
+    onNavigate,
     onSelectAddress,
     onEditAddress,
     onDeleteAddress,

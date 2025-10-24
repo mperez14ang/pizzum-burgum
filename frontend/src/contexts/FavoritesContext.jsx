@@ -110,20 +110,41 @@ export const FavoritesProvider = ({ children }) => {
         if (!isAuthenticated || !user) {
             return {
                 success: false,
-                error: 'Debes iniciar sesión para guardar favoritos'
+                error: 'Debes iniciar sesión para crear'
             };
         }
 
-        const response = await fetch('http://localhost:8080/api/creation/v1', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
-            },
-            body: JSON.stringify(transformedCreationData)
-        });
+        try {
+            const response = await fetch('http://localhost:8080/api/creation/v1', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`
+                },
+                body: JSON.stringify(transformedCreationData)
+            });
 
-        return await response.json();
+            // VALIDAR RESPUESTA
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error al crear creation:', errorText);
+                throw new Error(`Error al crear creation: ${response.status}`);
+            }
+
+            const creation = await response.json();
+
+            // VALIDAR QUE TENGA ID
+            if (!creation || !creation.id) {
+                throw new Error('La creation creada no tiene ID');
+            }
+
+            console.log('Creation creada con ID:', creation.id);
+            return { success: true, data: creation };
+
+        } catch (err) {
+            console.error('Error en addCreation:', err);
+            return { success: false, error: err.message };
+        }
     }
 
 
@@ -143,16 +164,26 @@ export const FavoritesProvider = ({ children }) => {
             // Transformar los datos al formato del backend
             const transformedCreation = transformCreationData(creationData);
 
-            // Obtener la id de la creation
-            const creation = await addCreation(transformedCreation);
+            // 1️⃣ CREAR LA CREATION (ahora con validación)
+            const creationResult = await addCreation(transformedCreation);
 
-            // Crear el payload para el backend
+            // ✅ VALIDAR RESULTADO
+            if (!creationResult.success) {
+                return {
+                    success: false,
+                    error: creationResult.error || 'Error al crear la creation'
+                };
+            }
+
+            const creation = creationResult.data;
+
+            // 2️⃣ CREAR EL FAVORITO
             const payload = {
                 clientEmail: user.email,
-                creationsIds: [creation["id"]]
+                creationsIds: [creation.id]
             };
 
-            console.log('Payload enviado al backend:', JSON.stringify(payload, null, 2));
+            console.log('📤 Enviando favorito:', JSON.stringify(payload, null, 2));
 
             const response = await fetch('http://localhost:8080/api/favorites', {
                 method: 'POST',
@@ -164,22 +195,28 @@ export const FavoritesProvider = ({ children }) => {
             });
 
             if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error al crear favorito:', errorText);
+
                 if (response.status === 401 || response.status === 403) {
                     return {
                         success: false,
                         error: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente'
                     };
                 }
-                throw new Error('Error al agregar a favoritos');
+                throw new Error(`Error al agregar a favoritos: ${response.status}`);
             }
 
             const data = await response.json();
+            console.log('✅ Favorito creado:', data);
 
-            setFavorites(prev => [...prev, data]);
+            // Recargar favoritos
+            await loadFavorites();
 
             return { success: true, data };
+
         } catch (err) {
-            console.error('Error adding to favorites:', err);
+            console.error('❌ Error en addToFavorites:', err);
             setError(err.message);
             return { success: false, error: err.message };
         } finally {
@@ -254,6 +291,7 @@ export const FavoritesProvider = ({ children }) => {
         error,
         isAuthenticated,
         loadFavorites,
+        addCreation,
         addToFavorites,
         removeFromFavorites,
         isFavorite,

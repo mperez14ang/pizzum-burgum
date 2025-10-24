@@ -33,31 +33,31 @@ public class FavoritesService implements FavoritesServiceInt {
     @Transactional
     @Override
     public FavoritesResponse createFavorites(FavoritesRequest favoritesDto) {
+        log.info("Creando favorito para cliente: {}", favoritesDto.getClientEmail());
+
         Favorites favorites = FavoritesMapper.toFavorites(favoritesDto);
+
         // Buscar cliente
         Client client = clientRepository.findById(favoritesDto.getClientEmail())
                 .orElseThrow(() -> new RuntimeException("No se encontró el cliente de favoritos"));
-
 
         // Pasar de creationDto a creation
         Set<Creation> creations = new HashSet<>();
         for (Long creationId : favoritesDto.getCreationsIds()){
             Creation creation = creationRepository.findById(creationId)
-                    .orElseThrow(() -> new RuntimeException("No se encontró la creacion"));
+                    .orElseThrow(() -> new RuntimeException("No se encontró la creacion con id: " + creationId));
             creations.add(creation);
-
         }
 
         favorites.setCreations(creations);
         favorites.setClient(client);
 
-        // Agregar a cliente
-        assert client != null;
-        client.getFavorites().add(favorites);
+        // Guardar el favorito (la relación bidireccional se maneja automáticamente)
+        Favorites savedFavorites = favoritesRepository.save(favorites);
 
-        favoritesRepository.save(favorites);
-        return FavoritesMapper.toFavoritesDto(favorites);
+        log.info("Favorito creado con ID: {}", savedFavorites.getId());
 
+        return FavoritesMapper.toFavoritesDto(savedFavorites);
     }
 
     @Override
@@ -81,20 +81,16 @@ public class FavoritesService implements FavoritesServiceInt {
 
     @Override
     public List<FavoritesResponse> getFavoritesByClientEmail(String email) {
-        // Buscar cliente por email
-        Client client = clientRepository.findById(email).orElse(null);
+        // Obtener favoritos directamente desde el repositorio
+        List<Favorites> favorites = favoritesRepository.findByClientEmail(email);
 
-        if (client == null) {
+        // Si no hay favoritos, devolver lista vacía
+        if (favorites == null || favorites.isEmpty()) {
             return List.of();
         }
 
-        // Si el cliente no existe o no tiene favoritos, devolver lista vacía
-        if (client.getFavorites() == null || client.getFavorites().isEmpty()) {
-            return List.of(); // Lista vacía inmutable
-        }
-
-        // Obtener favoritos del cliente
-        return client.getFavorites().stream()
+        // Convertir a DTO y devolver
+        return favorites.stream()
                 .map(FavoritesMapper::toFavoritesDto)
                 .toList();
     }

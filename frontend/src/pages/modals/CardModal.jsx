@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AlertCircle, CreditCard, Check, Loader2, X } from 'lucide-react';
+import { AlertCircle, CreditCard, Check, Loader2 } from 'lucide-react';
 import { useCard } from '../../contexts/CardContext.jsx';
 import toast from "react-hot-toast";
 import {Modal} from "../../components/common/Modal.jsx";
@@ -37,14 +37,22 @@ export const CardModal = ({ isOpen, onClose }) => {
             hidePostalCode: false,
         });
 
-        const target = document.querySelector('#card-element');
-        if (target) {
-            card.mount(target);
-        } else {
-            console.warn('No se encontró #card-element');
-        }
+        setTimeout(() => {
+            const target = document.querySelector('#card-element');
+            if (target) {
+                card.mount(target);
+            } else {
+                console.warn('No se encontró #card-element');
+            }
+        }, 0);
 
         setCardElement(card);
+
+        card.on('change', (event) => {
+            if (event.error) {
+                toast.error(event.error.message, { duration: 2000 });
+            }
+        });
 
         return () => {
             card.destroy();

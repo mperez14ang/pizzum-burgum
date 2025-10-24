@@ -3,7 +3,7 @@ import {Select} from "../../components/common/Select.jsx";
 import {Button} from "../../components/common/Button.jsx";
 
 export const UpdateOrderStateModal = (
-    {isOpen, onClose, onSubmit, selectedOrder, orderStates, setNewState, ORDER_STATE_LABELS}) => {
+    {isOpen, onClose, onSubmit, selectedOrder, orderStates, newState, setNewState, updating, ORDER_STATE_LABELS}) => {
     return <Modal
         isOpen={isOpen}
         onClose={onClose}

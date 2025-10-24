@@ -1,10 +1,10 @@
 import {Select} from "../../components/common/Select.jsx";
 import {Button} from "../../components/common/Button.jsx";
-import {Input} from "postcss";
 import {Modal} from "../../components/common/Modal.jsx";
+import {Input} from "../../components/common/Input.jsx";
 
 export const CreateProductModal = (
-    {isOpen, onClose, onSubmit, editingProduct, categories, CATEGORY_LABELS, availableTypes,
+    {isOpen, onClose, submitting, onSubmit, editingProduct, categories, CATEGORY_LABELS, availableTypes,
     formData, setFormData, formErrors}) => {
     return <Modal
         isOpen={isOpen}

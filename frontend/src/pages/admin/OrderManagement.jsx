@@ -205,7 +205,12 @@ export const OrderManagement = () => {
             <UpdateOrderStateModal
                 isOpen={isUpdateModalOpen}
                 onClose={() => setIsUpdateModalOpen(false)}
-                selectedOrder={selectedOrder} setNewState={setNewState} orderStates={orderStates} onSubmit={submitUpdateState}
+                selectedOrder={selectedOrder}
+                newState={newState}
+                setNewState={setNewState}
+                orderStates={orderStates}
+                updating={updating}
+                onSubmit={submitUpdateState}
                 ORDER_STATE_LABELS={ORDER_STATE_LABELS}></UpdateOrderStateModal>
         </div>
     );

@@ -68,8 +68,7 @@ export const HomePage = ({ onNavigate }) => {
 
                 {/* Modal de login prompt */}
                 <LoginAndRegisterModal isOpen={isShowLoginModal}
-                                       onClose={() => {setIsShowLoginModal(false)}}>
-                </LoginAndRegisterModal>
+                                       onClose={() => {setIsShowLoginModal(false)}}/>
             </main>
         </div>
     );

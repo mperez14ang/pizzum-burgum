@@ -232,11 +232,13 @@ export const ProductManagement = () => {
         onClose: () => setIsFormModalOpen(false),
         formData,
         setFormData,
-        editingProduct,
         formErrors,
+        editingProduct,
+        submitting,
         onSubmit: handleSubmit,
         categories,
-        CATEGORY_LABELS
+        CATEGORY_LABELS,
+        availableTypes
     };
 
     return (

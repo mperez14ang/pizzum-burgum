@@ -75,7 +75,7 @@ export const CreateAdminModal = ({isOpen, onSubmit, submitting, onClose, formDat
                 <Button
                     type="button"
                     variant="secondary"
-                    onClick={() => setIsFormModalOpen(false)}
+                    onClick={onClose}
                     disabled={submitting}
                 >
                     Cancelar

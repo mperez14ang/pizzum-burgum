@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import {Modal} from "../components/common/Modal.jsx";
+import {Modal} from "../../components/common/Modal.jsx";
 
-export const EditPasswordPage = ({ onSave, onBack }) => {
+export const EditPasswordModal = ({ isOpen, onSave, onClose }) => {
     const [formData, setFormData] = useState({
         password: '',
         repeatPassword: ''
@@ -22,8 +22,8 @@ export const EditPasswordPage = ({ onSave, onBack }) => {
 
     return (
         <Modal
-            isOpen={true}
-            onClose={onBack}
+            isOpen={isOpen}
+            onClose={onClose}
             title="Cambiar Contraseña"
             size="md"
         >

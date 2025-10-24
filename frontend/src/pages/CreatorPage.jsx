@@ -9,7 +9,8 @@ import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { ingredientsService } from '../services/api';
 import toast from "react-hot-toast";
-import {FavoritesLoginCard} from "./FavoritesLoginCard.jsx";
+import {FavoritesLoginModal} from "./modals/FavoritesLoginModal.jsx";
+import {LoginAndRegisterModal} from "./modals/LoginAndRegisterModal.jsx";
 
 export const CreatorPage = ({ productType, onBack, onNavigate}) => {
     const headerRef = useRef();
@@ -20,6 +21,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
     const [favoriteName, setFavoriteName] = useState('');
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const [isSavingFavorite, setIsSavingFavorite] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
 
     const images = {
@@ -126,7 +128,8 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
 
     // Handle Quick Login
     const handleQuickLogin = () => {
-        headerRef.current?.openLoginModal();
+        setShowLoginPrompt(false)
+        setIsAuthModalOpen(true)
     }
 
     // Toggle topping para pizza
@@ -790,9 +793,15 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
             </div>
 
             {/* Modal de login prompt */}
-            {showLoginPrompt && (
-                <FavoritesLoginCard onOpenLogin={true} onBack={(() => {setShowLoginPrompt(false)})} handleQuickLogin={handleQuickLogin}></FavoritesLoginCard>
-            )}
+            <FavoritesLoginModal
+                isOpen={showLoginPrompt}
+                onOpenLogin={handleQuickLogin}
+                onClose={(() => {setShowLoginPrompt(false)})}></FavoritesLoginModal>
+
+            {/* Modal para loguearse o registrarse*/}
+            <LoginAndRegisterModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}></LoginAndRegisterModal>
         </div>
     );
 };

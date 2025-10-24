@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { AlertCircle, CreditCard, Check, Loader2, X } from 'lucide-react';
-import { useCard } from '../contexts/CardContext.jsx';
+import { useCard } from '../../contexts/CardContext.jsx';
 import toast from "react-hot-toast";
-import {Modal} from "../components/common/Modal.jsx";
+import {Modal} from "../../components/common/Modal.jsx";
 
-export const CardPage = ({ onBack }) => {
+export const CardModal = ({ isOpen, onClose }) => {
     const {
         stripe,
         user,
@@ -20,7 +20,7 @@ export const CardPage = ({ onBack }) => {
     } = useCard();
 
     useEffect(() => {
-        if (!stripe) return;
+        if (!isOpen || !stripe) return;
 
         const elements = stripe.elements();
         const card = elements.create('card', {
@@ -37,23 +37,25 @@ export const CardPage = ({ onBack }) => {
             hidePostalCode: false,
         });
 
-        card.mount('#card-element');
+        const target = document.querySelector('#card-element');
+        if (target) {
+            card.mount(target);
+        } else {
+            console.warn('No se encontró #card-element');
+        }
+
         setCardElement(card);
 
-        card.on('change', (event) => {
-            if (event.error) {
-                toast.error(event.error.message, { duration: 2000 })
-            }
-        });
-
-        return () => card.destroy();
-    }, [stripe]);
+        return () => {
+            card.destroy();
+        };
+    }, [stripe, isOpen]);
 
     return (
         <>
             <Modal
-                isOpen={true}
-                onClose={onBack}
+                isOpen={isOpen}
+                onClose={onClose}
                 title=""
                 size="md"
             >
@@ -140,4 +142,4 @@ export const CardPage = ({ onBack }) => {
 
 };
 
-export default CardPage;
+export default CardModal;

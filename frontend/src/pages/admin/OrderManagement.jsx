@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
-import { adminService } from '../../services/api';
-import { Card, CardHeader, CardBody } from '../../components/common/Card';
-import { Button } from '../../components/common/Button';
-import { Select } from '../../components/common/Select';
-import { Badge } from '../../components/common/Badge';
-import { Modal } from '../../components/common/Modal';
-import { Loading } from '../../components/common/Loading';
-import { Eye } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import {useEffect, useState} from 'react';
+import {adminService} from '../../services/api';
+import {Card, CardBody} from '../../components/common/Card';
+import {Button} from '../../components/common/Button';
+import {Select} from '../../components/common/Select';
+import {Badge} from '../../components/common/Badge';
+import {Loading} from '../../components/common/Loading';
+import {Eye} from 'lucide-react';
+import toast, {Toaster} from 'react-hot-toast';
+import {OrderDetailModal} from "../modals/OrderDetailModal.jsx";
+import {UpdateOrderStateModal} from "../modals/UpdateOrderStateModal.jsx";
 
 const ORDER_STATE_COLORS = {
     UNPAID: 'warning',
@@ -193,77 +194,19 @@ export const OrderManagement = () => {
             )}
 
             {/* Detail Modal */}
-            <Modal
+            <OrderDetailModal
                 isOpen={isDetailModalOpen}
                 onClose={() => setIsDetailModalOpen(false)}
-                title={`Detalle del Pedido #${selectedOrder?.id}`}
-                size="lg"
-            >
-                {selectedOrder && (
-                    <div className="space-y-4">
-                        <div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Estado</h4>
-                            <Badge variant={ORDER_STATE_COLORS[selectedOrder.state]}>
-                                {ORDER_STATE_LABELS[selectedOrder.state] || selectedOrder.state}
-                            </Badge>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Cliente</h4>
-                            <p className="text-gray-600">{selectedOrder.clientEmail}</p>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Dirección de entrega</h4>
-                            <p className="text-gray-600">ID: {selectedOrder.addressId}</p>
-                        </div>
-                        <div>
-                            <h4 className="font-semibold text-gray-900 mb-2">Creaciones</h4>
-                            <p className="text-gray-600">IDs: {selectedOrder.creations?.join(', ') || 'N/A'}</p>
-                        </div>
-                    </div>
-                )}
-            </Modal>
+                selectedOrder={selectedOrder}
+                ORDER_STATE_LABELS={ORDER_STATE_LABELS}
+                ORDER_STATE_COLORS={ORDER_STATE_COLORS}></OrderDetailModal>
 
             {/* Update State Modal */}
-            <Modal
+            <UpdateOrderStateModal
                 isOpen={isUpdateModalOpen}
                 onClose={() => setIsUpdateModalOpen(false)}
-                title="Actualizar Estado del Pedido"
-            >
-                {selectedOrder && (
-                    <div className="space-y-4">
-                        <div>
-                            <p className="text-sm text-gray-600 mb-2">
-                                Estado actual: <strong>{ORDER_STATE_LABELS[selectedOrder.state]}</strong>
-                            </p>
-                            <Select
-                                label="Nuevo estado"
-                                value={newState}
-                                onChange={(e) => setNewState(e.target.value)}
-                                options={orderStates.map(state => ({
-                                    value: state,
-                                    label: ORDER_STATE_LABELS[state] || state
-                                }))}
-                            />
-                        </div>
-                        <div className="flex gap-3 justify-end">
-                            <Button
-                                variant="secondary"
-                                onClick={() => setIsUpdateModalOpen(false)}
-                                disabled={updating}
-                            >
-                                Cancelar
-                            </Button>
-                            <Button
-                                variant="primary"
-                                onClick={submitUpdateState}
-                                disabled={updating}
-                            >
-                                {updating ? 'Actualizando...' : 'Actualizar'}
-                            </Button>
-                        </div>
-                    </div>
-                )}
-            </Modal>
+                selectedOrder={selectedOrder} setNewState={setNewState} orderStates={orderStates} onSubmit={submitUpdateState}
+                ORDER_STATE_LABELS={ORDER_STATE_LABELS}></UpdateOrderStateModal>
         </div>
     );
 };

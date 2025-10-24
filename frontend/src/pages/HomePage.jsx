@@ -71,7 +71,7 @@ export const HomePage = ({ onNavigate }) => {
 
                 {/* Modal de login prompt */}
                 {showLoginPrompt && (
-                    <FavoritesLoginCard onOpenLogin={true} onBack={(() => {setShowLoginPrompt(false)})} handleQuickLogin={handleQuickLogin}></FavoritesLoginCard>
+                    <FavoritesLoginCard onOpenLogin={true} onBack={(() => {setShowLoginPrompt(false)})} handleQuickLogin={handleOpenLogin}></FavoritesLoginCard>
                 )}
             </main>
         </div>

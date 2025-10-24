@@ -26,13 +26,13 @@ export const FavoritesLoginCard = ({ onOpenLogin, onBack, handleQuickLogin }) =>
 
                     <div className="space-y-3">
                         <button
-                            onClick={}
+                            onClick={onOpenLogin}
                             className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition font-semibold"
                         >
                             Iniciar Sesión
                         </button>
                         <button
-                            onClick={() => setShowLoginPrompt(false)}
+                            onClick={(handleQuickLogin)}
                             className="w-full border-2 border-gray-200 py-3 rounded-lg hover:bg-gray-50 transition"
                         >
                             Cancelar

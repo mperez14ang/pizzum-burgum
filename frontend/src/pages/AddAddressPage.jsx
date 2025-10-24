@@ -2,7 +2,7 @@ import {MapPin, Plus, X} from 'lucide-react';
 import React, { useState } from 'react';
 import {Modal} from "../components/common/Modal.jsx";
 
-export const AddAddressPage = ({ onSave, onBack }) => {
+export const AddAddressPage = ({ onSave, onBack}) => {
     const [formData, setFormData] = useState({
         label: '',
         street: '',

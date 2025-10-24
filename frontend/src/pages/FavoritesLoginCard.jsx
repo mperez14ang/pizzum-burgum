@@ -1,0 +1,49 @@
+import {Heart, LogIn} from 'lucide-react';
+import React, {useState} from 'react';
+import {Modal} from "../components/common/Modal.jsx";
+
+export const FavoritesLoginCard = ({ onOpenLogin, onBack, handleQuickLogin }) => {
+    return (
+        <Modal
+            isOpen={true}
+            onClose={onBack}
+            title=""
+            size="md"
+        >
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
+                    <div className="text-center mb-6">
+                        <div className="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                            <Heart className="text-orange-500" size={32} />
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                            Inicia sesión para guardar favoritos
+                        </h3>
+                        <p className="text-gray-600">
+                            Crea una cuenta o inicia sesión para guardar tus creaciones favoritas
+                        </p>
+                    </div>
+
+                    <div className="space-y-3">
+                        <button
+                            onClick={}
+                            className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition font-semibold"
+                        >
+                            Iniciar Sesión
+                        </button>
+                        <button
+                            onClick={() => setShowLoginPrompt(false)}
+                            className="w-full border-2 border-gray-200 py-3 rounded-lg hover:bg-gray-50 transition"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+
+                    <p className="text-xs text-gray-500 text-center mt-4">
+                        Iniciar Sesión
+                    </p>
+                </div>
+            </div>
+        </Modal>
+    );
+};

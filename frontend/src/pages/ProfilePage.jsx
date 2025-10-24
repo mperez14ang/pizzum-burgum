@@ -3,6 +3,7 @@ import {ChevronLeft, CreditCard, Edit3, KeyRound, MapPin, Plus, Trash2} from 'lu
 import {Header} from "../components/common/header.jsx";
 import CardPage from "./CardPage.jsx";
 import {AddAddressPage} from "./AddAddressPage.jsx";
+import {EditPasswordPage} from "./EditPasswordPage.jsx";
 
 // Skeleton-only Profile Page (no API calls). Prepared with props for future wiring.
 // Expected props (all optional for now):
@@ -26,14 +27,17 @@ export const ProfilePage = ({
     onEditCard,
     onAddCard,
     onEditPassword,
+    onNavigate
                             }) => {
     const firstName = user?.firstName ?? '';
     const lastName = user?.lastName ?? '';
     const addresses = user?.addresses ?? [];
     const cards = user?.cards ?? [];
 
+    // Modals
     const [showCardModal, setShowCardModal] = useState(false);
     const [showAddressModal, setShowAddressModal] = useState(false);
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
 
     const [selectedAddressId, setSelectedAddressId] = useState(
         addresses.length ? addresses[0].id : ''
@@ -50,17 +54,15 @@ export const ProfilePage = ({
         if (onSelectAddress) onSelectAddress(id);
     };
 
-    const handleCreateCard = () => {
-        setShowCardModal(true);
-    }
+    const handleCreateCard = () => {setShowCardModal(true);}
 
-    const handleAddressCreate = () => {
-        setShowAddressModal(true);
-    }
+    const handleAddressCreate = () => {setShowAddressModal(true);}
+
+    const handleChangePassword = () => {setShowPasswordModal(true)}
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header/>
+            <Header onNavigate={onNavigate}/>
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Top bar */}
                 <div className="flex items-center justify-between mb-6">
@@ -74,7 +76,7 @@ export const ProfilePage = ({
 
                     {/* Discrete password edit button */}
                     <button
-                        onClick={onEditPassword}
+                        onClick={handleChangePassword}
                         className="inline-flex items-center text-sm text-gray-500 hover:text-gray-800"
                         title="Editar contraseña"
                     >
@@ -191,6 +193,7 @@ export const ProfilePage = ({
                     )}
                     {showCardModal && <CardPage onBack={() => setShowCardModal(false)} />}
                     {showAddressModal && <AddAddressPage onBack={() => setShowAddressModal(false)} />}
+                    {showPasswordModal && <EditPasswordPage onBack={() => setShowPasswordModal(false)} />}
                 </section>
             </div>
         </div>

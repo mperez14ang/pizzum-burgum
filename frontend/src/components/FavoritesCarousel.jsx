@@ -108,6 +108,7 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                         Iniciar Sesión
                     </button>
                 </div>
+
             </div>
         );
     }

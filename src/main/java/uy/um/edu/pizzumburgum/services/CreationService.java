@@ -42,6 +42,7 @@ public class CreationService implements CreationServiceInt {
 
         // Convertir creationsHasProductsDto a creationsHasProducts
         Set<CreationHasProducts> creationsHasProducts = new HashSet<>();
+        List<Product> products = productRepository.findAll();
         if (creationDto.getProducts() != null) {
             creationsHasProducts = creationDto.getProducts().stream()
                     .map(c -> {
@@ -49,7 +50,7 @@ public class CreationService implements CreationServiceInt {
 
                         Long productId = c.getProductId();
                         log.info(String.valueOf(c.getProductId()));
-                        Product product = productRepository.findById(productId)
+                        Product product = products.stream().filter(p -> p.getId().equals(productId)).findFirst()
                                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
                         creationHasProducts1.setProduct(product);
@@ -60,21 +61,23 @@ public class CreationService implements CreationServiceInt {
 
         // Convertir OrderHasCreationsDto a OrderHasCreations
         Set<OrderHasCreations> orderHasCreations = new HashSet<>();
+        List<OrderBy> orders = orderByRepository.findAll();
         if  (creationDto.getOrders() != null) {
             orderHasCreations = creationDto.getOrders().stream()
                     .map(c -> {
                         OrderHasCreations orderHasCreations1 = OrderHasCreationsMapper.toOrderHasCreations(c);
 
                         Long orderId = c.getOrderId();
-                        OrderBy orderBy = orderByRepository.findById(orderId)
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                        OrderBy orderBy = orders.stream().filter(o -> o.getId().equals(orderId)).findFirst()
+                                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
                         orderHasCreations1.setOrder(orderBy);
                         return orderHasCreations1;
                     }).collect(Collectors.toSet());
         }
 
-
+        log.info("creations: lenght{}", creationsHasProducts.size());
+        log.info("orders: lenght{}", orders.size());
         creation.setOrder(orderHasCreations);
         creation.setProducts(creationsHasProducts);
 
@@ -90,7 +93,9 @@ public class CreationService implements CreationServiceInt {
 
     @Override
     public List<CreationDto> getCreations() {
-        return List.of();
+        return creationRepository.findAll().stream()
+                .map(CreationMapper::toCreationDto)
+                .toList();
     }
 
     @Override

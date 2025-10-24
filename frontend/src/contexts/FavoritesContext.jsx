@@ -107,6 +107,7 @@ export const FavoritesProvider = ({ children }) => {
     };
 
     const addCreation = async (transformedCreationData) => {
+        console.log(transformedCreationData)
         if (!isAuthenticated || !user) {
             return {
                 success: false,

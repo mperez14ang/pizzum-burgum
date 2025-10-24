@@ -7,26 +7,24 @@ import uy.um.edu.pizzumburgum.entities.Creation;
 import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
 import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CreationMapper {
     public static CreationDto toCreationDto(Creation creation) {
         // Convertir creationsHasProducts a creationsHasProductsDto
-        Set<CreationHasProductsDto> creationsHasProductsDtos = new HashSet<>();
-        if (creation.getProducts() != null) {
-            for (CreationHasProducts creationHasProducts : creation.getProducts()){
-                creationsHasProductsDtos.add(CreationHasProductMapper.toCreationHasProductsDto(creationHasProducts));
-            }
-        }
+        Set<CreationHasProductsDto> creationsHasProductsDtos = creation.getProducts()
+                .stream()
+                .map(CreationHasProductMapper::toCreationHasProductsDto)
+                .collect(Collectors.toSet());
 
-        // Convertir orderHasCreations a orderHasCreationsDto
-        Set<OrderHasCreationsDto> orderHasCreationsDtos = new HashSet<>();
-        if (creation.getOrder() != null) {
-            for (OrderHasCreations orderHasCreation : creation.getOrder()){
-                orderHasCreationsDtos.add(OrderHasCreationsMapper.toOrderHasCreationsDto(orderHasCreation));
-            }
-        }
+        Set<OrderHasCreationsDto> orderHasCreationsDtos = creation.getOrder()
+                .stream()
+                .map(OrderHasCreationsMapper::toOrderHasCreationsDto)
+                .collect(Collectors.toSet());
+
 
         return CreationDto.builder()
                 .id(creation.getId())

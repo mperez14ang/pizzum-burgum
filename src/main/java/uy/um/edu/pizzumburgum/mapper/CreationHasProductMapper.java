@@ -15,7 +15,6 @@ public class CreationHasProductMapper {
 
     public static CreationHasProductsResponse toCreationHasProductsDto(CreationHasProducts creationHasProducts) {
         return CreationHasProductsResponse.builder()
-                .id(creationHasProducts.getId())
                 .product(ProductMapper.toProductDto(creationHasProducts.getProduct()))
                 .quantity(creationHasProducts.getQuantity())
                 .build();

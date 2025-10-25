@@ -11,8 +11,6 @@ import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreationHasProductsResponse {
-    private Long id;
-
     private int quantity;
 
     private ProductDto product;

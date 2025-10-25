@@ -4,8 +4,10 @@ import { OrderManagement } from './OrderManagement';
 import { ProductManagement } from './ProductManagement';
 import { AdminManagement } from './AdminManagement';
 import AdminProfilePage from './AdminProfilePage.jsx';
+import {useAuth} from "../../contexts/AuthContext.jsx";
 
 export const AdminPage = () => {
+    const { user} = useAuth();
     const [currentSection, setCurrentSection] = useState('orders');
 
     const renderSection = () => {
@@ -17,7 +19,7 @@ export const AdminPage = () => {
             case 'admins':
                 return <AdminManagement />;
             case 'profile':
-                return <AdminProfilePage onBack={() => {}} onEditPassword={() => {}} />;
+                return <AdminProfilePage onBack={() => {}} user={user} />;
             default:
                 return <OrderManagement />;
         }

@@ -11,9 +11,6 @@ import uy.um.edu.pizzumburgum.dto.request.CreationRequest;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderHasCreationsResponse {
-
-    private Long id;
-
     private int quantity;
 
     private CreationResponse creation;

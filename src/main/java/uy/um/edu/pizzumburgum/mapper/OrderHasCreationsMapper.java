@@ -15,7 +15,6 @@ public class OrderHasCreationsMapper {
 
     public static OrderHasCreationsResponse toOrderHasCreationsDto(OrderHasCreations orderHasCreations) {
         return OrderHasCreationsResponse.builder()
-                .id(orderHasCreations.getId())
                 .quantity(orderHasCreations.getQuantity())
                 .creation(CreationMapper.toCreationDto(orderHasCreations.getCreation()))
                 .build();

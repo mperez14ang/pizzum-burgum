@@ -247,9 +247,12 @@ export const ProductManagement = () => {
             <div className="mb-6">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold text-gray-900">Gestión de Productos</h2>
-                    <Button onClick={handleCreate}>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Nuevo Producto
+                    <Button
+                        onClick={handleCreate}
+                        className="flex items-center gap-2"
+                    >
+                        <Plus className="w-4 h-4" />
+                        <span>Nuevo Producto</span>
                     </Button>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">

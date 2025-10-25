@@ -9,13 +9,12 @@ import uy.um.edu.pizzumburgum.dto.request.OrderByRequest;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.entities.*;
 import uy.um.edu.pizzumburgum.mapper.OrderByMapper;
-import uy.um.edu.pizzumburgum.repository.AddressRepository;
-import uy.um.edu.pizzumburgum.repository.ClientRepository;
-import uy.um.edu.pizzumburgum.repository.OrderByRepository;
-import uy.um.edu.pizzumburgum.repository.OrderHasCreationsRepository;
+import uy.um.edu.pizzumburgum.mapper.OrderHasCreationsMapper;
+import uy.um.edu.pizzumburgum.repository.*;
 import uy.um.edu.pizzumburgum.services.interfaces.OrderByInt;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderByService implements OrderByInt {
@@ -24,47 +23,57 @@ public class OrderByService implements OrderByInt {
     private final OrderByRepository orderByRepository;
 
     @Autowired
-    private final OrderHasCreationsRepository orderHasCreationsRepository;
-
-    @Autowired
     private final AddressRepository addressRepository;
 
     @Autowired
     private final ClientRepository clientRepository;
 
-    public OrderByService(OrderByRepository orderByRepository, OrderHasCreationsRepository orderHasCreationsRepository, AddressRepository addressRepository, ClientRepository clientRepository) {
+    @Autowired
+    private CreationRepository creationRepository;
+
+    public OrderByService(OrderByRepository orderByRepository, AddressRepository addressRepository, ClientRepository clientRepository) {
         this.orderByRepository = orderByRepository;
-        this.orderHasCreationsRepository = orderHasCreationsRepository;
         this.addressRepository = addressRepository;
         this.clientRepository = clientRepository;
     }
 
     @Override
-    public OrderByResponse createOder(OrderByRequest orderByDtoRequest) {
+    public OrderByResponse createOrder(OrderByRequest orderByDtoRequest) {
         OrderBy orderBy = OrderByMapper.toOrderBy(orderByDtoRequest);
 
-        // Setear creations (OrderHasCreations)
+        // Convertir OrderHasCreationsDto a OrderHasCreations
         Set<OrderHasCreations> orderHasCreations = new HashSet<>();
-        for (Long creationsId : orderByDtoRequest.getCreations()){
-            orderHasCreations.add(orderHasCreationsRepository.findById(creationsId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "OrderHasCreations con id : " + creationsId + " no encontrado"))
-            );
+        List<Creation> orders = creationRepository.findAll();
+        if  (orderByDtoRequest.getCreations() != null) {
+            orderHasCreations = orderByDtoRequest.getCreations().stream()
+                    .map(c -> {
+                        OrderHasCreations orderHasCreations1 = OrderHasCreationsMapper.toOrderHasCreations(c);
+
+                        Long creationId = c.getCreationId();
+                        Creation creation = orders.stream().filter(o -> o.getId().equals(creationId)).findFirst()
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro una creacion con id " + creationId));
+
+                        orderHasCreations1.setOrder(orderBy);
+                        orderHasCreations1.setCreation(creation);
+                        return orderHasCreations1;
+                    }).collect(Collectors.toSet());
         }
 
         orderBy.setCreations(orderHasCreations);
 
-        // Setear address
-        // Verificar que el address sea del cliente TODO
-
+        // Verificar que address sea del cliente
         Address address = addressRepository.findById(orderByDtoRequest.getAddress())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Address de order con id : " + orderByDtoRequest.getAddress() + " no encontrado"));
 
-        orderBy.setAddress(address);
-
-        // Setear client
         Client client = clientRepository.findById(orderByDtoRequest.getClientEmail())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cliente de orden " + orderBy.getId() + " con id " + orderByDtoRequest.getClientEmail() + " no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cliente de orden " + orderBy.getId() + " con id " + orderByDtoRequest.getClientEmail() + " no encontrado"));
 
+        if (!client.getAddresses().contains(address)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El address de la orden con el cliente no coincide");
+        }
+
+        // Setear address y client
+        orderBy.setAddress(address);
         orderBy.setClient(client);
 
         orderByRepository.save(orderBy);

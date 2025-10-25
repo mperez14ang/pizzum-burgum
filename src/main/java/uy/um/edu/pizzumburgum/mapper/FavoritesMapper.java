@@ -1,8 +1,9 @@
 package uy.um.edu.pizzumburgum.mapper;
 
 import uy.um.edu.pizzumburgum.dto.request.FavoritesRequest;
+import uy.um.edu.pizzumburgum.dto.response.CreationResponse;
 import uy.um.edu.pizzumburgum.dto.response.FavoritesResponse;
-import uy.um.edu.pizzumburgum.dto.shared.CreationDto;
+import uy.um.edu.pizzumburgum.dto.request.CreationRequest;
 import uy.um.edu.pizzumburgum.entities.Creation;
 import uy.um.edu.pizzumburgum.entities.Favorites;
 
@@ -20,7 +21,7 @@ public class FavoritesMapper {
     }
 
     public static FavoritesResponse toFavoritesDto(Favorites favorites) {
-        Set<CreationDto> creationsIds = new HashSet<>();
+        Set<CreationResponse> creationsIds = new HashSet<>();
         for (Creation creation : favorites.getCreations()){
             creationsIds.add(
                     CreationMapper.toCreationDto(creation)

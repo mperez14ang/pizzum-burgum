@@ -8,11 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import uy.um.edu.pizzumburgum.dto.shared.CreationDto;
+import uy.um.edu.pizzumburgum.dto.request.CreationRequest;
+import uy.um.edu.pizzumburgum.dto.response.CreationResponse;
 import uy.um.edu.pizzumburgum.entities.*;
 import uy.um.edu.pizzumburgum.mapper.CreationHasProductMapper;
 import uy.um.edu.pizzumburgum.mapper.CreationMapper;
-import uy.um.edu.pizzumburgum.mapper.OrderHasCreationsMapper;
 import uy.um.edu.pizzumburgum.repository.CreationRepository;
 import uy.um.edu.pizzumburgum.repository.OrderByRepository;
 import uy.um.edu.pizzumburgum.repository.ProductRepository;
@@ -28,16 +28,10 @@ import java.util.stream.Collectors;
 public class CreationService implements CreationServiceInt {
     private final CreationRepository creationRepository;
     private final ProductRepository productRepository;
-    private final OrderByRepository orderByRepository;
-
-    private static final Logger log = LoggerFactory.getLogger(CreationService.class);
 
     @Transactional
     @Override
-    public CreationDto createCreation(CreationDto creationDto) {
-        log.info(creationDto.getName());
-        log.info(String.valueOf(creationDto.getType()));
-
+    public CreationResponse createCreation(CreationRequest creationDto) {
         // Convertir a creation
         Creation creation = CreationMapper.toCreation(creationDto);
 
@@ -50,36 +44,16 @@ public class CreationService implements CreationServiceInt {
                         CreationHasProducts creationHasProducts1 = CreationHasProductMapper.toCreationHasProducts(c);
 
                         Long productId = c.getProductId();
-                        log.info(String.valueOf(c.getProductId()));
                         Product product = products.stream().filter(p -> p.getId().equals(productId)).findFirst()
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro un producto con id " + productId));
 
                         creationHasProducts1.setProduct(product);
+                        creationHasProducts1.setCreation(creation);
                         return creationHasProducts1;
                     }).collect(Collectors.toSet());
         }
 
 
-        // Convertir OrderHasCreationsDto a OrderHasCreations
-        Set<OrderHasCreations> orderHasCreations = new HashSet<>();
-        List<OrderBy> orders = orderByRepository.findAll();
-        if  (creationDto.getOrders() != null) {
-            orderHasCreations = creationDto.getOrders().stream()
-                    .map(c -> {
-                        OrderHasCreations orderHasCreations1 = OrderHasCreationsMapper.toOrderHasCreations(c);
-
-                        Long orderId = c.getOrderId();
-                        OrderBy orderBy = orders.stream().filter(o -> o.getId().equals(orderId)).findFirst()
-                                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-                        orderHasCreations1.setOrder(orderBy);
-                        return orderHasCreations1;
-                    }).collect(Collectors.toSet());
-        }
-
-        log.info("creations: lenght{}", creationsHasProducts.size());
-        log.info("orders: lenght{}", orders.size());
-        creation.setOrder(orderHasCreations);
         creation.setProducts(creationsHasProducts);
 
         creationRepository.save(creation);
@@ -88,21 +62,21 @@ public class CreationService implements CreationServiceInt {
     }
 
     @Override
-    public CreationDto getCreationById(Long id) {
+    public CreationResponse getCreationById(Long id) {
         Creation creation = creationRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro una creacion con id " + id));
         return CreationMapper.toCreationDto(creation);
     }
 
     @Override
-    public List<CreationDto> getCreations() {
+    public List<CreationResponse> getCreations() {
         return creationRepository.findAll().stream()
                 .map(CreationMapper::toCreationDto)
                 .toList();
     }
 
     @Override
-    public CreationDto updateCreation(Long id, CreationDto creationDto) {
+    public CreationResponse updateCreation(Long id, CreationRequest creationDto) {
         return null;
     }
 

@@ -1,14 +1,12 @@
 import {useEffect, useState} from 'react';
-import {AuthProvider, useAuth} from './contexts/AuthContext';
-import { CreatorProvider } from './contexts/CreatorContext';
-import { FavoritesProvider } from './contexts/FavoritesContext';
-import { HomePage } from './pages/HomePage';
-import { CreatorPage } from './pages/CreatorPage';
-import { AdminPage } from './pages/admin/AdminPage';
-import { CardModal } from "./pages/modals/CardModal.jsx";
-import { CardProvider } from "./contexts/CardContext.jsx";
-import {AuthPage} from "./pages/AuthPage.jsx";
-import {Toaster} from "react-hot-toast";
+import {useAuth} from './contexts/AuthContext';
+import {CreatorProvider} from './contexts/CreatorContext';
+import {FavoritesProvider} from './contexts/FavoritesContext';
+import {HomePage} from './pages/HomePage';
+import {CreatorPage} from './pages/CreatorPage';
+import {AdminPage} from './pages/admin/AdminPage';
+import {CardModal} from "./pages/modals/CardModal.jsx";
+import {CardProvider} from "./contexts/CardContext.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 
 function App() {
@@ -69,7 +67,6 @@ function App() {
     if (isAuthenticated && user?.role === 'ADMIN') {
         return (
             <>
-                <Toaster position="top-right" />
                 <AdminPage />
             </>
         );
@@ -77,7 +74,6 @@ function App() {
 
     return (
         <CardProvider>
-            <Toaster position="top-right" />
             <FavoritesProvider>
                 <CreatorProvider>
                     {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}

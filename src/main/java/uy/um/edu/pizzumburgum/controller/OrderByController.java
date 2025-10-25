@@ -21,7 +21,7 @@ public class OrderByController {
 
     @PostMapping
     public OrderByResponse createOrder(@RequestBody OrderByRequest orderByRequest) {
-        return orderByService.createOder(orderByRequest);
+        return orderByService.createOrder(orderByRequest);
     }
 
     @GetMapping("{id}")

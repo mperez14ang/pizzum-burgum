@@ -1,4 +1,4 @@
-package uy.um.edu.pizzumburgum.dto.shared;
+package uy.um.edu.pizzumburgum.dto.request;
 
 import lombok.*;
 
@@ -6,13 +6,11 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderHasCreationsDto {
+public class OrderHasCreationsRequest {
 
     private Long id;
 
     private int quantity;
 
     private Long creationId;
-
-    private Long orderId;
 }

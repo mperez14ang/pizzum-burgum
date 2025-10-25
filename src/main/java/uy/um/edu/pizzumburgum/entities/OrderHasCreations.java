@@ -2,10 +2,7 @@ package uy.um.edu.pizzumburgum.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(
@@ -15,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
+@ToString(exclude = {"creation", "order"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class OrderHasCreations {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

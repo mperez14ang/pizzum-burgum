@@ -1,9 +1,10 @@
-package uy.um.edu.pizzumburgum.dto.shared;
+package uy.um.edu.pizzumburgum.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uy.um.edu.pizzumburgum.dto.request.CreationHasProductsRequest;
 import uy.um.edu.pizzumburgum.entities.CreationType;
 
 import java.util.Set;
@@ -12,7 +13,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreationDto {
+public class CreationResponse {
     private Long id;
 
     private String name;
@@ -21,7 +22,5 @@ public class CreationDto {
 
     private float price;
 
-    private Set<CreationHasProductsDto> products;
-
-    private Set<OrderHasCreationsDto> orders;
+    private Set<CreationHasProductsResponse> products;
 }

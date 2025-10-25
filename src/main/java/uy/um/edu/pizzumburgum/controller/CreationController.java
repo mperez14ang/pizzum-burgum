@@ -2,7 +2,8 @@ package uy.um.edu.pizzumburgum.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uy.um.edu.pizzumburgum.dto.shared.CreationDto;
+import uy.um.edu.pizzumburgum.dto.request.CreationRequest;
+import uy.um.edu.pizzumburgum.dto.response.CreationResponse;
 import uy.um.edu.pizzumburgum.services.CreationService;
 
 import java.util.List;
@@ -17,17 +18,17 @@ public class CreationController {
     }
 
     @PostMapping
-    public CreationDto createCreation(@RequestBody CreationDto creationDto) {
+    public CreationResponse createCreation(@RequestBody CreationRequest creationDto) {
         return creationService.createCreation(creationDto);
     }
 
     @GetMapping("{id}")
-    public CreationDto getCreation(@PathVariable Long id) {
+    public CreationResponse getCreation(@PathVariable Long id) {
         return creationService.getCreationById(id);
     }
 
     @GetMapping
-    public List<CreationDto> getCreations() {
+    public List<CreationResponse> getCreations() {
         return creationService.getCreations();
     }
 

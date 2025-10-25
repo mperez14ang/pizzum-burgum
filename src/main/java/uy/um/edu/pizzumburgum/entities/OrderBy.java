@@ -1,10 +1,7 @@
 package uy.um.edu.pizzumburgum.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
@@ -14,6 +11,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
+@ToString(exclude = {"creations", "client"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class OrderBy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

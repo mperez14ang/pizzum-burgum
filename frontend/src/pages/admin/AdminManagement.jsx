@@ -134,7 +134,6 @@ export const AdminManagement = () => {
 
     return (
         <div>
-            <Toaster position="top-right" />
 
             <div className="mb-6">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -149,7 +148,7 @@ export const AdminManagement = () => {
                 </p>
             </div>
 
-            {admins.length === 0 ? (
+            {admins.length > 0 ? (
                 <Card>
                     <CardBody>
                         <p className="text-center text-gray-500 py-8">No hay administradores para mostrar</p>

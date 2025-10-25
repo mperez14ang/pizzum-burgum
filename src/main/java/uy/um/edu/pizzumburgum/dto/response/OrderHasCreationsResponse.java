@@ -6,19 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uy.um.edu.pizzumburgum.dto.request.CreationRequest;
 
-import java.time.LocalDate;
-import java.util.Set;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class FavoritesResponse {
+public class OrderHasCreationsResponse {
+
     private Long id;
 
-    private LocalDate createdAt;
+    private int quantity;
 
-    private String clientEmail;
-
-    private Set<CreationResponse> creations;
+    private CreationResponse creation;
 }

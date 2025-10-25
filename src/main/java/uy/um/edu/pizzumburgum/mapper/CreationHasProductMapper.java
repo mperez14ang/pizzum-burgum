@@ -1,21 +1,23 @@
 package uy.um.edu.pizzumburgum.mapper;
 
-import uy.um.edu.pizzumburgum.dto.shared.CreationHasProductsDto;
+import uy.um.edu.pizzumburgum.dto.request.CreationHasProductsRequest;
+import uy.um.edu.pizzumburgum.dto.response.CreationHasProductsResponse;
 import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
 
 public class CreationHasProductMapper {
-    public static CreationHasProductsDto toCreationHasProductsDto(CreationHasProducts creationHasProducts) {
-        return CreationHasProductsDto.builder()
-                .id(creationHasProducts.getId())
-                .productId(creationHasProducts.getProduct().getId())
-                .quantity(creationHasProducts.getQuantity())
+
+    public static CreationHasProducts toCreationHasProducts(CreationHasProductsRequest creationHasProductsRequest) {
+        return CreationHasProducts.builder()
+                .id(creationHasProductsRequest.getId())
+                .quantity(creationHasProductsRequest.getQuantity())
                 .build();
     }
 
-    public static CreationHasProducts toCreationHasProducts(CreationHasProductsDto creationHasProductsDto) {
-        return CreationHasProducts.builder()
-                .id(creationHasProductsDto.getId())
-                .quantity(creationHasProductsDto.getQuantity())
+    public static CreationHasProductsResponse toCreationHasProductsDto(CreationHasProducts creationHasProducts) {
+        return CreationHasProductsResponse.builder()
+                .id(creationHasProducts.getId())
+                .product(ProductMapper.toProductDto(creationHasProducts.getProduct()))
+                .quantity(creationHasProducts.getQuantity())
                 .build();
     }
 }

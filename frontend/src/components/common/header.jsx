@@ -1,35 +1,24 @@
-import {LogOut, ShoppingBag, User, ChevronDown, History, UserCircle, MapPin, CreditCard, Star} from 'lucide-react';
 import {useAuth} from '../../contexts/AuthContext';
-import {useState, useEffect, forwardRef, useImperativeHandle, useRef} from 'react';
-import {Modal} from './Modal';
+import {forwardRef, useEffect, useRef, useState} from 'react';
 import toast from 'react-hot-toast';
-import {AuthPage} from "../../pages/AuthPage.jsx";
 import {LoginAndRegisterModal} from "../../pages/modals/LoginAndRegisterModal.jsx";
+import UserDropdown from "../../pages/dropdowns/UserDropdown.jsx";
+import CartDropdown from "../../pages/dropdowns/CartDropdown.jsx";
 
 export const Header = forwardRef(({onNavigate}, ref) => {
     const { user, isAuthenticated, logout } = useAuth();
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [isCartOpen, setIsCartOpen] = useState(false)
     const dropdownRef = useRef(null);
 
-    // Close modal when user becomes authenticated
+    // Cerrar modal despues de autenticarse
     useEffect(() => {
         if (isAuthenticated) {
             setIsAuthModalOpen(false);
+            setIsCartOpen(false);
         }
     }, [isAuthenticated]);
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsDropdownOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
 
     const handleLogout = () => {
         setIsDropdownOpen(false);
@@ -41,24 +30,20 @@ export const Header = forwardRef(({onNavigate}, ref) => {
         }
     };
 
-    const handleMenuItemClick = (action) => {
+    const onToggleCart = () => {
+        setIsCartOpen(!isCartOpen)
         setIsDropdownOpen(false);
+    }
 
-        if (action === 'Mi Perfil'){
-            onNavigate('profile')
-            return;
+    const onToggleUser = () => {
+        setIsDropdownOpen(!isDropdownOpen)
+        setIsCartOpen(false);
+    }
+
+    const handleClickOutside = (event, dropdownRef, onClose) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            onClose()
         }
-        if (action === 'Mis Favoritos'){
-            onNavigate('favorites')
-            return;
-        }
-
-        // TODO: Implementar navegación a las páginas correspondientes
-        toast.info(`Función "${action}" pendiente de implementar`, { duration: 2000 });
-    };
-
-    const handleOpenLogin = () => {
-        setIsAuthModalOpen(true);
     };
 
     return (
@@ -72,96 +57,30 @@ export const Header = forwardRef(({onNavigate}, ref) => {
                             PizzUM & BurgUM
                         </h1>
                         <div className="flex gap-4 items-center">
-                            <button className="p-2 hover:bg-gray-100 rounded-full">
-                                <ShoppingBag className="w-6 h-6" />
-                            </button>
+                            <CartDropdown isOpen={isCartOpen}
+                                          onToggle={onToggleCart}
+                                          onClose={() => setIsCartOpen(false)}
+                                          handleClickOutside={handleClickOutside} />
 
-                            {isAuthenticated ? (
-                                <div className="relative" ref={dropdownRef}>
-                                    <button
-                                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                        className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-                                    >
-                                        <span className="text-sm font-medium text-gray-700">
-                                            {user?.firstName || user?.email}
-                                        </span>
-                                        <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
-                                    </button>
-
-                                    {isDropdownOpen && (
-                                        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-                                            <button
-                                                onClick={() => handleMenuItemClick('Historial de Pedidos')}
-                                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-                                            >
-                                                <History className="w-4 h-4" />
-                                                Historial de Pedidos
-                                            </button>
-
-                                            <button
-                                                onClick={() => handleMenuItemClick('Mi Perfil')}
-                                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-                                            >
-                                                <UserCircle className="w-4 h-4" />
-                                                Mi Perfil
-                                            </button>
-
-                                            <button
-                                                onClick={() => handleMenuItemClick('Mis Direcciones')}
-                                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-                                            >
-                                                <MapPin className="w-4 h-4" />
-                                                Mis Direcciones
-                                            </button>
-
-                                            <button
-                                                onClick={() => handleMenuItemClick('Métodos de Pago')}
-                                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-                                            >
-                                                <CreditCard className="w-4 h-4" />
-                                                Métodos de Pago
-                                            </button>
-
-                                            <button
-                                                onClick={() => handleMenuItemClick('Mis Favoritos')}
-                                                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-                                            >
-                                                <Star className="w-4 h-4" />
-                                                Mis Favoritos
-                                            </button>
-
-                                            <div className="border-t border-gray-200 my-1"></div>
-
-                                            <button
-                                                onClick={handleLogout}
-                                                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
-                                            >
-                                                <LogOut className="w-4 h-4" />
-                                                Cerrar Sesión
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={handleOpenLogin}
-                                    className="p-2 hover:bg-gray-100 rounded-full"
-                                    title="Iniciar sesión"
-                                >
-                                    <User className="w-6 h-6" />
-                                </button>
-                            )}
+                            <UserDropdown isOpen={isDropdownOpen}
+                                          onToggle={onToggleUser}
+                                          onClose={() => setIsDropdownOpen(false)}
+                                          user={user}
+                                          isAuthenticated={isAuthenticated}
+                                          handleLogout={handleLogout}
+                                          onOpenLogin={() => setIsAuthModalOpen(true)}
+                                          onNavigate={onNavigate}
+                                          handleClickOutside={handleClickOutside}/>
                         </div>
+
                     </div>
                 </div>
             </header>
 
             {/* Login & Register Modal */}
-            {!isAuthenticated && (
-                <LoginAndRegisterModal
-                    isOpen={isAuthModalOpen}
-                    onClose={() => setIsAuthModalOpen(false)}></LoginAndRegisterModal>
-            )}
+            <LoginAndRegisterModal
+                isOpen={!isAuthenticated && isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}></LoginAndRegisterModal>
         </>
     );
 });

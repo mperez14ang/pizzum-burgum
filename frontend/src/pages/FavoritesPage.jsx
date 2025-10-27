@@ -1,12 +1,11 @@
-import {Heart, LogIn, ShoppingCart, Trash2} from 'lucide-react';
+import {ChevronLeft, Heart, LogIn, ShoppingCart, Trash2} from 'lucide-react';
 import {Header} from '../components/common/Header';
 import {useAuth} from '../contexts/AuthContext';
 import {useFavorites} from '../contexts/FavoritesContext';
-import {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import toast from 'react-hot-toast';
 
-export const FavoritesPage = ({ onNavigate }) => {
-    const { isAuthenticated } = useAuth();
+export const FavoritesPage = ({ onNavigate, onBack }) => {
     const { favorites, isLoading, removeFromFavorites } = useFavorites();
 
     const [processed, setProcessed] = useState([]);
@@ -60,6 +59,7 @@ export const FavoritesPage = ({ onNavigate }) => {
 
     const Section = ({ title, items }) => (
         <section className="mb-12">
+
             <div className="flex items-center gap-3 mb-4">
                 <div className="w-2 h-6 bg-orange-500 rounded" />
                 <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
@@ -127,6 +127,15 @@ export const FavoritesPage = ({ onNavigate }) => {
             <Header onNavigate={onNavigate} />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+                <button
+                    onClick={onBack}
+                    className="inline-flex items-center text-gray-600 hover:text-gray-900"
+                >
+                    <ChevronLeft size={20}/>
+                    <span className="ml-1">Volver</span>
+                </button>
+
                 <div className="mb-8">
                     <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
                         <Heart className="text-red-500" size={32} fill="currentColor" />

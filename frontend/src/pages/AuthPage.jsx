@@ -2,7 +2,7 @@ import {useState} from "react";
 import {useAuth} from "../contexts/AuthContext.jsx";
 import toast from "react-hot-toast";
 
-export const AuthPage = ({type, onToggleAuthType}) => {
+export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
     const { login, register } = useAuth();
 
     const [formData, setFormData] = useState({
@@ -226,33 +226,36 @@ export const AuthPage = ({type, onToggleAuthType}) => {
                 </button>
 
                 {/* Toggle between Login and Register */}
-                <div className="text-center pt-4 border-t border-gray-200">
-                    <p className="text-sm text-gray-600">
-                        {isRegister ? (
-                            <>
-                                ¿Ya tienes cuenta?{' '}
-                                <button
-                                    type="button"
-                                    onClick={onToggleAuthType}
-                                    className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
-                                >
-                                    Inicia sesión
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                ¿No tienes cuenta?{' '}
-                                <button
-                                    type="button"
-                                    onClick={onToggleAuthType}
-                                    className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
-                                >
-                                    Regístrate aquí
-                                </button>
-                            </>
-                        )}
-                    </p>
-                </div>
+                {canSwitch && (
+                    <div className="text-center pt-4 border-t border-gray-200">
+                        <p className="text-sm text-gray-600">
+                            {isRegister ? (
+                                <>
+                                    ¿Ya tienes cuenta?{' '}
+                                    <button
+                                        type="button"
+                                        onClick={onToggleAuthType}
+                                        className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
+                                    >
+                                        Inicia sesión
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    ¿No tienes cuenta?{' '}
+                                    <button
+                                        type="button"
+                                        onClick={onToggleAuthType}
+                                        className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
+                                    >
+                                        Regístrate aquí
+                                    </button>
+                                </>
+                            )}
+                        </p>
+                    </div>
+                )}
+
             </form>
         </div>
     );

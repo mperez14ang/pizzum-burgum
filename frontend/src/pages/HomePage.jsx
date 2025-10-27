@@ -1,10 +1,9 @@
 import {useRef, useState} from 'react';
-import { Header } from '../components/common/Header';
-import { FavoritesCarousel } from '../components/FavoritesCarousel';
+import {Header} from '../components/common/Header';
+import {FavoritesCarousel} from '../components/FavoritesCarousel';
 import burgerImg from '../assets/burger.jpg';
 import pizzaImg from '../assets/pizza.jpg';
 import {useAuth} from "../contexts/AuthContext.jsx";
-import {FavoritesLoginModal} from "./modals/FavoritesLoginModal.jsx";
 import {LoginAndRegisterModal} from "./modals/LoginAndRegisterModal.jsx";
 
 export const HomePage = ({ onNavigate }) => {

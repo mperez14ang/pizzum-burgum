@@ -46,6 +46,11 @@ export const Header = forwardRef(({onNavigate}, ref) => {
 
         if (action === 'Mi Perfil'){
             onNavigate('profile')
+            return;
+        }
+        if (action === 'Mis Favoritos'){
+            onNavigate('favorites')
+            return;
         }
 
         // TODO: Implementar navegación a las páginas correspondientes

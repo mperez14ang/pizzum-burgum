@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Heart, ShoppingCart, Trash2, LogIn, LucideBadgeInfo } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Heart, ShoppingBag, Trash2, LogIn, LucideBadgeInfo } from 'lucide-react';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
 import toast from "react-hot-toast";
@@ -265,7 +265,7 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                                                 onClick={() => handleAddToCart(favorite)}
                                                 className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2 text-sm"
                                             >
-                                                <ShoppingCart size={16} />
+                                                <ShoppingBag size={16} />
                                                 Agregar
                                             </button>
                                         </div>

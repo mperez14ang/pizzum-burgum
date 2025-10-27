@@ -1,4 +1,4 @@
-import {LogOut, ShoppingCart, User, ChevronDown, History, UserCircle, MapPin, CreditCard, Star} from 'lucide-react';
+import {LogOut, ShoppingBag, User, ChevronDown, History, UserCircle, MapPin, CreditCard, Star} from 'lucide-react';
 import {useAuth} from '../../contexts/AuthContext';
 import {useState, useEffect, forwardRef, useImperativeHandle, useRef} from 'react';
 import {Modal} from './Modal';
@@ -68,7 +68,7 @@ export const Header = forwardRef(({onNavigate}, ref) => {
                         </h1>
                         <div className="flex gap-4 items-center">
                             <button className="p-2 hover:bg-gray-100 rounded-full">
-                                <ShoppingCart className="w-6 h-6" />
+                                <ShoppingBag className="w-6 h-6" />
                             </button>
 
                             {isAuthenticated ? (

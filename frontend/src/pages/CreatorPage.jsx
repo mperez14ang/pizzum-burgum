@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Plus, Minus, ShoppingCart, Heart, X, Check } from 'lucide-react';
+import { ChevronLeft, Plus, Minus, ShoppingBag, Heart, X, Check } from 'lucide-react';
 import { Header } from '../components/common/Header';
 import { Accordion } from '../components/common/Accordion';
 import { QuantitySelector } from '../components/common/QuantitySelector';
@@ -765,7 +765,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                     onClick={handleAddToCart}
                                     className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2"
                                 >
-                                    <ShoppingCart size={20} />
+                                    <ShoppingBag size={20} />
                                     Agregar al Carrito
                                 </button>
 

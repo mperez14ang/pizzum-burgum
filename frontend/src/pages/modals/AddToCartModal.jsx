@@ -1,4 +1,4 @@
-import { ShoppingCart, Plus, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Plus, ArrowRight } from 'lucide-react';
 import { Modal } from '../../components/common/Modal.jsx';
 
 export const AddToCartModal = ({ isOpen, onClose, onContinueShopping, onGoToExtras, productType }) => {
@@ -11,7 +11,7 @@ export const AddToCartModal = ({ isOpen, onClose, onContinueShopping, onGoToExtr
         >
             <div className="text-center py-6">
                 <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                    <ShoppingCart className="text-green-500" size={32} />
+                    <ShoppingBag className="text-green-500" size={32} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
                     Tu {productType === 'pizza' ? 'pizza' : 'hamburguesa'} se agregó al carrito
@@ -42,7 +42,7 @@ export const AddToCartModal = ({ isOpen, onClose, onContinueShopping, onGoToExtr
                         className="w-full bg-orange-500 text-white py-4 px-6 rounded-lg hover:bg-orange-600 transition flex items-center justify-between group"
                     >
                         <div className="flex items-center gap-3">
-                            <ShoppingCart className="w-5 h-5" />
+                            <ShoppingBag className="w-5 h-5" />
                             <div className="text-left">
                                 <div className="font-semibold">Continuar al Carrito</div>
                                 <div className="text-sm text-orange-100">Ver productos extra y finalizar</div>

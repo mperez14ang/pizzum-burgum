@@ -1,11 +1,9 @@
 package uy.um.edu.pizzumburgum.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -14,6 +12,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
+@EqualsAndHashCode(exclude = {"creations"})
+@ToString(exclude = {"creations"})
 public class OrderBy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,9 +29,10 @@ public class OrderBy {
     private Address address;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private Set<OrderHasCreations> creations;
+    @Builder.Default
+    private Set<OrderHasCreations> creations = new HashSet<>();
 
-    @ManyToOne
-    @JoinColumn(name = "client_order", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 }

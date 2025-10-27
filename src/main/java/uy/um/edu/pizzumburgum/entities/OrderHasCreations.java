@@ -2,10 +2,7 @@ package uy.um.edu.pizzumburgum.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(
@@ -15,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
+@EqualsAndHashCode(exclude = {"creation", "order"})
+@ToString(exclude = {"creation", "order"})
 public class OrderHasCreations {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,11 +23,11 @@ public class OrderHasCreations {
     @Column(name = "quantity")
     private int quantity;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creation_id", nullable = false)
     private Creation creation;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
     private OrderBy order;
 }

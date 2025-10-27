@@ -10,6 +10,7 @@ import {CardProvider} from "./contexts/CardContext.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import {SessionExpiredPage} from "./pages/SessionExpiredPage.jsx";
 import toast from "react-hot-toast";
+import FavoritesPage from "./pages/FavoritesPage.jsx";
 
 function App() {
     const [currentPage, setCurrentPage] = useState('home');
@@ -53,6 +54,9 @@ function App() {
         }
         else if (type === 'home'){
             newPage = 'home'
+        }
+        else if (type === 'favorites'){
+            newPage = 'favorites'
         }
         else{
             console.log("No hay ninguna pagina definida!")
@@ -101,7 +105,10 @@ function App() {
                         <CreatorPage productType={"burger"} onBack={handleBack} onNavigate={handleNavigate}/>
                     )}
                     {currentPage === 'profile' && (
-                        <ProfilePage onBack={handleBack} user={user} onAddCard={CardModal} onNavigate={handleNavigate}/>
+                        <ProfilePage onBack={() => handleNavigate('home')} user={user} onAddCard={CardModal} onNavigate={handleNavigate}/>
+                    )}
+                    {currentPage === 'favorites' && (
+                        <FavoritesPage onBack={() => handleNavigate('home')} onNavigate={handleNavigate}/>
                     )}
                     {currentPage === 'session-expired' && (
                         <SessionExpiredPage onLogin={onLogin} onBack={() => handleNavigate('home')} isAuthenticated={isAuthenticated} />

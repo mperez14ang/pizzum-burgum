@@ -291,7 +291,7 @@ public class CartService {
         log.info("Carrito vaciado exitosamente");
     }
 
-    //Finaliza la compra: asigna dirección, método de pago y cambia estado (UNPAID → IN_QUEUE)
+    //Finaliza la compra: asigna dirección, metodo de pago y cambia estado (UNPAID → IN_QUEUE)
     @Transactional
     public OrderByResponse checkout(Long orderId, CheckoutRequest request) {
         log.info("Finalizando compra del carrito {}", orderId);
@@ -336,7 +336,7 @@ public class CartService {
         // Asignar dirección de entrega
         cart.setAddress(deliveryAddress);
 
-        // El método de pago se puede mostrar en frontend pero no lo guardamos en BD
+        // El metodo de pago se puede mostrar en frontend pero no lo guardamos en BD
         // Si quisieras guardarlo, tendrías que agregar un campo en OrderBy
         log.info("Método de pago seleccionado: {}", request.getPaymentMethod());
 

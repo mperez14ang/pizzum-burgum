@@ -26,11 +26,18 @@ const UserDropdown = ({
     const handleMenuItemClick = (action) => {
         onClose();
 
-        if (action === 'Mi Perfil') {
-            onNavigate('profile');
-        } else {
-            // TODO: Implementar navegación a las páginas correspondientes
-            toast.error(`Función "${action}" pendiente de implementar`, { duration: 2000 });
+        switch (action){
+            case "Mi Perfil":
+                onNavigate('profile')
+                break
+            case "Mis Favoritos":
+                onNavigate('favorites')
+                break
+            default:
+                {
+                    // TODO: Implementar navegación a las páginas correspondientes
+                    toast.error(`Función "${action}" pendiente de implementar`, { duration: 2000 });
+                }
         }
     };
 

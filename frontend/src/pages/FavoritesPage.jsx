@@ -2,7 +2,7 @@ import {Heart, LogIn, ShoppingCart, Trash2} from 'lucide-react';
 import {Header} from '../components/common/Header';
 import {useAuth} from '../contexts/AuthContext';
 import {useFavorites} from '../contexts/FavoritesContext';
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import toast from 'react-hot-toast';
 
 export const FavoritesPage = ({ onNavigate }) => {
@@ -36,15 +36,77 @@ export const FavoritesPage = ({ onNavigate }) => {
                         creationCount: fav.creations.length
                     };
                 })
-                .filter(Boolean)
-                // Orden alfabético por nombre
-                .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' }));
+                .filter(Boolean);
 
             setProcessed(processedFavorites);
         } else {
             setProcessed([]);
         }
     }, [favorites]);
+
+    // Listas por categoría, ordenadas alfabéticamente
+    const pizzas = useMemo(
+        () => processed
+            .filter(p => p.type === 'PIZZA')
+            .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' })),
+        [processed]
+    );
+    const burgers = useMemo(
+        () => processed
+            .filter(p => p.type === 'HAMBURGER')
+            .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' })),
+        [processed]
+    );
+
+    const Section = ({ title, items }) => (
+        <section className="mb-12">
+            <div className="flex items-center gap-3 mb-4">
+                <div className="w-2 h-6 bg-orange-500 rounded" />
+                <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
+            </div>
+
+            {items.length === 0 ? (
+                <p className="text-gray-500">No hay favoritos en esta categoría.</p>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {items.map(item => (
+                        <div key={item.favoriteId} className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
+                            <div className="h-44 w-full overflow-hidden">
+                                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="p-4">
+                                <div className="flex items-start justify-between gap-2">
+                                    <div>
+                                        <h4 className="text-lg font-semibold text-gray-900">{item.name}</h4>
+                                        <p className="text-sm text-gray-500">{item.description}</p>
+                                    </div>
+                                    <span className="text-orange-600 font-bold">{'$' + item.price.toFixed(2)}</span>
+                                </div>
+                                {/* Se quita la línea de "Incluye n creación(es)" */}
+
+                                <div className="mt-4 flex items-center justify-end gap-2">
+                                    <button
+                                        onClick={() => handleRemove(item.favoriteId)}
+                                        className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg inline-flex items-center gap-2"
+                                    >
+                                        <Trash2 size={16} />
+                                        Quitar
+                                    </button>
+                                    <button
+                                        onClick={() => handleAddToCart(item)}
+                                        className="px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 inline-flex items-center gap-2"
+                                    >
+                                        <ShoppingCart size={16} />
+                                        Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </section>
+    );
 
     const handleRemove = async (favoriteId) => {
         if (confirm('¿Eliminar este favorito?')) {
@@ -89,42 +151,9 @@ export const FavoritesPage = ({ onNavigate }) => {
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {processed.map(item => (
-                            <div key={item.favoriteId} className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
-                                <div className="h-44 w-full overflow-hidden">
-                                    <img src={item.image} alt={item.name}
-                                         className="w-full h-full object-cover"/>
-                                </div>
-                                <div className="p-4">
-                                    <div className="flex items-start justify-between gap-2">
-                                        <div>
-                                            <h4 className="text-lg font-semibold text-gray-900">{item.name}</h4>
-                                            <p className="text-sm text-gray-500">{item.description}</p>
-                                        </div>
-                                        <span className="text-orange-600 font-bold">{'$' + item.price.toFixed(2)}</span>
-                                    </div>
-                                    <p className="text-xs text-gray-400 mt-1">Incluye {item.creationCount} creación(es)</p>
-
-                                    <div className="mt-4 flex items-center justify-end gap-2">
-                                        <button
-                                            onClick={() => handleRemove(item.favoriteId)}
-                                            className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg inline-flex items-center gap-2"
-                                        >
-                                            <Trash2 size={16}/>
-                                            Quitar
-                                        </button>
-                                        <button
-                                            onClick={() => handleAddToCart(item)}
-                                            className="px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 inline-flex items-center gap-2"
-                                        >
-                                            <ShoppingCart size={16}/>
-                                            Agregar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                    <div>
+                        <Section title="Pizza" items={pizzas} />
+                        <Section title="Hamburguesa" items={burgers} />
                     </div>
                 )}
             </main>

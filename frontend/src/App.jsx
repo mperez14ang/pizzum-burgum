@@ -8,10 +8,13 @@ import {AdminPage} from './pages/admin/AdminPage';
 import {CardModal} from "./pages/modals/CardModal.jsx";
 import {CardProvider} from "./contexts/CardContext.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import {SessionExpiredPage} from "./pages/SessionExpiredPage.jsx";
+import toast from "react-hot-toast";
 
 function App() {
     const [currentPage, setCurrentPage] = useState('home');
-    const { user, isAuthenticated, isLoading } = useAuth();
+    const [prevPageType, setPrevPageType] = useState('home');
+    const { user, isAuthenticated, isLoading, checkUser } = useAuth();
 
     useEffect(() => {
         window.history.replaceState({ page: 'home' }, '', window.location.href);
@@ -39,7 +42,7 @@ function App() {
         });
     }, [currentPage]);
 
-    const handleNavigate = (type) => {
+    const handleNavigate = async (type, validate=true) => {
         let newPage = 'home';
 
         if (type === 'pizza' || type === 'burger'){
@@ -56,6 +59,15 @@ function App() {
             return
         }
 
+        // Check if token is verified
+        if (user && validate && type !== 'home'){
+            const result = await checkUser();
+            if (!result) {
+                setPrevPageType(type)
+                setCurrentPage('session-expired');
+                return
+            }
+        }
         setCurrentPage(newPage);
         window.history.pushState({ page: newPage }, '', window.location.href);
     };
@@ -63,6 +75,11 @@ function App() {
     const handleBack = () => {
         window.history.back();
     };
+
+    const onLogin = async () => {
+        await handleNavigate(prevPageType, false)
+        toast.success(prevPageType)
+    }
 
     if (isAuthenticated && user?.role === 'ADMIN') {
         return (
@@ -85,6 +102,9 @@ function App() {
                     )}
                     {currentPage === 'profile' && (
                         <ProfilePage onBack={handleBack} user={user} onAddCard={CardModal} onNavigate={handleNavigate}/>
+                    )}
+                    {currentPage === 'session-expired' && (
+                        <SessionExpiredPage onLogin={onLogin} onBack={() => handleNavigate('home')} isAuthenticated={isAuthenticated} />
                     )}
                 </CreatorProvider>
             </FavoritesProvider>

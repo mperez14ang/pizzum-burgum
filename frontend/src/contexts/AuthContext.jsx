@@ -1,5 +1,6 @@
 import {createContext, useContext, useEffect, useState} from 'react';
 import toast from "react-hot-toast";
+import {jwtDecode} from "jwt-decode";
 
 const AuthContext = createContext();
 
@@ -11,37 +12,44 @@ export const AuthProvider = ({ children }) => {
 
     // Comprobar si hay un usuario guardado al cargar
     useEffect(() => {
-        const checkUser = async () => {
-            const storedUser = localStorage.getItem('user');
-            if (storedUser) {
-                try {
-                    const userData = JSON.parse(storedUser);
-                    const token = userData.token;
+        checkUser()
+        setIsLoading(false);
+    }, []);
 
-                    const validator = await validate(token);
+    const checkUser = async () => {
+        const storedUser = localStorage.getItem('user');
+        if (!storedUser) {
+            setIsLoading(false);
+            return;
+        }
 
-                    console.log(validator.verified);
+        try {
+            const userData = JSON.parse(storedUser);
+            const token = userData.token;
 
-                    if (validator.verified === true) {
-                        setUser(userData);
-                        setTokenAuth(token);
-                        setIsAuthenticated(true);
-                    } else {
-                        setTokenAuth(null);
-                        setIsAuthenticated(false);
-                        toast.error("Invalid token " + token);
-                    }
+            // Verificar localmente
+            if (isTokenExpired(token)) {
+                // Verificar con el servidor
+                const validator = await validate(token);
 
-                } catch (error) {
-                    console.error('Error parsing stored user:', error);
-                    localStorage.removeItem('user');
+                if (validator.verified === true) {
+                    setUser(userData);
+                    setTokenAuth(token);
+                    setIsAuthenticated(true);
+                } else {
+                    logout();
+                    toast.error("Tu sesión ha vencido");
+                    return;
                 }
             }
-            setIsLoading(false);
-        };
+            return true
 
-        checkUser();
-    }, []);
+
+        } catch (error) {
+            console.error('Error parsing stored user:', error);
+            logout();
+        }
+    };
 
     const addUser = (userData) => {
         setUser(userData);
@@ -49,6 +57,16 @@ export const AuthProvider = ({ children }) => {
         setTokenAuth(userData.token);
         localStorage.setItem('user', JSON.stringify(userData));
         return { success: true, user: userData };
+    };
+
+    const isTokenExpired = (token) => {
+        try {
+            const decoded = jwtDecode(token);
+            const now = Date.now() / 1000;
+            return decoded.exp < now;
+        } catch (e) {
+            return true;
+        }
     };
 
     const login = async (email, password) => {
@@ -117,35 +135,22 @@ export const AuthProvider = ({ children }) => {
     };
 
     const validate = async (token) => {
-        if (!token) {
-            return { verified: false, error: 'No hay token' };
-        }
-
         try {
             const response = await fetch('http://localhost:8080/api/auth/v1/verify', {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 }
             });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                logout(); // Token invalido
-                return { verified: false, error: 'Token inválido' };
-            }
-
-            console.log(data)
-
-            return data;
-
+            if (!response.ok) return { verified: false };
+            return await response.json();
         } catch (error) {
             console.error('Error validando token:', error);
-            return { verified: false, error: 'Error de conexión' };
+            return { verified: false };
         }
     };
+
 
     const logout = () => {
         setUser(null);
@@ -162,7 +167,8 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         register,
-        validate
+        validate,
+        checkUser
     };
 
     return (

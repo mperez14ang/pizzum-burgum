@@ -1,5 +1,5 @@
 import { ShoppingCart, Plus, ArrowRight } from 'lucide-react';
-import { Modal } from './Modal';
+import { Modal } from '../../components/common/Modal.jsx';
 
 export const AddToCartModal = ({ isOpen, onClose, onContinueShopping, onGoToExtras, productType }) => {
     return (

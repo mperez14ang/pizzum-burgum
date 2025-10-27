@@ -4,7 +4,7 @@ import { ChevronLeft, Plus, Minus, ShoppingCart, Heart, X, Check } from 'lucide-
 import { Header } from '../components/common/Header';
 import { Accordion } from '../components/common/Accordion';
 import { QuantitySelector } from '../components/common/QuantitySelector';
-import { AddToCartModal } from '../components/common/AddToCartModal';
+import { AddToCartModal } from './modals/AddToCartModal.jsx';
 import { useCreatorStore } from '../contexts/CreatorContext';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';

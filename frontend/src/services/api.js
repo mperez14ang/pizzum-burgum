@@ -162,3 +162,82 @@ export const adminService = {
         });
     }
 };
+export const cartService = {
+    //Agrega una creación personalizada al carrito
+    addToCart: async (clientEmail, type, productIds, quantity = 1) => {
+        return fetchFromAPI('/cart/v1/add', {
+            method: 'POST',
+            body: JSON.stringify({
+                clientEmail,
+                type: type.toUpperCase(), // PIZZA o BURGER
+                productIds,
+                quantity
+            })
+        });
+    },
+    //Agrega un producto extra al carrito (bebida, postre, papas, etc.)
+
+    addExtraProduct: async (clientEmail, productId, productName, quantity = 1) => {
+        return fetchFromAPI('/cart/v1/add', {
+            method: 'POST',
+            body: JSON.stringify({
+                clientEmail,
+                type: 'EXTRA',
+                productIds: [productId], // Solo un producto
+                quantity
+            })
+        });
+    },
+    //Obtiene el carrito activo del cliente
+    getActiveCart: async (clientEmail) => {
+        try {
+            return await fetchFromAPI(`/cart/v1/client/${clientEmail}`);
+        } catch (error) {
+            // Si es 404 (no tiene carrito), retornar null
+            if (error.message.includes('404')) {
+                return null;
+            }
+            throw error;
+        }
+    },
+
+    //Obtiene un carrito por su ID
+    getCartById: async (orderId) => {
+        return fetchFromAPI(`/cart/v1/${orderId}`);
+    },
+
+    //Actualiza la cantidad de un item
+    updateCartItem: async (orderId, itemId, quantity) => {
+        return fetchFromAPI(`/cart/v1/${orderId}/items/${itemId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ quantity })
+        });
+    },
+
+    //Elimina un item del carrito
+
+    removeCartItem: async (orderId, itemId) => {
+        return fetchFromAPI(`/cart/v1/${orderId}/items/${itemId}`, {
+            method: 'DELETE'
+        });
+    },
+
+    //Vacía el carrito
+
+    clearCart: async (orderId) => {
+        return fetchFromAPI(`/cart/v1/${orderId}/clear`, {
+            method: 'DELETE'
+        });
+    },
+
+    //Finaliza la compra (checkout)
+    checkout: async (orderId, addressId, paymentMethod) => {
+        return fetchFromAPI(`/cart/v1/${orderId}/checkout`, {
+            method: 'POST',
+            body: JSON.stringify({
+                addressId,
+                paymentMethod
+            })
+        });
+    }
+};

@@ -8,6 +8,7 @@ import {AdminPage} from './pages/admin/AdminPage';
 import {CardModal} from "./pages/modals/CardModal.jsx";
 import {CardProvider} from "./contexts/CardContext.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import FavoritesPage from "./pages/FavoritesPage.jsx";
 
 function App() {
     const [currentPage, setCurrentPage] = useState('home');
@@ -51,6 +52,9 @@ function App() {
         else if (type === 'home'){
             newPage = 'home'
         }
+        else if (type === 'favorites'){
+            newPage = 'favorites'
+        }
         else{
             console.log("No hay ninguna pagina definida!")
             return
@@ -85,6 +89,9 @@ function App() {
                     )}
                     {currentPage === 'profile' && (
                         <ProfilePage onBack={handleBack} user={user} onAddCard={CardModal} onNavigate={handleNavigate}/>
+                    )}
+                    {currentPage === 'favorites' && (
+                        <FavoritesPage onNavigate={handleNavigate} />
                     )}
                 </CreatorProvider>
             </FavoritesProvider>

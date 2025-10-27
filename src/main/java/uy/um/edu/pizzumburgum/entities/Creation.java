@@ -2,11 +2,7 @@ package uy.um.edu.pizzumburgum.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
@@ -16,7 +12,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
-@EqualsAndHashCode(exclude = {"products", "order"})
+@ToString(exclude = {"products", "order"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Creation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

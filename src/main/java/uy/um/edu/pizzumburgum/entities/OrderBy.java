@@ -12,8 +12,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
-@EqualsAndHashCode(exclude = {"creations"})
-@ToString(exclude = {"creations"})
+@ToString(exclude = {"creations", "client"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class OrderBy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

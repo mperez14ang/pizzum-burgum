@@ -17,7 +17,7 @@ public class OrderByRequest {
 
     private Long address;
 
-    private Set<Long> creations;
+    private Set<OrderHasCreationsRequest> creations;
 
     private String clientEmail;
 }

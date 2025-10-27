@@ -2,7 +2,8 @@ package uy.um.edu.pizzumburgum.mapper;
 
 import uy.um.edu.pizzumburgum.dto.request.OrderByRequest;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
-import uy.um.edu.pizzumburgum.dto.shared.OrderHasCreationsDto;
+import uy.um.edu.pizzumburgum.dto.request.OrderHasCreationsRequest;
+import uy.um.edu.pizzumburgum.dto.response.OrderHasCreationsResponse;
 import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.entities.OrderBy;
 import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
@@ -24,9 +25,9 @@ public class OrderByMapper {
     public static OrderByResponse toOrderByDto(OrderBy orderBy) {
         Client client = orderBy.getClient();
 
-        Set<OrderHasCreationsDto> orderHasCreationsDtos = new HashSet<>();
+        Set<OrderHasCreationsResponse> orderHasCreationsResponses = new HashSet<>();
         for (OrderHasCreations orderHasCreations : orderBy.getCreations()){
-            orderHasCreationsDtos.add(OrderHasCreationsMapper.toOrderHasCreationsDto(orderHasCreations));
+            orderHasCreationsResponses.add(OrderHasCreationsMapper.toOrderHasCreationsDto(orderHasCreations));
         }
 
         return OrderByResponse.builder()
@@ -35,7 +36,7 @@ public class OrderByMapper {
                 .clientEmail(client.getEmail())
                 .clientName(client.getFirstName())
                 .address(AddressMapper.toAddressResponse(orderBy.getAddress()))
-                .creations(orderHasCreationsDtos)
+                .creations(orderHasCreationsResponses)
                 .build();
     }
 }

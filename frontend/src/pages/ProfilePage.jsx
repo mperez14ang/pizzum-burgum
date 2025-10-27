@@ -4,6 +4,7 @@ import {Header} from "../components/common/header.jsx";
 import CardModal from "./modals/CardModal.jsx";
 import {AddAddressModal} from "./modals/AddAddressModal.jsx";
 import {EditPasswordModal} from "./modals/EditPasswordModal.jsx";
+import {capitalize} from "../utils/StringUtils.jsx";
 
 // Skeleton-only Profile Page (no API calls). Prepared with props for future wiring.
 // Expected props (all optional for now):
@@ -88,10 +89,10 @@ export const ProfilePage = ({
                 {/* User name section */}
                 <div className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900">
-                        Nombre: <span className="font-black">{firstName || '—'}</span>
+                        Nombre: <span className="font-black">{capitalize(firstName) || '—'}</span>
                     </h1>
                     <p className="mt-3 text-2xl sm:text-3xl text-gray-700">
-                        Apellido: <span className="font-semibold">{lastName || '—'}</span>
+                        Apellido: <span className="font-semibold">{capitalize(lastName) || '—'}</span>
                     </p>
                 </div>
 

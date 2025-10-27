@@ -1,18 +1,19 @@
 package uy.um.edu.pizzumburgum.services.interfaces;
 
 import org.springframework.http.ResponseEntity;
-import uy.um.edu.pizzumburgum.dto.shared.CreationDto;
+import uy.um.edu.pizzumburgum.dto.request.CreationRequest;
+import uy.um.edu.pizzumburgum.dto.response.CreationResponse;
 
 import java.util.List;
 
 public interface CreationServiceInt {
-    CreationDto createCreation(CreationDto creationDto);
+    CreationResponse createCreation(CreationRequest creationDto);
 
-    CreationDto getCreationById(Long id);
+    CreationResponse getCreationById(Long id);
 
-    List<CreationDto> getCreations();
+    List<CreationResponse> getCreations();
 
-    CreationDto updateCreation(Long id, CreationDto creationDto);
+    CreationResponse updateCreation(Long id, CreationRequest creationDto);
 
     ResponseEntity<String> deleteCreation(Long id);
 }

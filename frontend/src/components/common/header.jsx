@@ -35,6 +35,10 @@ export const Header = forwardRef(({onNavigate}, ref) => {
         setIsDropdownOpen(false);
         logout();
         toast.success('Sesión cerrada', { duration: 2000 });
+        // After logging out, navigate to Home page
+        if (onNavigate) {
+            onNavigate('home');
+        }
     };
 
     const handleMenuItemClick = (action) => {

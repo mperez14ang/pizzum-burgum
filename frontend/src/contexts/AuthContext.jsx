@@ -1,4 +1,5 @@
 import {createContext, useContext, useEffect, useState} from 'react';
+import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
@@ -10,20 +11,36 @@ export const AuthProvider = ({ children }) => {
 
     // Comprobar si hay un usuario guardado al cargar
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
+        const checkUser = async () => {
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    const token = userData.token;
 
-        if (storedUser) {
-            try {
-                const userData = JSON.parse(storedUser);
-                setUser(userData);
-                setIsAuthenticated(true);
-                setTokenAuth(userData.token);
-            } catch (error) {
-                console.error('Error parsing stored user:', error);
-                localStorage.removeItem('user');
+                    const validator = await validate(token);
+
+                    console.log(validator.verified);
+
+                    if (validator.verified === true) {
+                        setUser(userData);
+                        setTokenAuth(token);
+                        setIsAuthenticated(true);
+                    } else {
+                        setTokenAuth(null);
+                        setIsAuthenticated(false);
+                        toast.error("Invalid token " + token);
+                    }
+
+                } catch (error) {
+                    console.error('Error parsing stored user:', error);
+                    localStorage.removeItem('user');
+                }
             }
-        }
-        setIsLoading(false);
+            setIsLoading(false);
+        };
+
+        checkUser();
     }, []);
 
     const addUser = (userData) => {
@@ -31,7 +48,7 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         setTokenAuth(userData.token);
         localStorage.setItem('user', JSON.stringify(userData));
-        return { success: true, token: userData.token, user: userData };
+        return { success: true, user: userData };
     };
 
     const login = async (email, password) => {
@@ -99,17 +116,17 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const validate = async () => {
-        if (!tokenAuth) {
-            return { success: false, error: 'No hay token' };
+    const validate = async (token) => {
+        if (!token) {
+            return { verified: false, error: 'No hay token' };
         }
 
         try {
-            const response = await fetch('http://localhost:8080/api/auth/v1/validate', {
+            const response = await fetch('http://localhost:8080/api/auth/v1/verify', {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${tokenAuth}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -117,14 +134,16 @@ export const AuthProvider = ({ children }) => {
 
             if (!response.ok) {
                 logout(); // Token invalido
-                return { success: false, error: 'Token inválido' };
+                return { verified: false, error: 'Token inválido' };
             }
 
-            return { success: true, data };
+            console.log(data)
+
+            return data;
 
         } catch (error) {
             console.error('Error validando token:', error);
-            return { success: false, error: 'Error de conexión' };
+            return { verified: false, error: 'Error de conexión' };
         }
     };
 

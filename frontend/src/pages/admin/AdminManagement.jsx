@@ -134,14 +134,16 @@ export const AdminManagement = () => {
 
     return (
         <div>
-            <Toaster position="top-right" />
 
             <div className="mb-6">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                     <h2 className="text-2xl font-bold text-gray-900">Gestión de Administradores</h2>
-                    <Button onClick={handleCreate}>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Nuevo Administrador
+                    <Button
+                        onClick={handleCreate}
+                        className="flex items-center gap-2"
+                    >
+                        <Plus className="w-4 h-4" />
+                        <span>Nuevo Administrador</span>
                     </Button>
                 </div>
                 <p className="text-sm text-gray-600 mt-2">

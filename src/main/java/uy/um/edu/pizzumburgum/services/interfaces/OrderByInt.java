@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface OrderByInt {
-    OrderByResponse createOder(OrderByRequest orderByDto);
+    OrderByResponse createOrder(OrderByRequest orderByDto);
 
     OrderByResponse getOrderById(Long id);
 

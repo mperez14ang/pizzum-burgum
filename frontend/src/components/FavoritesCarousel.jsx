@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Heart, ShoppingCart, Trash2, LogIn } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Heart, ShoppingCart, Trash2, LogIn, LucideBadgeInfo } from 'lucide-react';
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
 import toast from "react-hot-toast";
@@ -81,6 +81,10 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
             }
         }
     };
+
+    const handleInfo = async (favoriteId) => {
+        toast.success("Hola! " + favoriteId)
+    }
 
     const handleAddToCart = (favorite) => {
         toast.success(`${favorite.name} agregado al carrito`, { duration: 2000 })
@@ -198,7 +202,7 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                     <div
                         className="flex transition-transform duration-500 ease-in-out gap-6"
                         style={{
-                            transform: `translateX(-${currentIndex * (100 / itemsVisible)}%)`
+                            transform: `translateX(-${currentIndex * (102 / itemsVisible)}%)`
                         }}
                     >
                         {favoritesData.map((favorite) => (
@@ -226,18 +230,18 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                                             className="absolute top-2 right-2 bg-white/90 p-2 rounded-full hover:bg-red-50 transition"
                                             title="Eliminar de favoritos"
                                         >
-                                            <Heart size={16} className="text-red-500" fill="currentColor" />
+                                            <Trash2 className="w-4 h-4" />
                                         </button>
 
-                                        {/* Badge del tipo */}
-                                        <div className="absolute bottom-2 left-2">
-                                            <span className={`
-                                                px-2 py-1 rounded-full text-xs font-semibold text-white
-                                                ${favorite.type === 'PIZZA' ? 'bg-orange-500' : 'bg-yellow-600'}
-                                            `}>
-                                                {favorite.type === 'PIZZA' ? '🍕' : '🍔'}
-                                            </span>
-                                        </div>
+                                        {/* Botón de informacion */}
+                                        <button
+                                            onClick={() => handleInfo(favorite.favoriteId)}
+                                            className="absolute top-2 left-2 bg-white/90 p-2 rounded-full hover:bg-red-50 transition"
+                                            title="Informacion del favorito"
+                                        >
+                                            <LucideBadgeInfo className="w-4 h-4" />
+                                        </button>
+
                                     </div>
 
                                     {/* Contenido */}

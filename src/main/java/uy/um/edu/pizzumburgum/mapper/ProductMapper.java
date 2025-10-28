@@ -13,6 +13,7 @@ public class ProductMapper {
                 .price(product.getPrice())
                 .productCategory(product.getCategory())
                 .available(product.getAvailable())
+                .deleted(product.getDeleted())
                 .build();
     }
 
@@ -24,6 +25,7 @@ public class ProductMapper {
                 .price(productDto.getPrice())
                 .category(productDto.getProductCategory())
                 .available(productDto.getAvailable() != null ? productDto.getAvailable() : true)
+                .deleted(productDto.getDeleted() != null ? productDto.getDeleted() : false)
                 .build();
     }
 }

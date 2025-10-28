@@ -30,6 +30,9 @@ public class Creation {
     @Column(name="price")
     private float price;
 
+    @Column(name = "available")
+    private Boolean available;
+
     @OneToMany(mappedBy = "creation", cascade = CascadeType.ALL)
     private Set<CreationHasProducts> products;
 

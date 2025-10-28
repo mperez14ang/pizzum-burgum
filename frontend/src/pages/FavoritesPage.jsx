@@ -3,6 +3,7 @@ import {Header} from '../components/common/Header';
 import {useFavorites} from '../contexts/FavoritesContext';
 import React, {useEffect, useMemo, useState} from 'react';
 import toast from 'react-hot-toast';
+import {AddToCartButton} from "../components/common/AddToCartButton.jsx";
 
 export const FavoritesPage = ({ onNavigate, onBack }) => {
     const { favorites, isLoading, removeFromFavorites } = useFavorites();
@@ -31,7 +32,8 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                             ? 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&h=600&fit=crop'
                             : 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop',
                         description: `${firstCreation.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'} personalizada`,
-                        creationCount: fav.creations.length
+                        creationCount: fav.creations.length,
+                        available: fav.available
                     };
                 })
                 .filter(Boolean);
@@ -99,22 +101,15 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                                 </button>
                             </div>
 
-                            {/* Contenido */}
-                            <div className="p-4 flex flex-col flex-grow">
-                                <h4 className="text-lg font-bold text-gray-900 mb-1">{item.name}</h4>
-                                <p className="text-sm text-gray-600 mb-3 flex-grow">{item.description}</p>
-
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-xl font-bold text-orange-500">${item.price}</span>
-                                    </div>
+                                <div className="mt-4 flex items-center justify-end gap-2">
                                     <button
-                                        onClick={() => handleAddToCart(item)}
-                                        className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2 text-sm"
+                                        onClick={() => handleRemove(item.favoriteId)}
+                                        className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg inline-flex items-center gap-2"
                                     >
-                                        <ShoppingBag size={16} />
-                                        Agregar
+                                        <Trash2 size={16} />
+                                        Quitar
                                     </button>
+                                    <AddToCartButton onClick={() => handleAddToCart(item)} isAvailable={item.available} isDeleted={item.deleted} />
                                 </div>
                             </div>
                         </div>

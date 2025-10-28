@@ -6,19 +6,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import uy.um.edu.pizzumburgum.dto.request.AddToCartRequest;
-import uy.um.edu.pizzumburgum.dto.request.CheckoutRequest;
-import uy.um.edu.pizzumburgum.dto.request.UpdateCartItemRequest;
+import uy.um.edu.pizzumburgum.dto.request.*;
 import uy.um.edu.pizzumburgum.dto.response.CartResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.entities.*;
 import uy.um.edu.pizzumburgum.mapper.CartMapper;
+import uy.um.edu.pizzumburgum.mapper.CreationHasProductMapper;
 import uy.um.edu.pizzumburgum.mapper.OrderByMapper;
+import uy.um.edu.pizzumburgum.mapper.ProductMapper;
 import uy.um.edu.pizzumburgum.repository.*;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -83,13 +84,21 @@ public class CartService {
 
         // 3. Validar productos (ingredientes)
         Set<Product> products = new HashSet<>();
-        for (Long productId : request.getProductIds()) {
+        Set<CreationHasProducts> creationHasProducts = new HashSet<>();
+        for (CreationHasProductsRequest creationHasProductsRequest : request.getProducts()) {
+            Long productId = creationHasProductsRequest.getProductId();
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new ResponseStatusException(
                             HttpStatus.NOT_FOUND,
                             "Producto con ID " + productId + " no encontrado"
                     ));
             products.add(product);
+
+            // CreationHasProducts
+            creationHasProducts.add(CreationHasProducts.builder()
+                            .quantity(creationHasProductsRequest.getQuantity())
+                            .product(product)
+                    .build());
         }
 
         // 4. Calcular precio (suma de precios de productos)
@@ -115,11 +124,11 @@ public class CartService {
         log.info("Creation creada con ID: {} y precio: {}", creation.getId(), totalPrice);
 
         // 7. Vincular productos a la creation (CreationHasProducts)
-        for (Product product : products) {
+        for (CreationHasProducts creationHasProducts1 : creationHasProducts) {
             CreationHasProducts chp = CreationHasProducts.builder()
                     .creation(creation)
-                    .product(product)
-                    .quantity(1) // Por defecto 1 de cada ingrediente
+                    .product(creationHasProducts1.getProduct())
+                    .quantity(creationHasProducts1.getQuantity())
                     .build();
             creationHasProductsRepository.save(chp);
             creation.getProducts().add(chp);

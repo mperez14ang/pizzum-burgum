@@ -1,5 +1,6 @@
 package uy.um.edu.pizzumburgum.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import uy.um.edu.pizzumburgum.dto.request.CheckoutRequest;
 import uy.um.edu.pizzumburgum.dto.request.UpdateCartItemRequest;
 import uy.um.edu.pizzumburgum.dto.response.CartResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
+import uy.um.edu.pizzumburgum.services.AuthService;
 import uy.um.edu.pizzumburgum.services.CartService;
 
 import java.util.HashMap;
@@ -24,6 +26,13 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
+    @Autowired
+    private final AuthService authService;
+
+    public CartController(AuthService authService) {
+        this.authService = authService;
+    }
+
     //POST /api/cart/v1/add: Agrega una creación personalizada al carrito
 
     @PostMapping("/add")
@@ -33,11 +42,11 @@ public class CartController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    //GET /api/cart/v1/client/{clientEmail}: obtiene el carrito activo de un cliente
+    //GET /api/cart/v1/my: obtiene el carrito activo de un cliente
 
-    @GetMapping("/client/{clientEmail}")
-    public ResponseEntity<CartResponse> getActiveCart(@PathVariable String clientEmail) {
-        log.info("GET /api/cart/v1/client/{}", clientEmail);
+    @GetMapping("/my")
+    public ResponseEntity<CartResponse> getActiveCart(HttpServletRequest request) {
+        String clientEmail = authService.getUserEmail(request);
         CartResponse response = cartService.getActiveCart(clientEmail);
         return ResponseEntity.ok(response);
     }

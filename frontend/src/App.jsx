@@ -82,7 +82,6 @@ function App() {
 
     const onLogin = async () => {
         await handleNavigate(prevPageType, false)
-        toast.success(prevPageType)
     }
 
     if (isAuthenticated && user?.role === 'ADMIN') {

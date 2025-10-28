@@ -1,5 +1,6 @@
 package uy.um.edu.pizzumburgum.services;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,13 +62,26 @@ public class OrderByService implements OrderByInt {
 
         orderBy.setCreations(orderHasCreations);
 
-        // Verificar que address sea del cliente
-        Address address = addressRepository.findById(orderByDtoRequest.getAddress())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Address de order con id : " + orderByDtoRequest.getAddress() + " no encontrado"));
-
         Client client = clientRepository.findById(orderByDtoRequest.getClientEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cliente de orden " + orderBy.getId() + " con id " + orderByDtoRequest.getClientEmail() + " no encontrado"));
 
+
+        Address address;
+        // Si la direccion es null, obtener la primera del cliente
+        if (orderBy.getAddress() == null) {
+            address = client.getAddresses().stream()
+                    .findFirst()
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.BAD_REQUEST,
+                            "El cliente no tiene direcciones registradas"
+                    ));
+        }
+        else {
+            address = addressRepository.findById(orderByDtoRequest.getAddress())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Address de order con id : " + orderByDtoRequest.getAddress() + " no encontrado"));
+        }
+
+        // Verificar que address sea del cliente
         if (!client.getAddresses().contains(address)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El address de la orden con el cliente no coincide");
         }
@@ -104,10 +118,74 @@ public class OrderByService implements OrderByInt {
                 .toList();
     }
 
+    /** Esto actualiza la orden segun lo que venga **/
+    @Transactional
     @Override
     public OrderByResponse updateOrder(Long id, OrderByRequest orderByDto) {
-        return null;
+        OrderBy existingOrder = orderByRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Orden " + id + " no encontrada"));
+
+        if (orderByDto.getState() != null) {
+            existingOrder.setState(orderByDto.getState());
+        }
+
+        if (orderByDto.getAddress() != null) {
+            Address newAddress = addressRepository.findById(orderByDto.getAddress())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Address con id " + orderByDto.getAddress() + " no encontrado"));
+
+            // Si pasa un cliente, verificar relación
+            if (orderByDto.getClientEmail() != null) {
+                Client client = clientRepository.findById(orderByDto.getClientEmail())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                "Cliente con id " + orderByDto.getClientEmail() + " no encontrado"));
+
+                if (!client.getAddresses().contains(newAddress)) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "El address de la orden no pertenece al cliente");
+                }
+
+                existingOrder.setClient(client);
+            } else if (existingOrder.getClient() != null &&
+                    !existingOrder.getClient().getAddresses().contains(newAddress)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "El address no pertenece al cliente actual de la orden");
+            }
+
+            existingOrder.setAddress(newAddress);
+        }
+
+        // Actualizar cliente (si viene y no vino address)
+        if (orderByDto.getClientEmail() != null && orderByDto.getAddress() == null) {
+            Client client = clientRepository.findById(orderByDto.getClientEmail())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Cliente con id " + orderByDto.getClientEmail() + " no encontrado"));
+            existingOrder.setClient(client);
+        }
+
+        // Actualizar creations (si vienen)
+        if (orderByDto.getCreations() != null) {
+            Set<OrderHasCreations> updatedCreations = orderByDto.getCreations().stream().map(c -> {
+                OrderHasCreations ohc = OrderHasCreationsMapper.toOrderHasCreations(c);
+
+                Creation creation = creationRepository.findById(c.getCreationId())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "No se encontró una creación con id " + c.getCreationId()));
+
+                ohc.setOrder(existingOrder);
+                ohc.setCreation(creation);
+                return ohc;
+            }).collect(Collectors.toSet());
+
+            existingOrder.setCreations(updatedCreations);
+        }
+
+        // Guardar cambios
+        orderByRepository.saveAndFlush(existingOrder);
+
+        return OrderByMapper.toOrderByDto(existingOrder);
     }
+
 
     @Override
     public ResponseEntity<Map<String, Object>> deleteOrder(Long id) {

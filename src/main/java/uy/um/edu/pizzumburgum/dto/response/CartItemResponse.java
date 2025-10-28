@@ -21,4 +21,5 @@ public class CartItemResponse {
     private Float unitPrice;
     private Integer quantity;
     private Float subtotal;
+    private String image;
 }

@@ -24,7 +24,7 @@ public class AddToCartRequest {
     private CreationType type;
 
     @NotEmpty(message = "Debe seleccionar al menos un ingrediente")
-    private Set<Long> productIds;
+    private Set<CreationHasProductsRequest> products;
 
     @NotNull(message = "La cantidad es obligatoria")
     @Min(value = 1, message = "La cantidad debe ser al menos 1")

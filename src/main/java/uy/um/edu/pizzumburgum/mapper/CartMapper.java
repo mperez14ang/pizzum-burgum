@@ -4,6 +4,7 @@ import uy.um.edu.pizzumburgum.dto.response.CartItemResponse;
 import uy.um.edu.pizzumburgum.dto.response.CartResponse;
 import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
 import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
+import uy.um.edu.pizzumburgum.entities.CreationType;
 import uy.um.edu.pizzumburgum.entities.OrderBy;
 import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
 
@@ -47,6 +48,14 @@ public class CartMapper {
                 .map(ProductMapper::toProductDto)
                 .collect(Collectors.toSet());
 
+        String image = null;
+        if (orderHasCreations.getCreation().getType() == CreationType.PIZZA){
+            image = "assets/pizza.jpg";
+        }
+        else if (orderHasCreations.getCreation().getType() == CreationType.HAMBURGER){
+            image = "assets/burger.jpg";
+        }
+
         float unitPrice = orderHasCreations.getCreation().getPrice();
         float subtotal = unitPrice * orderHasCreations.getQuantity();
 
@@ -59,6 +68,7 @@ public class CartMapper {
                 .unitPrice(unitPrice)
                 .quantity(orderHasCreations.getQuantity())
                 .subtotal(subtotal)
+                .image(image)
                 .build();
     }
 }

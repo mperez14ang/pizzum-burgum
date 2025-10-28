@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
     // Comprobar si hay un usuario guardado al cargar
     useEffect(() => {
-        checkUser()
+        checkUser().then(r => {})
         setIsLoading(false);
     }, []);
 
@@ -20,36 +20,42 @@ export const AuthProvider = ({ children }) => {
         const storedUser = localStorage.getItem('user');
         if (!storedUser) {
             setIsLoading(false);
-            return;
+            return false;
         }
 
         try {
             const userData = JSON.parse(storedUser);
             const token = userData.token;
 
-            // Verificar localmente
+            // Check if token is expired
             if (isTokenExpired(token)) {
-                // Verificar con el servidor
+                // Verify with server
                 const validator = await validate(token);
 
                 if (validator.verified === true) {
                     setUser(userData);
                     setTokenAuth(token);
                     setIsAuthenticated(true);
+                    return true;
                 } else {
                     logout();
                     toast.error("Tu sesión ha vencido");
-                    return;
+                    return false;
                 }
+            } else {
+                // Token is valid locally
+                setUser(userData);
+                setTokenAuth(token);
+                setIsAuthenticated(true);
+                return true;
             }
-            return true
-
-
         } catch (error) {
             console.error('Error parsing stored user:', error);
             logout();
+            return false;
         }
     };
+
 
     const addUser = (userData) => {
         setUser(userData);

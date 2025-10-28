@@ -44,6 +44,11 @@ public class OrderByController {
         return orderByService.deleteOrder(id);
     }
 
+    @PutMapping("{id}")
+    public OrderByResponse updateOrder(@PathVariable Long id, @RequestBody OrderByRequest orderByDto) {
+        return orderByService.updateOrder(id, orderByDto);
+    }
+
     @PatchMapping("{id}/state")
     public ResponseEntity<OrderByResponse> updateOrderState(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String stateStr = body.get("state");

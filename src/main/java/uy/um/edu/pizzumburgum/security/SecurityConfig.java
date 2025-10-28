@@ -68,6 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/client/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers("/api/users/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers("/api/order/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers("/api/cart/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers("/api/card/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers("/api/creation/**").hasAnyRole(CLIENT, ADMIN)
 

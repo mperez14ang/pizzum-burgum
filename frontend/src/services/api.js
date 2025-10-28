@@ -1,3 +1,5 @@
+import {transformCreationData} from "../utils/parsers.jsx";
+
 const API_BASE_URL = 'http://localhost:8080/api';
 
 const getAuthHeaders = () => {
@@ -164,13 +166,16 @@ export const adminService = {
 };
 export const cartService = {
     //Agrega una creación personalizada al carrito
-    addToCart: async (clientEmail, type, productIds, quantity = 1) => {
+    addToCart: async (clientEmail, creationData, quantity) => {
+
+        const transformedCreation = transformCreationData(creationData);
+
         return fetchFromAPI('/cart/v1/add', {
             method: 'POST',
             body: JSON.stringify({
                 clientEmail,
-                type: type.toUpperCase(), // PIZZA o BURGER
-                productIds,
+                type: transformedCreation.type.toUpperCase(), // PIZZA o BURGER
+                products: transformedCreation.products,
                 quantity
             })
         });
@@ -189,9 +194,9 @@ export const cartService = {
         });
     },
     //Obtiene el carrito activo del cliente
-    getActiveCart: async (clientEmail) => {
+    getActiveCart: async () => {
         try {
-            return await fetchFromAPI(`/cart/v1/client/${clientEmail}`);
+            return await fetchFromAPI(`/cart/v1/my`);
         } catch (error) {
             // Si es 404 (no tiene carrito), retornar null
             if (error.message.includes('404')) {

@@ -1,14 +1,13 @@
-
-import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, Plus, Minus, ShoppingBag, Heart, X, Check } from 'lucide-react';
-import { Header } from '../components/common/Header';
-import { Accordion } from '../components/common/Accordion';
-import { QuantitySelector } from '../components/common/QuantitySelector';
-import { AddToCartModal } from './modals/AddToCartModal.jsx';
-import { useCreatorStore } from '../contexts/CreatorContext';
-import { useFavorites } from '../contexts/FavoritesContext';
-import { useAuth } from '../contexts/AuthContext';
-import { ingredientsService } from '../services/api';
+import {useEffect, useRef, useState} from 'react';
+import {ChevronLeft, Heart, ShoppingBag} from 'lucide-react';
+import {Header} from '../components/common/Header';
+import {Accordion} from '../components/common/Accordion';
+import {QuantitySelector} from '../components/common/QuantitySelector';
+import {AddToCartModal} from './modals/AddToCartModal.jsx';
+import {useCreatorStore} from '../contexts/CreatorContext';
+import {useFavorites} from '../contexts/FavoritesContext';
+import {useAuth} from '../contexts/AuthContext';
+import {cartService, ingredientsService} from '../services/api';
 import toast from "react-hot-toast";
 import {FavoritesLoginModal} from "./modals/FavoritesLoginModal.jsx";
 import {LoginAndRegisterModal} from "./modals/LoginAndRegisterModal.jsx";
@@ -17,7 +16,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
     const headerRef = useRef();
     const { creation, updateCreation, resetCreation } = useCreatorStore();
     const { addToFavorites, isLoading: favoritesLoading } = useFavorites();
-    const { login, isAuthenticated } = useAuth();
+    const { login, isAuthenticated, user } = useAuth();
 
     const [favoriteName, setFavoriteName] = useState('');
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
@@ -184,15 +183,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
         }
     };
 
-    // Guardar creación en favoritos
-    const handleSaveFavorite = async () => {
-        // Validar autenticación
-        console.log(isAuthenticated)
-        if (!isAuthenticated) {
-            setShowLoginPrompt(true);
-            return;
-        }
-
+    const authenticateAndCreateCreationData = (productType) => {
         // Validar campos obligatorios
         if (productType === 'pizza') {
             if (!selectedSize) {
@@ -214,18 +205,9 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
             }
         }
 
-        // Validar que haya un nombre
-        if (!favoriteName.trim()) {
-            toast.error('Por favor ingresa un nombre para tu favorito', { duration: 2000 })
-            return;
-        }
-
-        setIsSavingFavorite(true);
-
-        const creationData = productType === 'pizza' ? {
+        return productType === 'pizza' ? {
             name: favoriteName.trim(),
             type: 'PIZZA',
-            price: calculateTotal(),
             size: selectedSize,
             dough: selectedDough,
             sauce: selectedSauce,
@@ -234,7 +216,6 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
         } : {
             name: favoriteName.trim(),
             type: 'HAMBURGER',
-            price: calculateTotal(),
             bread: selectedBread,
             meat: selectedMeat,
             meatQuantity: meatQuantity,
@@ -242,6 +223,26 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
             toppings: selectedBurgerToppings,
             sauces: selectedBurgerSauces
         };
+    }
+
+    // Guardar creación en favoritos
+    const handleSaveFavorite = async (productType) => {
+        // Validar autenticación
+        console.log(isAuthenticated)
+        if (!isAuthenticated) {
+            setShowLoginPrompt(true);
+            return;
+        }
+
+        const creationData = authenticateAndCreateCreationData(productType)
+
+        setIsSavingFavorite(true);
+
+        // Validar que haya un nombre
+        if (!favoriteName.trim()) {
+            toast.error('Por favor ingresa un nombre para tu favorito', { duration: 2000 })
+            return;
+        }
 
         console.log('Guardando creación:', creationData);
 
@@ -258,51 +259,29 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
             }
         }
 
-
     };
 
     // Agregar al carrito
-    const handleAddToCart = () => {
-        // Validar campos obligatorios
-        if (productType === 'pizza') {
-            if (!selectedSize) {
-                toast.error("El tamaño de la pizza es obligatorio", { duration: 2000 })
-                return;
-            }
-            if (!selectedDough) {
-                toast.error("El tipo de masa es obligatorio", { duration: 2000 })
-                return;
-            }
-        } else {
-            if (!selectedBread) {
-                toast.error("El tipo de pan es obligatorio", { duration: 2000 })
-                return;
-            }
-            if (!selectedMeat) {
-                toast.error("Debe seleccionar al menos un tipo de carne", { duration: 2000 })
-                return;
-            }
+    const handleAddToCart = async (productType) => {
+        if (!isAuthenticated || !user) {
+            toast.error("Debes de loguearte para guardar en el carrito")
+            return;
         }
 
-        // TODO: Aquí se debe agregar la creación al carrito cuando esté implementado
-        const creationData = productType === 'pizza' ? {
-            type: 'pizza',
-            size: selectedSize,
-            dough: selectedDough,
-            sauce: selectedSauce,
-            cheese: selectedCheese,
-            toppings: selectedToppings,
-            total: calculateTotal()
-        } : {
-            type: 'burger',
-            bread: selectedBread,
-            meat: selectedMeat,
-            meatQuantity: meatQuantity,
-            cheese: selectedBurgerCheese,
-            toppings: selectedBurgerToppings,
-            sauces: selectedBurgerSauces,
-            total: calculateTotal()
-        };
+        const creationData = authenticateAndCreateCreationData(productType)
+
+        console.log(creationData)
+
+        const result = await cartService.addToCart(user.email, creationData, 1);
+
+        toast.error("CART RESULT: " + result)
+
+        if (!result){
+            toast.error("No se pudo agregar al carrito {}", result.message)
+            return
+        }
+
+        toast.success("Agregado a carrito")
 
         console.log('Agregado al carrito:', creationData);
 
@@ -320,7 +299,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
     // Handler para ir a productos extra - SIN FUNCIONALIDAD (pendiente implementación)
     const handleGoToExtras = () => {
         setShowCartModal(false);
-        toast.info('Funcionalidad en desarrollo', { duration: 2000 });
+        toast.loading('Funcionalidad en desarrollo', { duration: 2000 });
         // TODO: Implementar navegación a página de productos extra
         // onNavigate('extras');
     };
@@ -762,7 +741,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
 
                             <div className="space-y-3">
                                 <button
-                                    onClick={handleAddToCart}
+                                    onClick={() => handleAddToCart(productType)}
                                     className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2"
                                 >
                                     <ShoppingBag size={20} />
@@ -777,7 +756,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                         onChange={(e) => setFavoriteName(e.target.value)}
                                         onKeyPress={(e) => {
                                             if (e.key === 'Enter' && favoriteName.trim()) {
-                                                handleSaveFavorite();
+                                                handleSaveFavorite(productType);
                                             }
                                         }}
                                         placeholder={productType === 'pizza' ? 'Ej: Mi Pizza Suprema' : 'Ej: Mi Burger Especial'}
@@ -785,7 +764,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
                                         maxLength={50}
                                     />
                                     <button
-                                        onClick={handleSaveFavorite}
+                                        onClick={() => handleSaveFavorite(productType)}
                                         disabled={!favoriteName.trim() || isSavingFavorite}
                                         className={`
                                             absolute right-2 top-1/2 -translate-y-1/2

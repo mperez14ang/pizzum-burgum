@@ -177,6 +177,7 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                                     onChange={(e) => handleInputChange("dni", e.target.value)}
                                     error={errors.dni}
                                     isLoading={isLoading}
+                                    maxLength={8}
                                 />
 
                                 <InputField
@@ -261,7 +262,7 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
     );
 };
 
-function InputField({ label, id, type = "text", value, onChange, error, isLoading }) {
+function InputField({ label, id, type = "text", value, onChange, error, isLoading, maxLength=-1 }) {
     return (
         <div className="text-left">
             <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
@@ -274,7 +275,9 @@ function InputField({ label, id, type = "text", value, onChange, error, isLoadin
                 value={value}
                 onChange={onChange}
                 disabled={isLoading}
-                className={`w-full border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 
+                maxLength={maxLength}
+                className={`w-full border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2
+                 
           ${
                     error
                         ? "border-red-500 focus:ring-red-500"

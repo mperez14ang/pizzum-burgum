@@ -31,9 +31,10 @@ public class ProductController {
     public ResponseEntity<List<ProductDto>> getFilteredProducts(
             @RequestParam(required = false) ProductType type,
             @RequestParam(required = false) ProductCategory category,
-            @RequestParam(required = false) Boolean available
+            @RequestParam(required = false) Boolean available,
+            @RequestParam(required = false) Boolean deleted
     ) {
-        return ResponseEntity.ok(productService.getFilteredProducts(type, category, available));
+        return ResponseEntity.ok(productService.getFilteredProducts(type, category, available, deleted));
     }
 
     @GetMapping("/{id}")
@@ -115,9 +116,8 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Map<String, Object>> deleteProduct(@PathVariable Long id) {
+        return productService.deleteProduct(id);
     }
 
     @GetMapping("/categories")

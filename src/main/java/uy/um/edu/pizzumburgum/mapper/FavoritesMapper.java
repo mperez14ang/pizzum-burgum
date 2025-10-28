@@ -28,11 +28,15 @@ public class FavoritesMapper {
             );
         }
 
+        boolean creationsAvailable = favorites.getCreations().stream()
+                .allMatch(Creation::getAvailable);
+
         return FavoritesResponse.builder()
                 .id(favorites.getId())
                 .clientEmail(favorites.getClient().getEmail())
                 .createdAt(favorites.getDateCreated())
                 .creations(creationsIds)
+                .available(creationsAvailable)
                 .build();
     }
 }

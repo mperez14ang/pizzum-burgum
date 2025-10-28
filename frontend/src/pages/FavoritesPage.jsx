@@ -4,6 +4,7 @@ import {useAuth} from '../contexts/AuthContext';
 import {useFavorites} from '../contexts/FavoritesContext';
 import React, {useEffect, useMemo, useState} from 'react';
 import toast from 'react-hot-toast';
+import {AddToCartButton} from "../components/common/AddToCartButton.jsx";
 
 export const FavoritesPage = ({ onNavigate, onBack }) => {
     const { favorites, isLoading, removeFromFavorites } = useFavorites();
@@ -32,7 +33,8 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                             ? 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&h=600&fit=crop'
                             : 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop',
                         description: `${firstCreation.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'} personalizada`,
-                        creationCount: fav.creations.length
+                        creationCount: fav.creations.length,
+                        available: fav.available
                     };
                 })
                 .filter(Boolean);
@@ -92,13 +94,7 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                                         <Trash2 size={16} />
                                         Quitar
                                     </button>
-                                    <button
-                                        onClick={() => handleAddToCart(item)}
-                                        className="px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 inline-flex items-center gap-2"
-                                    >
-                                        <ShoppingCart size={16} />
-                                        Agregar
-                                    </button>
+                                    <AddToCartButton onClick={() => handleAddToCart(item)} isAvailable={item.available} isDeleted={item.deleted} />
                                 </div>
                             </div>
                         </div>

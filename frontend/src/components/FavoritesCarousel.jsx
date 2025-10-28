@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight, Heart, ShoppingBag, Trash2, LogIn, LucideBad
 import { useFavorites } from '../contexts/FavoritesContext';
 import { useAuth } from '../contexts/AuthContext';
 import toast from "react-hot-toast";
+import {FavoriteButton} from "./common/FavoriteButton.jsx";
+import {AddToCartButton} from "./common/AddToCartButton.jsx";
 
 export const FavoritesCarousel = ( { onOpenLogin } ) => {
     const { favorites, loadFavorites, removeFromFavorites, isLoading } = useFavorites();
@@ -52,7 +54,8 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                         ? 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop'
                         : 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop',
                     description: `${firstCreation.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'} personalizada`,
-                    creationCount: fav.creations.length
+                    creationCount: fav.creations.length,
+                    available: fav.available
                 };
             }).filter(Boolean);
 
@@ -260,14 +263,8 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                                                     ${favorite.price}
                                                 </span>
                                             </div>
+                                            <AddToCartButton onClick={() => handleAddToCart(favorite)} isAvailable={favorite.available} />
 
-                                            <button
-                                                onClick={() => handleAddToCart(favorite)}
-                                                className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2 text-sm"
-                                            >
-                                                <ShoppingBag size={16} />
-                                                Agregar
-                                            </button>
                                         </div>
                                     </div>
                                 </div>

@@ -5,6 +5,7 @@ import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.dto.request.OrderHasCreationsRequest;
 import uy.um.edu.pizzumburgum.dto.response.OrderHasCreationsResponse;
 import uy.um.edu.pizzumburgum.entities.Client;
+import uy.um.edu.pizzumburgum.entities.Creation;
 import uy.um.edu.pizzumburgum.entities.OrderBy;
 import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
 
@@ -30,6 +31,10 @@ public class OrderByMapper {
             orderHasCreationsResponses.add(OrderHasCreationsMapper.toOrderHasCreationsDto(orderHasCreations));
         }
 
+        boolean creationsAvailable = orderBy.getCreations().stream()
+                .map(OrderHasCreations::getCreation)
+                .allMatch(Creation::getAvailable);
+
         return OrderByResponse.builder()
                 .id(orderBy.getId())
                 .state(orderBy.getState())
@@ -37,6 +42,7 @@ public class OrderByMapper {
                 .clientName(client.getFirstName())
                 .address(AddressMapper.toAddressResponse(orderBy.getAddress()))
                 .creations(orderHasCreationsResponses)
+                .available(creationsAvailable)
                 .build();
     }
 }

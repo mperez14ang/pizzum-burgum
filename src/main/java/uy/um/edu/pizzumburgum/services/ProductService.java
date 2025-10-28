@@ -3,10 +3,12 @@ package uy.um.edu.pizzumburgum.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
+import uy.um.edu.pizzumburgum.entities.Creation;
 import uy.um.edu.pizzumburgum.entities.Product;
 import uy.um.edu.pizzumburgum.entities.ProductCategory;
 import uy.um.edu.pizzumburgum.entities.ProductType;
@@ -15,8 +17,10 @@ import uy.um.edu.pizzumburgum.repository.ProductRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.ProductServiceInt;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,11 +62,12 @@ public class ProductService implements ProductServiceInt {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ProductDto> getFilteredProducts(ProductType type, ProductCategory category, Boolean available) {
+    public List<ProductDto> getFilteredProducts(ProductType type, ProductCategory category, Boolean available, Boolean deleted) {
         return productRepository.findAll().stream()
                 .filter(product -> type == null || product.getType() == type)
                 .filter(product -> category == null || product.getCategory() == category)
                 .filter(product -> available == null || product.getAvailable() == available)
+                .filter(product -> deleted == null || product.getDeleted() == deleted)
                 .map(ProductMapper::toProductDto)
                 .collect(Collectors.toList());
     }
@@ -77,11 +82,27 @@ public class ProductService implements ProductServiceInt {
 
     @Transactional
     @Override
-    public void deleteProduct(Long id) throws ResponseStatusException {
-        if (!productRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Producto con id : " + id + " no encontrado");
+    public ResponseEntity<Map<String, Object>> deleteProduct(Long id) throws ResponseStatusException {
+        Map<String, Object> message = new HashMap<>();
+
+        Product product = productRepository.findById(id)
+                .orElseThrow( () ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, "Producto con id : " + id + " no encontrado")
+                );
+
+        // Setear eliminate a true
+        product.setDeleted(true);
+
+        // Borrar solo si no esta referenciado
+        if (product.getCreations().isEmpty()) {
+            productRepository.deleteById(id);
+            message.put("message", "Producto con id : " + id + " eliminado.");
         }
-        productRepository.deleteById(id);
+        else{
+            message.put("message", "Producto con id : " + id + " fue marcado como 'deleted'.");
+        }
+        return ResponseEntity.ok(message);
+
     }
 
     @Override

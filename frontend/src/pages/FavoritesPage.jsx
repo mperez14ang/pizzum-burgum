@@ -1,6 +1,5 @@
-import {ChevronLeft, Heart, LogIn, ShoppingCart, Trash2} from 'lucide-react';
+import {ChevronLeft, Heart, LucideBadgeInfo, ShoppingBag, Trash2} from 'lucide-react';
 import {Header} from '../components/common/Header';
-import {useAuth} from '../contexts/AuthContext';
 import {useFavorites} from '../contexts/FavoritesContext';
 import React, {useEffect, useMemo, useState} from 'react';
 import toast from 'react-hot-toast';
@@ -70,33 +69,50 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {items.map(item => (
-                        <div key={item.favoriteId} className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
-                            <div className="h-44 w-full overflow-hidden">
-                                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                            </div>
-                            <div className="p-4">
-                                <div className="flex items-start justify-between gap-2">
-                                    <div>
-                                        <h4 className="text-lg font-semibold text-gray-900">{item.name}</h4>
-                                        <p className="text-sm text-gray-500">{item.description}</p>
-                                    </div>
-                                    <span className="text-orange-600 font-bold">{'$' + item.price.toFixed(2)}</span>
-                                </div>
-                                {/* Se quita la línea de "Incluye n creación(es)" */}
+                        <div key={item.favoriteId} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                            {/* Imagen y acciones superpuestas */}
+                            <div className="relative h-40 overflow-hidden group">
+                                <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                    onError={(e) => { e.target.src = 'https://via.placeholder.com/400x300?text=Sin+imagen'; }}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
 
-                                <div className="mt-4 flex items-center justify-end gap-2">
-                                    <button
-                                        onClick={() => handleRemove(item.favoriteId)}
-                                        className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg inline-flex items-center gap-2"
-                                    >
-                                        <Trash2 size={16} />
-                                        Quitar
-                                    </button>
+                                {/* Botón eliminar */}
+                                <button
+                                    onClick={() => handleRemove(item.favoriteId)}
+                                    className="absolute top-2 right-2 bg-white/90 p-2 rounded-full hover:bg-red-50 transition"
+                                    title="Eliminar de favoritos"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+
+                                {/* Botón información */}
+                                <button
+                                    onClick={() => handleInfo(item.favoriteId)}
+                                    className="absolute top-2 left-2 bg-white/90 p-2 rounded-full hover:bg-red-50 transition"
+                                    title="Informacion del favorito"
+                                >
+                                    <LucideBadgeInfo className="w-4 h-4" />
+                                </button>
+                            </div>
+
+                            {/* Contenido */}
+                            <div className="p-4 flex flex-col flex-grow">
+                                <h4 className="text-lg font-bold text-gray-900 mb-1">{item.name}</h4>
+                                <p className="text-sm text-gray-600 mb-3 flex-grow">{item.description}</p>
+
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xl font-bold text-orange-500">${item.price}</span>
+                                    </div>
                                     <button
                                         onClick={() => handleAddToCart(item)}
-                                        className="px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 inline-flex items-center gap-2"
+                                        className="w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition flex items-center justify-center gap-2 text-sm"
                                     >
-                                        <ShoppingCart size={16} />
+                                        <ShoppingBag size={16} />
                                         Agregar
                                     </button>
                                 </div>
@@ -115,6 +131,10 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                 toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'), { duration: 2000 });
             }
         }
+    };
+
+    const handleInfo = async (favoriteId) => {
+        toast.success("Hola! " + favoriteId);
     };
 
     const handleAddToCart = (favorite) => {

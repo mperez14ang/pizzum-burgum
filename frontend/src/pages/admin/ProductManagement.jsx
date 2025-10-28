@@ -24,6 +24,7 @@ export const ProductManagement = () => {
     const [categoryFilter, setCategoryFilter] = useState('');
     const [categories, setCategories] = useState([]);
     const [types, setTypes] = useState([]);
+    const [isDeleted, setIsDeleted] = useState(false);
 
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -64,7 +65,7 @@ export const ProductManagement = () => {
     const loadProducts = async () => {
         try {
             setLoading(true);
-            const data = await adminService.getAllProducts();
+            const data = await adminService.getAllProducts(isDeleted);
             console.log(data)
             setProducts(data);
             setFilteredProducts(data);
@@ -241,6 +242,19 @@ export const ProductManagement = () => {
         availableTypes
     };
 
+    const handleIsDeleted = async () => {
+        try {
+            const newValue = !isDeleted;
+            setIsDeleted(newValue);
+            const data = await adminService.getAllProducts(newValue);
+            setProducts(data);
+            setFilteredProducts(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+
     return (
         <div>
 
@@ -256,21 +270,49 @@ export const ProductManagement = () => {
                     </Button>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                    <div className="w-full sm:w-64">
-                        <Select
-                            placeholder="Todas las categorías"
-                            value={categoryFilter}
-                            onChange={(e) => setCategoryFilter(e.target.value)}
-                            options={categories.map(cat => ({
-                                value: cat,
-                                label: CATEGORY_LABELS[cat] || cat
-                            }))}
-                        />
+
+                    {/* Contenedor que agrupa los 2 selects uno al lado del otro */}
+                    <div className="flex gap-4 w-full sm:w-auto">
+
+                        {/* Categorías */}
+                        <div className="w-48">
+                            <Select
+                                placeholder="Todas las categorías"
+                                value={categoryFilter}
+                                onChange={(e) => setCategoryFilter(e.target.value)}
+                                options={categories.map(cat => ({
+                                    value: cat,
+                                    label: CATEGORY_LABELS[cat] || cat
+                                }))}
+                            />
+                        </div>
+
+                        {/* Filtros */}
+                        <div className="w-48 flex flex-col gap-1">
+                            <Select
+                                placeholder="Productos Activos"
+                                value={isDeleted ? "show_deleted" : "hide_deleted"}
+                                onChange={(e) => handleIsDeleted(e.target.value === "show_deleted")}
+                                options={[
+                                    {
+                                        value: "show_deleted",
+                                        label: "Productos Borrados",
+                                    }
+                                ]}
+                            />
+
+
+                        </div>
+
                     </div>
+
+                    {/* Contador */}
                     <p className="text-sm text-gray-600">
                         Mostrando {filteredProducts.length} de {products.length} productos
                     </p>
+
                 </div>
+
             </div>
 
             {filteredProducts.length === 0 ? (
@@ -285,6 +327,12 @@ export const ProductManagement = () => {
                         <Card key={product.id}>
                             <CardBody>
                                 <div className="space-y-3">
+                                    {product.deleted && (
+                                        <p className="text-red-600 font-bold text-sm">
+                                            ESTE PRODUCTO ESTÁ BORRADO
+                                        </p>
+                                    )}
+
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <h3 className="font-semibold text-gray-900">{product.name}</h3>
@@ -320,13 +368,15 @@ export const ProductManagement = () => {
                                         >
                                             <Edit className="w-4 h-4" />
                                         </Button>
-                                        <Button
-                                            variant="danger"
-                                            size="sm"
-                                            onClick={() => handleDelete(product)}
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </Button>
+                                        {!product.deleted && (
+                                            <Button
+                                                variant="danger"
+                                                size="sm"
+                                                onClick={() => handleDelete(product)}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                            )}
                                     </div>
                                 </div>
                             </CardBody>
@@ -336,7 +386,7 @@ export const ProductManagement = () => {
             )}
 
             {/* Crear Producto Modal */}
-            <CreateProductModal {...createProductsProps} />;
+            <CreateProductModal {...createProductsProps} />
 
         </div>
     );

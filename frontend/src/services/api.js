@@ -88,8 +88,8 @@ export const ingredientsService = {
 
 export const adminService = {
     // Products
-    getAllProducts: async () => {
-        return fetchFromAPI('/products?deleted=false', {
+    getAllProducts: async (deleted = false) => {
+        return fetchFromAPI(`/products?deleted=${deleted}`, {
             method: 'GET'
         });
     },

@@ -19,12 +19,12 @@ const CATEGORY_LABELS = {
 
 export const ProductManagement = () => {
     const [products, setProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [categoryFilter, setCategoryFilter] = useState('');
     const [categories, setCategories] = useState([]);
     const [types, setTypes] = useState([]);
     const [isDeleted, setIsDeleted] = useState(false);
+    const [isAvailable, setIsAvailable] = useState(null);
 
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -45,30 +45,30 @@ export const ProductManagement = () => {
         loadTypes();
     }, []);
 
-    useEffect(() => {
-        if (categoryFilter) {
-            setFilteredProducts(products.filter(p => p.productCategory === categoryFilter));
-        } else {
-            setFilteredProducts(products);
-        }
-    }, [categoryFilter, products]);
+    // Función auxiliar para aplicar filtros actuales
+    const getCurrentFilters = () => ({
+        deleted: isDeleted,
+        available: isAvailable,
+        category: categoryFilter || undefined
+    });
 
-    useEffect(() => {
-        // Cuando cambia la categoría en el formulario, cargar los tipos correspondientes
-        if (formData.productCategory) {
-            loadTypesByCategory(formData.productCategory);
-        } else {
-            setAvailableTypes([]);
-        }
-    }, [formData.productCategory]);
-
-    const loadProducts = async () => {
+    const loadProducts = async (filters = null) => {
         try {
             setLoading(true);
-            const data = await adminService.getAllProducts(isDeleted);
-            console.log(data)
+
+            // Si no se pasan filtros, usar los actuales
+            const activeFilters = filters !== null ? filters : getCurrentFilters();
+
+            const data = await adminService.getAllProducts(activeFilters);
+
+            // Solo actualizar estados de filtros si se pasaron nuevos filtros
+            if (filters !== null) {
+                setIsAvailable(activeFilters.available);
+                setIsDeleted(activeFilters.deleted);
+                setCategoryFilter(activeFilters.category || '');
+            }
+
             setProducts(data);
-            setFilteredProducts(data);
         } catch (error) {
             toast.error('Error al cargar productos', { duration: 2000 });
             console.error(error);
@@ -130,7 +130,6 @@ export const ProductManagement = () => {
             available: product.available !== false
         });
         setFormErrors({});
-        // Cargar los tipos de la categoría del producto
         if (product.productCategory) {
             loadTypesByCategory(product.productCategory);
         }
@@ -141,11 +140,11 @@ export const ProductManagement = () => {
         if (!window.confirm(`¿Estás seguro de eliminar el producto "${product.name}"?`)) {
             return;
         }
-
         try {
             await adminService.deleteProduct(product.id);
             toast.success('Producto eliminado', { duration: 2000 });
-            loadProducts();
+            // Recargar sin pasar filtros para mantener los actuales
+            await loadProducts();
         } catch (error) {
             toast.error('Error al eliminar producto', { duration: 2000 });
             console.error(error);
@@ -156,7 +155,8 @@ export const ProductManagement = () => {
         try {
             await adminService.toggleProductAvailability(product.id, !product.available);
             toast.success(product.available ? 'Producto marcado como no disponible' : 'Producto marcado como disponible', { duration: 2000 });
-            loadProducts();
+            // Recargar sin pasar filtros para mantener los actuales
+            await loadProducts();
         } catch (error) {
             toast.error('Error al cambiar disponibilidad', { duration: 2000 });
             console.error(error);
@@ -211,12 +211,49 @@ export const ProductManagement = () => {
             }
 
             setIsFormModalOpen(false);
-            loadProducts();
+            // Recargar sin pasar filtros para mantener los actuales
+            await loadProducts();
         } catch (error) {
             toast.error(editingProduct ? 'Error al actualizar producto' : 'Error al crear producto', { duration: 2000 });
             console.error('Error completo:', error);
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleCategoryChange = async (category) => {
+        await loadProducts({
+            deleted: isDeleted,
+            available: isAvailable,
+            category: category || undefined
+        });
+    };
+
+    const handleStatusFilterChange = async (value) => {
+        if (value === "show_deleted") {
+            await loadProducts({
+                deleted: true,
+                available: null,
+                category: categoryFilter || undefined
+            });
+        } else if (value === "available") {
+            await loadProducts({
+                deleted: false,
+                available: true,
+                category: categoryFilter || undefined
+            });
+        } else if (value === "not_available") {
+            await loadProducts({
+                deleted: false,
+                available: false,
+                category: categoryFilter || undefined
+            });
+        } else {
+            await loadProducts({
+                deleted: false,
+                available: null,
+                category: categoryFilter || undefined
+            });
         }
     };
 
@@ -228,36 +265,8 @@ export const ProductManagement = () => {
         );
     }
 
-    const createProductsProps = {
-        isOpen: isFormModalOpen,
-        onClose: () => setIsFormModalOpen(false),
-        formData,
-        setFormData,
-        formErrors,
-        editingProduct,
-        submitting,
-        onSubmit: handleSubmit,
-        categories,
-        CATEGORY_LABELS,
-        availableTypes
-    };
-
-    const handleIsDeleted = async () => {
-        try {
-            const newValue = !isDeleted;
-            setIsDeleted(newValue);
-            const data = await adminService.getAllProducts(newValue);
-            setProducts(data);
-            setFilteredProducts(data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-
     return (
         <div>
-
             <div className="mb-6">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold text-gray-900">Gestión de Productos</h2>
@@ -270,52 +279,55 @@ export const ProductManagement = () => {
                     </Button>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-
-                    {/* Contenedor que agrupa los 2 selects uno al lado del otro */}
                     <div className="flex gap-4 w-full sm:w-auto">
-
-                        {/* Categorías */}
                         <div className="w-48">
                             <Select
                                 placeholder="Todas las categorías"
                                 value={categoryFilter}
-                                onChange={(e) => setCategoryFilter(e.target.value)}
+                                onChange={(e) => handleCategoryChange(e.target.value)}
                                 options={categories.map(cat => ({
                                     value: cat,
                                     label: CATEGORY_LABELS[cat] || cat
                                 }))}
                             />
                         </div>
-
-                        {/* Filtros */}
-                        <div className="w-48 flex flex-col gap-1">
+                        <div className="w-48">
                             <Select
-                                placeholder="Productos Activos"
-                                value={isDeleted ? "show_deleted" : "hide_deleted"}
-                                onChange={(e) => handleIsDeleted(e.target.value === "show_deleted")}
+                                placeholder={'Todos Los Activos'}
+                                value={
+                                    isDeleted
+                                        ? "show_deleted"
+                                        : isAvailable === true
+                                            ? "available"
+                                            : isAvailable === false
+                                                ? "not_available"
+                                                : "all_active"
+                                }
+                                onChange={(e) => handleStatusFilterChange(e.target.value)}
                                 options={[
                                     {
+                                        value: "available",
+                                        label: "Disponibles",
+                                    },
+                                    {
+                                        value: "not_available",
+                                        label: "No Disponibles",
+                                    },
+                                    {
                                         value: "show_deleted",
-                                        label: "Productos Borrados",
-                                    }
+                                        label: "Borrados",
+                                    },
                                 ]}
                             />
-
-
                         </div>
-
                     </div>
-
-                    {/* Contador */}
                     <p className="text-sm text-gray-600">
-                        Mostrando {filteredProducts.length} de {products.length} productos
+                        Mostrando {products.length} producto{products.length !== 1 ? 's' : ''}
                     </p>
-
                 </div>
-
             </div>
 
-            {filteredProducts.length === 0 ? (
+            {products.length === 0 ? (
                 <Card>
                     <CardBody>
                         <p className="text-center text-gray-500 py-8">No hay productos para mostrar</p>
@@ -323,7 +335,7 @@ export const ProductManagement = () => {
                 </Card>
             ) : (
                 <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredProducts.map((product) => (
+                    {products.map((product) => (
                         <Card key={product.id}>
                             <CardBody>
                                 <div className="space-y-3">
@@ -332,11 +344,10 @@ export const ProductManagement = () => {
                                             ESTE PRODUCTO ESTÁ BORRADO
                                         </p>
                                     )}
-
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                                            <p className="text-sm text-gray-500">{product.productType?.replace('_', ' ')}</p>
+                                            <p className="text-sm text-gray-500">{product.productType?.replace(/_/g, ' ')}</p>
                                         </div>
                                         <Badge variant={product.available ? 'success' : 'danger'}>
                                             {product.available ? 'Disponible' : 'No disponible'}
@@ -349,25 +360,29 @@ export const ProductManagement = () => {
                                         <Badge>{CATEGORY_LABELS[product.productCategory] || product.productCategory}</Badge>
                                     </div>
                                     <div className="flex gap-2 pt-2">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleToggleAvailability(product)}
-                                            title={product.available ? 'Marcar como no disponible' : 'Marcar como disponible'}
-                                        >
-                                            {product.available ? (
-                                                <ToggleRight className="w-4 h-4" />
-                                            ) : (
-                                                <ToggleLeft className="w-4 h-4" />
-                                            )}
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleEdit(product)}
-                                        >
-                                            <Edit className="w-4 h-4" />
-                                        </Button>
+                                        {!product.deleted && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleToggleAvailability(product)}
+                                                title={product.available ? 'Marcar como no disponible' : 'Marcar como disponible'}
+                                            >
+                                                {product.available ? (
+                                                    <ToggleRight className="w-4 h-4" />
+                                                ) : (
+                                                    <ToggleLeft className="w-4 h-4" />
+                                                )}
+                                            </Button>
+                                        )}
+                                        {!product.deleted && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleEdit(product)}
+                                            >
+                                                <Edit className="w-4 h-4" />
+                                            </Button>
+                                        )}
                                         {!product.deleted && (
                                             <Button
                                                 variant="danger"
@@ -376,7 +391,7 @@ export const ProductManagement = () => {
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
-                                            )}
+                                        )}
                                     </div>
                                 </div>
                             </CardBody>
@@ -385,9 +400,20 @@ export const ProductManagement = () => {
                 </div>
             )}
 
-            {/* Crear Producto Modal */}
-            <CreateProductModal {...createProductsProps} />
-
+            <CreateProductModal
+                isOpen={isFormModalOpen}
+                onClose={() => setIsFormModalOpen(false)}
+                submitting={submitting}
+                onSubmit={handleSubmit}
+                editingProduct={editingProduct}
+                categories={categories}
+                CATEGORY_LABELS={CATEGORY_LABELS}
+                availableTypes={availableTypes}
+                formData={formData}
+                setFormData={setFormData}
+                formErrors={formErrors}
+                onCategoryChange={loadTypesByCategory}
+            />
         </div>
     );
 };

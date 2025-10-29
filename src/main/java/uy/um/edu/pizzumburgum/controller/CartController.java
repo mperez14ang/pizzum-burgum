@@ -36,57 +36,55 @@ public class CartController {
     //POST /api/cart/v1/add: Agrega una creación personalizada al carrito
 
     @PostMapping("/add")
-    public ResponseEntity<CartResponse> addToCart(@Valid @RequestBody AddToCartRequest request) {
-        log.info("POST /api/cart/v1/add - Cliente: {}", request.getClientEmail());
-        CartResponse response = cartService.addToCart(request);
+    public ResponseEntity<CartResponse> addToCart(HttpServletRequest httpRequest, @Valid @RequestBody AddToCartRequest request) {
+        String clientEmail = authService.getUserEmail(httpRequest);
+        log.info("POST /api/cart/v1/add - Cliente: {}", clientEmail);
+        CartResponse response = cartService.addToCart(request, clientEmail);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     //GET /api/cart/v1/my: obtiene el carrito activo de un cliente
 
     @GetMapping("/my")
-    public ResponseEntity<CartResponse> getActiveCart(HttpServletRequest request) {
+    public ResponseEntity<CartResponse> getCart(HttpServletRequest request) {
         String clientEmail = authService.getUserEmail(request);
-        CartResponse response = cartService.getActiveCart(clientEmail);
+        CartResponse response = cartService.getCart(clientEmail);
         return ResponseEntity.ok(response);
     }
 
-    //GET /api/cart/v1/{orderId}:Obtiene un carrito por su ID
-    @GetMapping("/{orderId}")
-    public ResponseEntity<CartResponse> getCartById(@PathVariable Long orderId) {
-        log.info("GET /api/cart/v1/{}", orderId);
-        CartResponse response = cartService.getCartById(orderId);
-        return ResponseEntity.ok(response);
-    }
-
-    //PUT /api/cart/v1/{orderId}/items/{itemId}:Actualiza la cantidad de un item en el carrito
-    @PutMapping("/{orderId}/items/{itemId}")
+    //PUT /api/cart/v1/items/{itemId}:Actualiza la cantidad de un item en el carrito
+    @PutMapping("/items/{itemId}")
     public ResponseEntity<CartResponse> updateCartItem(
-            @PathVariable Long orderId,
+            HttpServletRequest httpRequest,
             @PathVariable Long itemId,
             @Valid @RequestBody UpdateCartItemRequest request) {
 
-        log.info("PUT /api/cart/v1/{}/items/{}", orderId, itemId);
-        CartResponse response = cartService.updateCartItemQuantity(orderId, itemId, request);
+        String clientEmail = authService.getUserEmail(httpRequest);
+        log.info("PUT /api/cart/v1/items/{}", itemId);
+        CartResponse response = cartService.updateCartItemQuantity(clientEmail, itemId, request);
         return ResponseEntity.ok(response);
     }
 
-    //DELETE /api/cart/v1/{orderId}/items/{itemId}: elimina un item del carrito
-    @DeleteMapping("/{orderId}/items/{itemId}")
+    //DELETE /api/cart/v1/items/{itemId}: elimina un item del carrito
+    @DeleteMapping("/items/{itemId}")
     public ResponseEntity<CartResponse> removeCartItem(
-            @PathVariable Long orderId,
+            HttpServletRequest httpRequest,
             @PathVariable Long itemId) {
 
-        log.info("DELETE /api/cart/v1/{}/items/{}", orderId, itemId);
-        CartResponse response = cartService.removeCartItem(orderId, itemId);
+        String clientEmail = authService.getUserEmail(httpRequest);
+        log.info("DELETE /api/cart/v1/items/{}", itemId);
+        CartResponse response = cartService.removeCartItem(clientEmail, itemId);
         return ResponseEntity.ok(response);
     }
 
-    //DELETE /api/cart/v1/{orderId}/clear: vacía completamente el carrito
-    @DeleteMapping("/{orderId}/clear")
-    public ResponseEntity<Map<String, String>> clearCart(@PathVariable Long orderId) {
-        log.info("DELETE /api/cart/v1/{}/clear", orderId);
-        cartService.clearCart(orderId);
+    //DELETE /api/cart/v1/clear: vacía completamente el carrito
+    @DeleteMapping("/clear")
+    public ResponseEntity<Map<String, String>> clearCart(
+            HttpServletRequest httpRequest
+    ) {
+        String clientEmail = authService.getUserEmail(httpRequest);
+        log.info("DELETE /api/cart/v1/clear");
+        cartService.clearCart(clientEmail);
 
         Map<String, String> response = new HashMap<>();
         response.put("message", "Carrito vaciado exitosamente");
@@ -94,15 +92,16 @@ public class CartController {
         return ResponseEntity.ok(response);
     }
 
-    //POST /api/cart/v1/{orderId}/checkout: finaliza la compra: selecciona dirección, método de pago y confirma (UNPAID → IN_QUEUE)
+    //POST /api/cart/v1/checkout: finaliza la compra: selecciona dirección, metodo de pago y confirma (UNPAID → IN_QUEUE)
 
-    @PostMapping("/{orderId}/checkout")
+    @PostMapping("/checkout")
     public ResponseEntity<OrderByResponse> checkout(
-            @PathVariable Long orderId,
+            HttpServletRequest httpRequest,
             @Valid @RequestBody CheckoutRequest request) {
 
-        log.info("POST /api/cart/v1/{}/checkout", orderId);
-        OrderByResponse response = cartService.checkout(orderId, request);
+        String clientEmail = authService.getUserEmail(httpRequest);
+        log.info("POST /api/cart/v1/checkout");
+        OrderByResponse response = cartService.checkout(clientEmail, request);
         return ResponseEntity.ok(response);
     }
 }

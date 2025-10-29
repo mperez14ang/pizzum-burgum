@@ -46,6 +46,11 @@ export const Header = forwardRef(({onNavigate}, ref) => {
         }
     };
 
+    const handleCheckout = () => {
+        setIsCartOpen(false)
+        onNavigate('checkout')
+    }
+
     return (
         <>
             <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -60,7 +65,9 @@ export const Header = forwardRef(({onNavigate}, ref) => {
                             <CartDropdown isOpen={isCartOpen}
                                           onToggle={onToggleCart}
                                           onClose={() => setIsCartOpen(false)}
-                                          handleClickOutside={handleClickOutside} />
+                                          handleClickOutside={handleClickOutside}
+                                          onCheckout={handleCheckout}
+                            />
 
                             <UserDropdown isOpen={isDropdownOpen}
                                           onToggle={onToggleUser}

@@ -50,6 +50,8 @@ public class SecurityConfig {
                         // Public endpoints
                         .requestMatchers("/api/public/**").permitAll()
 
+                        .requestMatchers("/assets/**").permitAll()
+
                         // Products - READ ONLY public, WRITE requires ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole(ADMIN)

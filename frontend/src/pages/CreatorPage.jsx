@@ -267,14 +267,17 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
             toast.error("Debes de loguearte para guardar en el carrito")
             return;
         }
+        console.log("Handle Add to cart from creator ")
+        console.log(productType)
 
         const creationData = authenticateAndCreateCreationData(productType)
 
         console.log(creationData)
 
-        const result = await cartService.addToCart(user.email, creationData, 1);
+        // Mostrar modal de confirmación
+        setShowCartModal(true);
 
-        toast.error("CART RESULT: " + result)
+        const result = await cartService.addToCart( creationData, 1);
 
         if (!result){
             toast.error("No se pudo agregar al carrito {}", result.message)
@@ -284,9 +287,6 @@ export const CreatorPage = ({ productType, onBack, onNavigate}) => {
         toast.success("Agregado a carrito")
 
         console.log('Agregado al carrito:', creationData);
-
-        // Mostrar modal de confirmación
-        setShowCartModal(true);
     };
 
     // Handler para continuar creando - lleva al homepage

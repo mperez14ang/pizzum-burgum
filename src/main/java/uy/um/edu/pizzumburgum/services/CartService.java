@@ -49,19 +49,19 @@ public class CartService {
     //Agrega una creación personalizada al carrito: si no existe carrito activo, lo crea (SIN DIRECCIÓN todavía)
 
     @Transactional
-    public CartResponse addToCart(AddToCartRequest request) {
-        log.info("Agregando item al carrito para cliente: {}", request.getClientEmail());
+    public CartResponse addToCart(AddToCartRequest request, String clientEmail) {
+        log.info("Agregando item al carrito para cliente: {}", clientEmail);
 
         // 1. Validar cliente
-        Client client = clientRepository.findById(request.getClientEmail())
+        Client client = clientRepository.findById(clientEmail)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Cliente con email " + request.getClientEmail() + " no encontrado"
+                        "Cliente con email " + clientEmail + " no encontrado"
                 ));
 
         // 2. Buscar o crear carrito activo (UNPAID) - SIN DIRECCIÓN
         OrderBy cart = orderByRepository
-                .findByClientEmailAndState(request.getClientEmail(), OrderState.UNPAID)
+                .findByClientEmailAndState(clientEmail, OrderState.UNPAID)
                 .orElseGet(() -> {
                     log.info("No existe carrito activo, creando uno nuevo");
 
@@ -118,6 +118,7 @@ public class CartService {
                 .price(totalPrice.floatValue())
                 .products(new HashSet<>())
                 .order(new HashSet<>())
+                .available(true)
                 .build();
 
         creation = creationRepository.save(creation);
@@ -154,31 +155,8 @@ public class CartService {
      * Obtiene el carrito activo de un cliente
      */
     @Transactional(readOnly = true)
-    public CartResponse getActiveCart(String clientEmail) {
-        log.info("Obteniendo carrito activo para cliente: {}", clientEmail);
-
-        OrderBy cart = orderByRepository
-                .findByClientEmailAndState(clientEmail, OrderState.UNPAID)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "No existe un carrito activo para el cliente " + clientEmail
-                ));
-
-        return CartMapper.toCartResponse(cart);
-    }
-
-    /**
-     * Obtiene un carrito por su ID
-     */
-    @Transactional(readOnly = true)
-    public CartResponse getCartById(Long orderId) {
-        log.info("Obteniendo carrito con ID: {}", orderId);
-
-        OrderBy cart = orderByRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Carrito con ID " + orderId + " no encontrado"
-                ));
+    public CartResponse getCart(String clientEmail) {
+        OrderBy cart = this.getActiveCart(clientEmail);
 
         return CartMapper.toCartResponse(cart);
     }
@@ -187,23 +165,11 @@ public class CartService {
      * Actualiza la cantidad de un item en el carrito
      */
     @Transactional
-    public CartResponse updateCartItemQuantity(Long orderId, Long itemId, UpdateCartItemRequest request) {
-        log.info("Actualizando cantidad del item {} en carrito {}", itemId, orderId);
+    public CartResponse updateCartItemQuantity(String clientEmail, Long itemId, UpdateCartItemRequest request) {
+        log.info("Actualizando cantidad del item {} en carrito", itemId);
 
         // Validar orden
-        OrderBy cart = orderByRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Carrito con ID " + orderId + " no encontrado"
-                ));
-
-        // Validar que esté en estado UNPAID
-        if (cart.getState() != OrderState.UNPAID) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "No se puede modificar un carrito en estado " + cart.getState()
-            );
-        }
+        OrderBy cart = this.getActiveCart(clientEmail);
 
         // Buscar item
         OrderHasCreations item = orderHasCreationsRepository.findById(itemId)
@@ -213,7 +179,7 @@ public class CartService {
                 ));
 
         // Verificar que pertenece a esta orden
-        if (!item.getOrder().getId().equals(orderId)) {
+        if (!item.getOrder().getId().equals(cart.getId())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "El item no pertenece a este carrito"
@@ -232,23 +198,11 @@ public class CartService {
     //Elimina un item del carrito
 
     @Transactional
-    public CartResponse removeCartItem(Long orderId, Long itemId) {
-        log.info("Eliminando item {} del carrito {}", itemId, orderId);
+    public CartResponse removeCartItem(String clientEmail, Long itemId) {
+        log.info("Eliminando item {} del carrito de {}", itemId, clientEmail);
 
         // Validar orden
-        OrderBy cart = orderByRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Carrito con ID " + orderId + " no encontrado"
-                ));
-
-        // Validar estado
-        if (cart.getState() != OrderState.UNPAID) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "No se puede modificar un carrito en estado " + cart.getState()
-            );
-        }
+        OrderBy cart = this.getActiveCart(clientEmail);
 
         // Buscar item
         OrderHasCreations item = orderHasCreationsRepository.findById(itemId)
@@ -258,7 +212,7 @@ public class CartService {
                 ));
 
         // Verificar pertenencia
-        if (!item.getOrder().getId().equals(orderId)) {
+        if (!item.getOrder().getId().equals(cart.getId())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "El item no pertenece a este carrito"
@@ -277,21 +231,10 @@ public class CartService {
     //Vacía completamente el carrito
 
     @Transactional
-    public void clearCart(Long orderId) {
-        log.info("Vaciando carrito {}", orderId);
+    public void clearCart(String clientEmail) {
+        log.info("Vaciando carrito de " + clientEmail);
 
-        OrderBy cart = orderByRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Carrito con ID " + orderId + " no encontrado"
-                ));
-
-        if (cart.getState() != OrderState.UNPAID) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "No se puede modificar un carrito en estado " + cart.getState()
-            );
-        }
+        OrderBy cart = this.getActiveCart(clientEmail);
 
         orderHasCreationsRepository.deleteAll(cart.getCreations());
         cart.getCreations().clear();
@@ -302,22 +245,10 @@ public class CartService {
 
     //Finaliza la compra: asigna dirección, metodo de pago y cambia estado (UNPAID → IN_QUEUE)
     @Transactional
-    public OrderByResponse checkout(Long orderId, CheckoutRequest request) {
-        log.info("Finalizando compra del carrito {}", orderId);
+    public OrderByResponse checkout(String clientEmail, CheckoutRequest request) {
+        log.info("Finalizando compra del carrito del usuario {}", clientEmail);
 
-        OrderBy cart = orderByRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Carrito con ID " + orderId + " no encontrado"
-                ));
-
-        // Validar estado
-        if (cart.getState() != OrderState.UNPAID) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Solo se pueden finalizar carritos en estado UNPAID"
-            );
-        }
+        OrderBy cart = this.getActiveCart(clientEmail);
 
         // Validar que tenga items
         if (cart.getCreations().isEmpty()) {
@@ -356,5 +287,24 @@ public class CartService {
         log.info("Compra finalizada exitosamente. Orden en cola de preparación");
 
         return OrderByMapper.toOrderByDto(cart);
+    }
+
+    private OrderBy getActiveCart(String clientEmail){
+        log.info("Obteniendo carrito activo para cliente: {}", clientEmail);
+
+        OrderBy cart = orderByRepository
+                .findByClientEmailAndState(clientEmail, OrderState.UNPAID)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No existe un carrito activo para el cliente " + clientEmail
+                ));
+        // Validar que esté en estado UNPAID
+        if (cart.getState() != OrderState.UNPAID) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Carrito activo no puede estar en estado " + cart.getState()
+            );
+        }
+        return cart;
     }
 }

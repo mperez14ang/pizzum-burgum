@@ -1,17 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
-import {cartService} from "../../services/api.js";
+import React, {useEffect, useRef, useState} from 'react';
+import {ArrowRight, Minus, Plus, ShoppingBag, Trash2, X} from 'lucide-react';
 import {useAuth} from "../../contexts/AuthContext.jsx";
-import {AuthPage} from "../AuthPage.jsx";
-import {Modal} from "../../components/common/Modal.jsx";
 import {LoginAndRegisterModal} from "../modals/LoginAndRegisterModal.jsx";
+import {
+    cartInteraction,
+    cartItemCount,
+    cartSubtotal,
+    removeItem,
+    updateQuantity
+} from "../../utils/CartInteraction.jsx";
 
-const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside }) => {
+const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckout }) => {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isLoginModals, setIsLoginModals] = useState(null)
     const {isAuthenticated} = useAuth();
+    const debounceTimers = useRef({});
 
     const dropdownRef = useRef(null);
 
@@ -27,63 +32,11 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside }) => {
         // No hacer nada si no está abierto o no está autenticado
         if (!isOpen || !isAuthenticated) return;
 
-        const fetchCart = async () => {
-            setLoading(true);
-            setError(null);
-
-            try {
-                const response = await cartService.getActiveCart();
-
-                if (response && response.items) {
-                    // Transformar los items del backend al formato del componente
-                    const transformedItems = response.items.map(item => {
-                        // Normalizar la ruta de la imagen
-                        let imageUrl = item.image;
-                        if (imageUrl && !imageUrl.startsWith('/')) {
-                            imageUrl = '/' + imageUrl;
-                        }
-
-                        return {
-                            id: item.itemId,
-                            name: item.creationName,
-                            price: item.unitPrice,
-                            quantity: item.quantity,
-                            subtotal: item.subtotal,
-                            image: imageUrl
-                        };
-                    });
-
-                    setCartItems(transformedItems);
-                } else {
-                    setCartItems([]);
-                }
-            } catch (err) {
-                console.error('Error al obtener carrito:', err);
-                setError('No se pudo cargar el carrito');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchCart();
+        cartInteraction({setLoading, setCartItems, setError}).then(r => {});
     }, [isOpen, isAuthenticated]);
 
-    const updateQuantity = (id, change) => {
-        setCartItems(items =>
-            items.map(item =>
-                item.id === id
-                    ? { ...item, quantity: Math.max(1, item.quantity + change) }
-                    : item
-            )
-        );
-    };
-
-    const removeItem = (id) => {
-        setCartItems(items => items.filter(item => item.id !== id));
-    };
-
-    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const itemCount = cartItemCount(cartItems);
+    const subtotal = cartSubtotal(cartItems);
 
     return (
         <div className="relative inline-block" ref={dropdownRef}>
@@ -159,7 +112,7 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside }) => {
                                             <div className="flex justify-between items-start mb-2">
                                                 <h3 className="text-sm font-medium text-gray-800 line-clamp-2">{item.name}</h3>
                                                 <button
-                                                    onClick={() => removeItem(item.id)}
+                                                    onClick={() => removeItem(item.id, cartItems, setCartItems)}
                                                     className="text-gray-400 hover:text-red-500 transition-colors ml-2"
                                                     title="Eliminar"
                                                 >
@@ -170,14 +123,14 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside }) => {
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2 bg-gray-100 rounded-md p-1">
                                                     <button
-                                                        onClick={() => updateQuantity(item.id, -1)}
+                                                        onClick={() => updateQuantity(item.id, item.quantity - 1, cartItems, setCartItems, debounceTimers)}
                                                         className="w-6 h-6 flex items-center justify-center hover:bg-white rounded transition-colors"
                                                     >
                                                         <Minus className="w-3 h-3" />
                                                     </button>
                                                     <span className="w-6 text-center text-sm font-medium">{item.quantity}</span>
                                                     <button
-                                                        onClick={() => updateQuantity(item.id, 1)}
+                                                        onClick={() => updateQuantity(item.id, item.quantity + 1, cartItems, setCartItems, debounceTimers)}
                                                         className="w-6 h-6 flex items-center justify-center hover:bg-white rounded transition-colors"
                                                     >
                                                         <Plus className="w-3 h-3" />
@@ -199,7 +152,8 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside }) => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <button className="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition-colors font-semibold flex items-center justify-center gap-2">
+                                    <button className="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition-colors font-semibold flex items-center justify-center gap-2"
+                                    onClick={onCheckout}>
                                         Finalizar Compra
                                         <ArrowRight className="w-5 h-5" />
                                     </button>

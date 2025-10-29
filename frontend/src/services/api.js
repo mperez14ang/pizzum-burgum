@@ -162,8 +162,13 @@ export const adminService = {
             method: 'POST',
             body: JSON.stringify(admin)
         });
+    },
+
+    getAllClients: async () => {
+        return fetchFromAPI('/client/v1');
     }
 };
+
 export const cartService = {
     //Agrega una creación personalizada al carrito
     addToCart: async (clientEmail, creationData, quantity) => {
@@ -246,3 +251,22 @@ export const cartService = {
         });
     }
 };
+
+export const clientService = {
+    getAddresses(){
+        return fetchFromAPI(`/address/my`, {
+            method: 'GET'
+        });
+    },
+
+    addAddress(clientEmail, street, city, postalCode){
+        return fetchFromAPI(`/client/v1/${clientEmail}/address`, {
+            method: 'POST',
+            body: JSON.stringify({
+                street,
+                city,
+                postalCode
+            })
+        });
+    }
+}

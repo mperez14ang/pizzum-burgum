@@ -57,11 +57,13 @@ export const AuthProvider = ({ children }) => {
     };
 
 
-    const addUser = (userData) => {
-        setUser(userData);
-        setIsAuthenticated(true);
-        setTokenAuth(userData.token);
-        localStorage.setItem('user', JSON.stringify(userData));
+    const addUser = (userData, logInAfter=true) => {
+        if (logInAfter){
+            setUser(userData);
+            setIsAuthenticated(true);
+            setTokenAuth(userData.token);
+            localStorage.setItem('user', JSON.stringify(userData));
+        }
         return { success: true, user: userData };
     };
 
@@ -75,7 +77,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const login = async (email, password) => {
+    const login = async (email, password, logInAfter=true) => {
         try {
             const response = await fetch('http://localhost:8080/api/auth/v1/login', {
                 method: 'POST',
@@ -97,14 +99,14 @@ export const AuthProvider = ({ children }) => {
                 };
             }
 
-            return addUser(data);
+            return addUser(data, logInAfter);
         } catch (error) {
             console.error('Error en login:', error);
             return { success: false, error: 'Error de conexión. Intente nuevamente.' };
         }
     };
 
-    const register = async (email, password, firstName, lastName, birthDate, dni) => {
+    const register = async (email, password, firstName, lastName, birthDate, dni, logInAfter=true) => {
         try {
             const response = await fetch('http://localhost:8080/api/auth/v1/register', {
                 method: 'POST',
@@ -132,7 +134,7 @@ export const AuthProvider = ({ children }) => {
                 };
             }
 
-            return addUser(data);
+            return addUser(data, logInAfter);
 
         } catch (error) {
             console.error('Error en register:', error);

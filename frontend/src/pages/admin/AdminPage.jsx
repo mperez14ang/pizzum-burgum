@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AdminLayout } from '../../layouts/AdminLayout';
 import { OrderManagement } from './OrderManagement';
 import { ProductManagement } from './ProductManagement';
-import { AdminManagement } from './AdminManagement';
+import { UserManagement } from './UserManagement.jsx';
 import AdminProfilePage from './AdminProfilePage.jsx';
 import {useAuth} from "../../contexts/AuthContext.jsx";
 
@@ -16,8 +16,8 @@ export const AdminPage = () => {
                 return <OrderManagement />;
             case 'products':
                 return <ProductManagement />;
-            case 'admins':
-                return <AdminManagement />;
+            case 'users':
+                return <UserManagement />;
             case 'profile':
                 return <AdminProfilePage onBack={() => {}} user={user} />;
             default:

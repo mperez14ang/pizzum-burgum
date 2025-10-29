@@ -9,7 +9,7 @@ export const AdminLayout = ({ children, currentSection, onSectionChange }) => {
     const menuItems = [
         { id: 'orders', label: 'Pedidos', icon: ShoppingBag },
         { id: 'products', label: 'Productos', icon: Package },
-        { id: 'admins', label: 'Administradores', icon: Users },
+        { id: 'users', label: 'Usuarios', icon: Users },
         { id: 'profile', label: 'Mi Perfil', icon: UserIcon }
     ];
 

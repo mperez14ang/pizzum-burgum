@@ -4,35 +4,15 @@ import {AddAddressModal} from "../pages/modals/AddAddressModal.jsx";
 import {clientService} from "../services/api.js";
 import toast from "react-hot-toast";
 
-export const AddressComponent = ({user, onSelectAddress, onEditAddress, onDeleteAddress, onCreateAddress}) => {
-    const [addresses, setAddresses] = useState([]);
+export const AddressComponent = ({user, addresses, onSelectAddress, onEditAddress, onDeleteAddress, onCreateAddress}) => {
     const [showAddressModal, setShowAddressModal] = useState(false);
     const [selectedAddressId, setSelectedAddressId] = useState('');
-    const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
-
-    useEffect(() => {
-        getAddresses();
-    }, []);
 
     useEffect(() => {
         if (addresses.length > 0 && !selectedAddressId) {
             setSelectedAddressId(addresses[0].id);
         }
     }, [addresses]);
-
-    const getAddresses = async () => {
-        setIsLoadingAddresses(true);
-        try {
-            const new_addresses = await clientService.getAddresses();
-            setAddresses(new_addresses);
-            console.log(new_addresses);
-        } catch (error) {
-            console.error('Error al cargar direcciones:', error);
-            toast.error('Error al cargar direcciones');
-        } finally {
-            setIsLoadingAddresses(false);
-        }
-    };
 
     const selectedAddress = useMemo(
         () => addresses.find(a => a.id === selectedAddressId),

@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {ChevronLeft, CreditCard, Edit3, KeyRound, MapPin, Plus, Trash2} from 'lucide-react';
 import {Header} from "../components/common/header.jsx";
 import CardModal from "./modals/CardModal.jsx";
@@ -6,6 +6,9 @@ import {AddAddressModal} from "./modals/AddAddressModal.jsx";
 import {EditPasswordModal} from "./modals/EditPasswordModal.jsx";
 import {capitalize} from "../utils/StringUtils.jsx";
 import {AddressComponent} from "../components/AddressComponent.jsx";
+import {clientService} from "../services/api.js";
+import toast from "react-hot-toast";
+import {CardComponent} from "../components/CardComponent.jsx";
 
 // Skeleton-only Profile Page (no API calls). Prepared with props for future wiring.
 // Expected props (all optional for now):
@@ -30,14 +33,29 @@ export const ProfilePage = ({
     const firstName = user?.firstName ?? '';
     const lastName = user?.lastName ?? '';
     const cards = user?.cards ?? [];
+    const [addresses, setAddresses] = useState([]);
+    const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
 
     // Modals
-    const [showCardModal, setShowCardModal] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
 
+    useEffect(() => {
+        getAddresses();
+    }, []);
 
-
-    const handleCreateCard = () => {setShowCardModal(true);}
+    const getAddresses = async () => {
+        setIsLoadingAddresses(true);
+        try {
+            const new_addresses = await clientService.getAddresses();
+            setAddresses(new_addresses);
+            console.log(new_addresses);
+        } catch (error) {
+            console.error('Error al cargar direcciones:', error);
+            toast.error('Error al cargar direcciones');
+        } finally {
+            setIsLoadingAddresses(false);
+        }
+    };
 
     const handleChangePassword = () => {setShowPasswordModal(true)}
 
@@ -73,54 +91,11 @@ export const ProfilePage = ({
                     </h1>
                 </div>
 
-                <AddressComponent user={user} />
+                <AddressComponent user={user} addresses={addresses} />
 
+                <CardComponent cards={cards}/>
 
-                {/* Credit cards section */}
-                <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center">
-                            <div
-                                className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 mr-3">
-                                <CreditCard className="w-5 h-5"/>
-                            </div>
-                            <h2 className="text-lg font-semibold text-gray-900">Tarjetas</h2>
-                        </div>
-
-                        <button
-                            onClick={handleCreateCard}
-                            className="inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium"
-                        >
-                            <Plus size={16} className="mr-2"/> Agregar tarjeta
-                        </button>
-                    </div>
-
-                    {cards.length === 0 ? (
-                        <p className="text-gray-500 text-sm">No tienes tarjetas guardadas.</p>
-                    ) : (
-                        <ul className="divide-y divide-gray-200">
-                            {cards.map(card => (
-                                <li key={card.id} className="py-3 flex items-center justify-between">
-                                    <div className="min-w-0">
-                                        <p className="text-gray-900 font-medium">
-                                            {card.label || card.brand || 'Tarjeta'} {card.last4 ? `•••• ${card.last4}` : ''}
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => onEditCard && onEditCard(card.id)}
-                                            className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border text-sm font-medium border-gray-300 text-gray-700 hover:bg-gray-50"
-                                        >
-                                            <Edit3 size={16} className="mr-1.5"/> Editar
-                                        </button>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                    <CardModal isOpen={showCardModal} onClose={() => setShowCardModal(false)} />
-                    <EditPasswordModal isOpen={showPasswordModal} onClose={() => setShowPasswordModal(false)} />
-                </section>
+                <EditPasswordModal isOpen={showPasswordModal} onClose={() => setShowPasswordModal(false)} />
             </div>
         </div>
     );

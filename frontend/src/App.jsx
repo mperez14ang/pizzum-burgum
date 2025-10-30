@@ -60,8 +60,9 @@ function App() {
         else if (type === 'favorites'){
             newPage = 'favorites'
         }
-        else if (type === 'orders'){
+        else if (type === 'orders') {
             newPage = 'orders'
+        }
         else if (type === 'checkout'){
             newPage = 'checkout'
         }
@@ -118,6 +119,7 @@ function App() {
                     )}
                     {currentPage === 'orders' && (
                         <OrderHistoryPage onBack={() => handleNavigate('home')} onNavigate={handleNavigate}/>
+                    )}
                     {currentPage === 'checkout' && (
                         <CheckoutPage onNavigate={handleNavigate} onBack={handleBack}/>
                     )}

@@ -1,6 +1,7 @@
 package uy.um.edu.pizzumburgum.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.query.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -10,10 +11,7 @@ import uy.um.edu.pizzumburgum.dto.request.*;
 import uy.um.edu.pizzumburgum.dto.response.CartResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.entities.*;
-import uy.um.edu.pizzumburgum.mapper.CartMapper;
-import uy.um.edu.pizzumburgum.mapper.CreationHasProductMapper;
-import uy.um.edu.pizzumburgum.mapper.OrderByMapper;
-import uy.um.edu.pizzumburgum.mapper.ProductMapper;
+import uy.um.edu.pizzumburgum.mapper.*;
 import uy.um.edu.pizzumburgum.repository.*;
 
 import java.math.BigDecimal;
@@ -148,6 +146,46 @@ public class CartService {
         log.info("Item agregado al carrito exitosamente");
 
         // 9. Retornar respuesta
+        return CartMapper.toCartResponse(cart);
+    }
+
+    /**
+     * Agrega una creacion ya creada a un carrito activo
+     */
+    @Transactional
+    public CartResponse addCreationToCart(OrderHasCreationsRequest request, String clientEmail) {
+        OrderBy cart = this.getActiveCart(clientEmail);
+
+        // Verificar que la creacion existe
+        Creation creation = creationRepository.findById(request.getCreationId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Creation con ID " + request.getCreationId() + " no encontrada"
+                ));
+
+        OrderHasCreations cartItem = OrderHasCreations.builder()
+                .order(cart)
+                .creation(creation)
+                .quantity(request.getQuantity())
+                .build();
+
+        // 4. Calcular precio (suma de precios de productos)
+        BigDecimal totalPrice = creation.getProducts().stream()
+                .map(product -> {
+                    return product.getProduct().getPrice();
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        creation.setPrice(totalPrice.floatValue());
+
+        cartItem = orderHasCreationsRepository.save(cartItem);
+
+        cart.getCreations().add(cartItem);
+
+        cart = orderByRepository.save(cart);
+
+        log.info("Creation {} agregada al carrito exitosamente", creation.getId());
+
         return CartMapper.toCartResponse(cart);
     }
 

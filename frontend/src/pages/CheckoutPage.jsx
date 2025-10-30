@@ -8,6 +8,10 @@ import {capitalize} from "../utils/StringUtils.jsx";
 import {AddressComponent} from "../components/AddressComponent.jsx";
 import {CardComponent} from "../components/CardComponent.jsx";
 import {cartInteraction, cartItemCount, cartSubtotal, updateQuantity} from "../utils/CartInteraction.jsx";
+import CardModal from "./modals/CardModal.jsx";
+import {AddAddressModal} from "./modals/AddAddressModal.jsx";
+import {useCards} from "../contexts/UseCards.jsx";
+import {useAddresses} from "../contexts/UseAddresses.jsx";
 
 export const CheckoutPage = ({ onNavigate, onBack }) => {
     const { user, isAuthenticated } = useAuth();
@@ -16,6 +20,16 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
     const [submitting, setSubmitting] = useState(false);
     const [cartItems, setCartItems] = useState([]);
     const debounceTimers = useRef({});
+    const [showCardModal, setShowCardModal] = useState(false);
+    const [showAddressModal, setShowAddressModal] = useState(false);
+    const itemCount = cartItemCount(cartItems);
+    const subtotal = cartSubtotal(cartItems);
+
+    const calculateDelivery = () => {return 50; };
+    const total = subtotal + calculateDelivery();
+
+    const { cards, isLoadingCards, getCards, handleCreateCard } = useCards();
+    const { addresses, isLoadingAddresses, getAddresses, handleCreateAddress } = useAddresses();
 
     // Datos del formulario
     const [formData, setFormData] = useState({
@@ -27,6 +41,8 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
         if (!isAuthenticated) return;
 
         cartInteraction({setLoading, setError, setCartItems}).then(r => {});
+        getAddresses();
+        getCards();
     }, [isAuthenticated]);
 
 
@@ -45,10 +61,6 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
                 [name]: ''
             }));
         }
-    };
-
-    const calculateDelivery = () => {
-        return 50; // Costo fijo de delivery
     };
 
     // Procesar pedido
@@ -76,9 +88,21 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
         }
     };
 
-    const itemCount = cartItemCount(cartItems);
-    const subtotal = cartSubtotal(cartItems);
-    const total = subtotal + calculateDelivery();
+    const handleCreateAddressSubmit = async (addressData) => {
+        const success = await handleCreateAddress(addressData, user);
+        if (success) {
+            setShowAddressModal(false);
+            getAddresses()
+        }
+    };
+
+    const handleCreateCardSubmit = async (cardData) => {
+        const success = await handleCreateCard(cardData, user);
+        if (success) {
+            setShowCardModal(false);
+            getCards()
+        }
+    };
 
     if (loading) {
         return (
@@ -113,7 +137,7 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Formulario de checkout */}
                     <div className="lg:col-span-2">
-                        <form onSubmit={handleSubmitOrder} className="space-y-6">
+                        <form className="space-y-6">
                             {/* Datos personales */}
                             <div className="bg-white rounded-lg shadow p-6">
                                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
@@ -150,7 +174,10 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
                                     Dirección de Entrega
                                 </h2>
 
-                                <AddressComponent user={user} addresses={[]} />
+                                <AddressComponent user={user}
+                                                  addresses={addresses}
+                                                  hasTitle={false}
+                                                  onOpenCreateAddress={() => setShowAddressModal(true)} />
                             </div>
 
                             {/* Metodo de pago */}
@@ -160,7 +187,7 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
                                     Método de Pago
                                 </h2>
 
-                                <CardComponent cards={[]}/>
+                                <CardComponent cards={cards} hasTitle={false} onOpenCreateCard={() => setShowCardModal(true)}/>
                             </div>
 
                             {/* Notas del pedido */}
@@ -196,7 +223,7 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
                                         <div className="flex-1">
                                             <h3 className="font-medium text-sm">{item.name}</h3>
                                             <p className="text-xs text-gray-600 mt-1">
-                                                {item.type === 'PIZZA' ? '🍕 Pizza' : '🍔 Hamburguesa'}
+                                                {item.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'}
                                             </p>
                                             <div className="flex items-center justify-between mt-2">
                                                 <div className="flex items-center gap-2">
@@ -276,6 +303,8 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
                     </div>
                 </div>
             </div>
+            <CardModal isOpen={showCardModal} onClose={() => setShowCardModal(false)} onSave={handleCreateCardSubmit} />
+            <AddAddressModal isOpen={showAddressModal} onClose={() => setShowAddressModal(false)} onSave={handleCreateAddressSubmit} />
         </div>
     );
 };

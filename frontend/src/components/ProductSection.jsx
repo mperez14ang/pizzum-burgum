@@ -69,7 +69,7 @@ export const ProductSection = ({
             <button
                 key={item.id}
                 onClick={onClick}
-                className={`p-4 border-2 rounded-lg transition ${
+                className={`p-4 border-2 rounded-lg transition w-fit min-w-[200px] ${
                     isSelected
                         ? 'border-orange-500 bg-orange-50'
                         : 'border-gray-200 hover:border-orange-300'
@@ -77,7 +77,7 @@ export const ProductSection = ({
             >
                 <div className="font-semibold text-sm">{item.name}</div>
                 <div className="text-xs text-gray-600">
-                    {item.price > 0 ? `+$${item.price}` : 'Incluido'}
+                    {item.price > 0 ? `+${item.price}` : 'Incluido'}
                 </div>
             </button>
         );
@@ -91,7 +91,7 @@ export const ProductSection = ({
                 </p>
             )}
 
-            <div className={`grid grid-cols-1 md:grid-cols-${section.gridCols} gap-3`}>
+            <div className={`grid-cols-1 flex flex-wrap md:grid-cols-${section.gridCols} gap-3`}>
                 {ingredients.map(renderItem)}
             </div>
 

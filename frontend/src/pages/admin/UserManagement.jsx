@@ -171,7 +171,6 @@ export const UserManagement = () => {
 
     return (
         <div>
-            <Toaster position="top-right" />
 
             <div className="mb-6">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">

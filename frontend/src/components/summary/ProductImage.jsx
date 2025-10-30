@@ -11,7 +11,7 @@ export const ProductImage = ({ productConfig }) => {
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-3">
                 <p className="text-white font-semibold text-lg">
-                    {productConfig.emoji} Tu {productConfig.displayName}
+                    Tu {productConfig.displayName}
                 </p>
             </div>
         </div>

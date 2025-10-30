@@ -12,6 +12,7 @@ import {LoginAndRegisterModal} from "./modals/LoginAndRegisterModal.jsx";
 import {PRODUCT_CONFIG} from "../utils/ProductsConfig.jsx";
 import {ProductSection} from "../components/ProductSection.jsx";
 import {SummaryPanel} from "../components/summary/SummaryPanel.jsx";
+import {createCreationData} from "../utils/CartInteraction.jsx";
 
 export const CreatorPage = ({ productType, onBack, onNavigate }) => {
     const headerRef = useRef();
@@ -108,31 +109,6 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
         return total;
     };
 
-    // Crear datos de creación para API
-    const createCreationData = () => {
-        if (!validateSelections()) return null;
-
-        const data = {
-            name: favoriteName.trim(),
-            type: productConfig.type
-        };
-
-        // Mapear selecciones a formato de API
-        productConfig.sections.forEach(section => {
-            const value = selections[section.stateKey];
-            if (value) {
-                if (section.type === 'single-select-with-quantity') {
-                    data[section.id] = value;
-                    data[`${section.id}Quantity`] = selections[section.quantityConfig.stateKey] || 1;
-                } else {
-                    data[section.id] = value;
-                }
-            }
-        });
-
-        return data;
-    };
-
     // Guardar en favoritos
     const handleSaveFavorite = async () => {
         if (!isAuthenticated) {
@@ -145,7 +121,9 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
             return;
         }
 
-        const creationData = createCreationData();
+        if (!validateSelections()) return null;
+
+        const creationData = createCreationData({productConfig, favoriteName, selections});
         if (!creationData) return;
 
         setIsSavingFavorite(true);
@@ -167,7 +145,9 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
             return;
         }
 
-        const creationData = createCreationData();
+        if (!validateSelections()) return null;
+
+        const creationData = createCreationData({productConfig, favoriteName, selections});
         if (!creationData) return;
 
         setShowCartModal(true);
@@ -243,7 +223,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
                     <div className="lg:col-span-2">
                         <div className="bg-white rounded-lg shadow p-6">
                             <h2 className="text-2xl font-bold mb-6">
-                                {productConfig.emoji} Crea tu {productConfig.displayName}
+                                Crea tu {productConfig.displayName}
                             </h2>
 
                             <div className="space-y-4">

@@ -1,14 +1,20 @@
-import {ChevronLeft, Heart, LucideBadgeInfo, Trash2} from 'lucide-react';
+import {ChevronLeft, Heart} from 'lucide-react';
 import {Header} from '../components/common/Header';
 import {useFavorites} from '../contexts/FavoritesContext';
 import React, {useEffect, useMemo, useState} from 'react';
 import toast from 'react-hot-toast';
-import {AddToCartButton} from "../components/common/AddToCartButton.jsx";
+import {FavoriteComponent} from "../components/FavoriteComponent.jsx";
+import {FavoriteInfoModal} from "./modals/FavoritesInfoModal.jsx";
+import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
+import {useAuth} from "../contexts/AuthContext.jsx";
 
 export const FavoritesPage = ({ onNavigate, onBack }) => {
     const { favorites, isLoading, removeFromFavorites } = useFavorites();
+    const { isAuthenticated } = useAuth()
 
     const [processed, setProcessed] = useState([]);
+    const [showInfoModal, setShowInfoModal] = useState(false);
+    const [selectedFavorite, setSelectedFavorite] = useState(null);
 
     useEffect(() => {
         if (favorites && favorites.length > 0) {
@@ -32,7 +38,8 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                             ? 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&h=600&fit=crop'
                             : 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop',
                         description: `${firstCreation.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'} personalizada`,
-                        creationCount: fav.creations.length
+                        creationCount: fav.creations.length,
+                        creationId: fav.creations.id
                     };
                 })
                 .filter(Boolean);
@@ -43,9 +50,10 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
         }
     }, [favorites]);
 
-    const handleInfo = (favoriteId) => {
-        toast.success("Hola! " + favoriteId)
-    }
+    const handleInfo = (favorite) => {
+        setSelectedFavorite(favorite);
+        setShowInfoModal(true);
+    };
 
     // Listas por categoría, ordenadas alfabéticamente
     const pizzas = useMemo(
@@ -75,41 +83,10 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {items.map(item => (
                         <div key={item.favoriteId} className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
-                            <div className="h-44 w-full overflow-hidden relative">
-                                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-
-                                {/* Botón de información */}
-                                <button
-                                    onClick={() => handleInfo(item.favoriteId)}
-                                    className="absolute top-2 left-2 bg-white/90 p-2 rounded-full hover:bg-red-50 transition"
-                                    title="Información del favorito"
-                                >
-                                    <LucideBadgeInfo className="w-4 h-4" />
-                                </button>
-                            </div>
-
-                            <div className="p-4">
-                                <div className="flex items-start justify-between gap-2">
-                                    <div>
-                                        <h4 className="text-lg font-semibold text-gray-900">{item.name}</h4>
-                                        <p className="text-sm text-gray-500">{item.description}</p>
-                                    </div>
-                                    <span className="text-orange-600 font-bold">{'$' + item.price.toFixed(2)}</span>
-                                </div>
-                                {/* Se quita la línea de "Incluye n creación(es)" */}
-
-                                <div className="mt-4 flex items-center justify-end gap-2">
-                                    <button
-                                        onClick={() => handleRemove(item.favoriteId)}
-                                        className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg inline-flex items-center gap-2"
-                                    >
-                                        <Trash2 size={16} />
-                                        Quitar
-                                    </button>
-
-                                    <AddToCartButton isAvailable={item.available} onClick={() => handleAddToCart(item)}/>
-                                </div>
-                            </div>
+                            <FavoriteComponent
+                                favorite={item}
+                                handleInfo={handleInfo}
+                            />
                         </div>
                     ))}
                 </div>
@@ -124,11 +101,6 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                 toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'), { duration: 2000 });
             }
         }
-    };
-
-    const handleAddToCart = (favorite) => {
-        // TODO: Integrar con carrito cuando esté disponible
-        toast.success(`${favorite.name} agregado al carrito`, { duration: 2000 });
     };
 
     return (
@@ -175,6 +147,13 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                     </div>
                 )}
             </main>
+            {/* Modal de información */}
+            <FavoriteInfoModal
+                isOpen={showInfoModal}
+                onClose={() => setShowInfoModal(false)}
+                favorite={selectedFavorite}
+                onOrder={() => handleAddFavoriteToCart(items, isAuthenticated)}
+            />
         </div>
     );
 };

@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uy.um.edu.pizzumburgum.dto.request.AddToCartRequest;
-import uy.um.edu.pizzumburgum.dto.request.CheckoutRequest;
-import uy.um.edu.pizzumburgum.dto.request.UpdateCartItemRequest;
+import uy.um.edu.pizzumburgum.dto.request.*;
 import uy.um.edu.pizzumburgum.dto.response.CartResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.services.AuthService;
@@ -41,6 +39,14 @@ public class CartController {
         log.info("POST /api/cart/v1/add - Cliente: {}", clientEmail);
         CartResponse response = cartService.addToCart(request, clientEmail);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/add_creation")
+    public ResponseEntity<CartResponse> addCreationToCart(HttpServletRequest httpRequest, @Valid @RequestBody OrderHasCreationsRequest request) {
+        String clientEmail = authService.getUserEmail(httpRequest);
+        log.info("POST /api/cart/v1/addCreationToCart: {}", clientEmail);
+        CartResponse response = cartService.addCreationToCart(request, clientEmail);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     //GET /api/cart/v1/my: obtiene el carrito activo de un cliente

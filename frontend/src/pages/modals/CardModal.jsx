@@ -4,7 +4,7 @@ import { useCard } from '../../contexts/CardContext.jsx';
 import toast from "react-hot-toast";
 import {Modal} from "../../components/common/Modal.jsx";
 
-export const CardModal = ({ isOpen, onClose }) => {
+export const CardModal = ({ isOpen, onClose, onSave }) => {
     const {
         stripe,
         user,
@@ -107,14 +107,13 @@ export const CardModal = ({ isOpen, onClose }) => {
 
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                            Email (opcional)
+                            Email
                         </label>
                         <input
+                            disabled={true}
                             type="email"
                             id="email"
-                            value={email}
-                            placeholder={user.email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={user.email}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>

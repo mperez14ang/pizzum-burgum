@@ -4,9 +4,9 @@ import {useFavorites} from '../contexts/FavoritesContext';
 import React, {useEffect, useMemo, useState} from 'react';
 import toast from 'react-hot-toast';
 import {FavoriteComponent} from "../components/FavoriteComponent.jsx";
-import {FavoriteInfoModal} from "./modals/FavoritesInfoModal.jsx";
 import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
 import {useAuth} from "../contexts/AuthContext.jsx";
+import FavoriteDetailModal from "./modals/FavoriteDetailModal.jsx";
 
 export const FavoritesPage = ({ onNavigate, onBack }) => {
     const { favorites, isLoading, removeFromFavorites } = useFavorites();
@@ -148,7 +148,7 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                 )}
             </main>
             {/* Modal de información */}
-            <FavoriteInfoModal
+            <FavoriteDetailModal
                 isOpen={showInfoModal}
                 onClose={() => setShowInfoModal(false)}
                 favorite={selectedFavorite}

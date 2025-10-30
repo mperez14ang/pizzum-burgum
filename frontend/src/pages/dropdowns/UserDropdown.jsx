@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from 'react';
-import { ChevronDown, CreditCard, History, LogOut, MapPin, Star, User, UserCircle } from 'lucide-react';
+import { ChevronDown, Menu, History, LogOut, MapPin, Star, User, UserCircle } from 'lucide-react';
 import toast from "react-hot-toast";
 
 const UserDropdown = ({
@@ -27,20 +27,18 @@ const UserDropdown = ({
         onClose();
 
         switch (action){
-            case "Historial de Pedidos":
-                onNavigate('orders')
-                break
             case "Mi Perfil":
                 onNavigate('profile')
+                break
+            case "Historial de Pedidos":
+                onNavigate('orders')
                 break
             case "Mis Favoritos":
                 onNavigate('favorites')
                 break
-            default:
-                {
-                    // TODO: Implementar navegación a las páginas correspondientes
-                    toast.error(`Función "${action}" pendiente de implementar`, { duration: 2000 });
-                }
+            case "Pagina Principal":
+                onNavigate('home')
+                break
         }
     };
 
@@ -76,14 +74,6 @@ const UserDropdown = ({
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                     <button
-                        onClick={() => handleMenuItemClick('Historial de Pedidos')}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-                    >
-                        <History className="w-4 h-4" />
-                        Historial de Pedidos
-                    </button>
-
-                    <button
                         onClick={() => handleMenuItemClick('Mi Perfil')}
                         className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
                     >
@@ -92,19 +82,11 @@ const UserDropdown = ({
                     </button>
 
                     <button
-                        onClick={() => handleMenuItemClick('Mis Direcciones')}
+                        onClick={() => handleMenuItemClick('Historial de Pedidos')}
                         className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
                     >
-                        <MapPin className="w-4 h-4" />
-                        Mis Direcciones
-                    </button>
-
-                    <button
-                        onClick={() => handleMenuItemClick('Métodos de Pago')}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
-                    >
-                        <CreditCard className="w-4 h-4" />
-                        Métodos de Pago
+                        <History className="w-4 h-4" />
+                        Historial de Pedidos
                     </button>
 
                     <button
@@ -113,6 +95,14 @@ const UserDropdown = ({
                     >
                         <Star className="w-4 h-4" />
                         Mis Favoritos
+                    </button>
+
+                    <button
+                        onClick={() => handleMenuItemClick('Pagina Principal')}
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-3"
+                    >
+                        <Menu className="w-4 h-4" />
+                        Pagina Principal
                     </button>
 
                     <div className="border-t border-gray-200 my-1"></div>

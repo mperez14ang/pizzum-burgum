@@ -4,11 +4,14 @@ import {useFavorites} from '../contexts/FavoritesContext';
 import React, {useEffect, useMemo, useState} from 'react';
 import toast from 'react-hot-toast';
 import {AddToCartButton} from "../components/common/AddToCartButton.jsx";
+import FavoriteDetailModal from "./modals/FavoriteDetailModal.jsx";
 
 export const FavoritesPage = ({ onNavigate, onBack }) => {
     const { favorites, isLoading, removeFromFavorites } = useFavorites();
 
     const [processed, setProcessed] = useState([]);
+    const [isDetailOpen, setIsDetailOpen] = useState(false);
+    const [selectedFavorite, setSelectedFavorite] = useState(null);
 
     useEffect(() => {
         if (favorites && favorites.length > 0) {
@@ -44,7 +47,13 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
     }, [favorites]);
 
     const handleInfo = (favoriteId) => {
-        toast.success("Hola! " + favoriteId)
+        const fav = favorites?.find(f => f.id === favoriteId);
+        if (fav) {
+            setSelectedFavorite(fav);
+            setIsDetailOpen(true);
+        } else {
+            toast.error('No se encontró el favorito seleccionado');
+        }
     }
 
     // Listas por categoría, ordenadas alfabéticamente
@@ -175,6 +184,11 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                     </div>
                 )}
             </main>
+            <FavoriteDetailModal
+                isOpen={isDetailOpen}
+                onClose={() => setIsDetailOpen(false)}
+                favorite={selectedFavorite}
+            />
         </div>
     );
 };

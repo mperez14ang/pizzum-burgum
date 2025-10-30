@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import toast from "react-hot-toast";
 import {FavoriteButton} from "./common/FavoriteButton.jsx";
 import {AddToCartButton} from "./common/AddToCartButton.jsx";
+import FavoriteDetailModal from "../pages/modals/FavoriteDetailModal.jsx";
 
 export const FavoritesCarousel = ( { onOpenLogin } ) => {
     const { favorites, loadFavorites, removeFromFavorites, isLoading } = useFavorites();
@@ -12,6 +13,9 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
     const [favoritesData, setFavoritesData] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const carouselRef = useRef(null);
+
+    const [isDetailOpen, setIsDetailOpen] = useState(false);
+    const [selectedFavorite, setSelectedFavorite] = useState(null);
 
     const [itemsVisible, setItemsVisible] = useState(3);
 
@@ -86,7 +90,13 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
     };
 
     const handleInfo = async (favoriteId) => {
-        toast.success("Hola! " + favoriteId)
+        const fav = favorites?.find(f => f.id === favoriteId);
+        if (fav) {
+            setSelectedFavorite(fav);
+            setIsDetailOpen(true);
+        } else {
+            toast.error('No se encontró el favorito seleccionado');
+        }
     }
 
     const handleAddToCart = (favorite) => {
@@ -115,7 +125,11 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                         Iniciar Sesión
                     </button>
                 </div>
-
+                <FavoriteDetailModal
+                    isOpen={isDetailOpen}
+                    onClose={() => setIsDetailOpen(false)}
+                    favorite={selectedFavorite}
+                />
             </div>
         );
     }
@@ -133,6 +147,11 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                         Crea una pizza o hamburguesa personalizada y guárdala como favorita
                     </p>
                 </div>
+                <FavoriteDetailModal
+                    isOpen={isDetailOpen}
+                    onClose={() => setIsDetailOpen(false)}
+                    favorite={selectedFavorite}
+                />
             </div>
         );
     }
@@ -144,6 +163,11 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
                     <p className="text-gray-600">Cargando favoritos...</p>
                 </div>
+                <FavoriteDetailModal
+                    isOpen={isDetailOpen}
+                    onClose={() => setIsDetailOpen(false)}
+                    favorite={selectedFavorite}
+                />
             </div>
         );
     }
@@ -292,6 +316,11 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                     </div>
                 )}
             </div>
+                <FavoriteDetailModal
+                    isOpen={isDetailOpen}
+                    onClose={() => setIsDetailOpen(false)}
+                    favorite={selectedFavorite}
+                />
         </div>
     );
 };

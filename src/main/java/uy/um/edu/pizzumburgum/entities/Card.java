@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -18,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 @Builder
+@EqualsAndHashCode(exclude = "client")
 public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,8 +53,9 @@ public class Card {
     @Column(name = "is_default")
     private boolean isDefault = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "has_cards", nullable = false)
+    @ToString.Exclude
     private Client client;
 
     public boolean isExpired() {

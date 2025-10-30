@@ -197,6 +197,16 @@ export const cartService = {
         });
     },
 
+    addCreationToCart: async (creationId, quantity) => {
+        return fetchFromAPI('/cart/v1/add_creation', {
+            method: 'POST',
+            body: JSON.stringify({
+                creationId,
+                quantity
+            })
+        })
+    },
+
     //Obtiene el carrito activo del cliente
     getActiveCart: async () => {
         console.log("Get Active Cart")
@@ -261,5 +271,21 @@ export const clientService = {
                 postalCode
             })
         });
+    },
+
+    addCards(clientEmail, paymentMethodId){
+        return fetchFromAPI('/card/v1', {
+            method: 'POST',
+            body: JSON.stringify({
+                clientEmail,
+                paymentMethodId
+            })
+        })
+    },
+
+    getCards(){
+        return fetchFromAPI('/card/v1/my', {
+            method: 'GET'
+        })
     }
 }

@@ -1,11 +1,9 @@
-import {Edit3, Plus, MapPin, Trash2, X} from "lucide-react";
+import {Edit3, MapPin, Plus, Trash2} from "lucide-react";
 import React, {useEffect, useMemo, useState} from "react";
-import {AddAddressModal} from "../pages/modals/AddAddressModal.jsx";
 import {clientService} from "../services/api.js";
 import toast from "react-hot-toast";
 
-export const AddressComponent = ({user, addresses, onSelectAddress, onEditAddress, onDeleteAddress, onCreateAddress}) => {
-    const [showAddressModal, setShowAddressModal] = useState(false);
+export const AddressComponent = ({user, addresses, onSelectAddress, onEditAddress, onDeleteAddress, onOpenCreateAddress, onCreateAddress, hasTitle=true}) => {
     const [selectedAddressId, setSelectedAddressId] = useState('');
 
     useEffect(() => {
@@ -25,36 +23,18 @@ export const AddressComponent = ({user, addresses, onSelectAddress, onEditAddres
         if (onSelectAddress) onSelectAddress(id);
     };
 
-    const handleAddressCreate = () => {
-        setShowAddressModal(true);
-    };
-
-    const handleCreateSubmit = async (addressData) => {
-        console.log(addressData)
-        if (!user.email){
-            toast.error("User email es null")
-        }
-
-        const response = await clientService.addAddress(user.email, addressData.street, addressData.city, addressData.postalCode)
-
-        if (response){
-            setShowAddressModal(false);
-            toast.success("Address agregado con exito")
-            return
-        }
-        toast.error("No se pudo agregar el address")
-
-    };
-
     return (
         <div>
             <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-                <div className="flex items-center mb-4">
-                    <div className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 mr-3">
-                        <MapPin className="w-5 h-5"/>
+                {hasTitle && (
+                    <div className="flex items-center mb-4">
+                        <div className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 mr-3">
+                            <MapPin className="w-5 h-5"/>
+                        </div>
+                        <h2 className="text-lg font-semibold text-gray-900">Direcciones</h2>
                     </div>
-                    <h2 className="text-lg font-semibold text-gray-900">Direcciones</h2>
-                </div>
+                )}
+
 
                 <div className="grid sm:grid-cols-[1fr_auto_auto] gap-3 items-center">
                     <select
@@ -77,6 +57,7 @@ export const AddressComponent = ({user, addresses, onSelectAddress, onEditAddres
                         onClick={() => selectedAddress && onEditAddress && onEditAddress(selectedAddress.id)}
                         disabled={!selectedAddress}
                         className="inline-flex items-center justify-center px-4 py-2 rounded-lg border text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-gray-300 text-gray-700 hover:bg-gray-50"
+                        type="button"
                     >
                         <Edit3 size={16} className="mr-2"/> Editar
                     </button>
@@ -85,6 +66,7 @@ export const AddressComponent = ({user, addresses, onSelectAddress, onEditAddres
                         onClick={() => selectedAddress && onDeleteAddress && onDeleteAddress(selectedAddress.id)}
                         disabled={!selectedAddress}
                         className="inline-flex items-center justify-center px-4 py-2 rounded-lg border text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-red-300 text-red-600 hover:bg-red-50"
+                        type="button"
                     >
                         <Trash2 size={16} className="mr-2"/> Eliminar
                     </button>
@@ -100,15 +82,14 @@ export const AddressComponent = ({user, addresses, onSelectAddress, onEditAddres
 
                 <div className="mt-4">
                     <button
-                        onClick={handleAddressCreate}
+                        onClick={onOpenCreateAddress}
                         className="inline-flex items-center px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium"
+                        type="button"
                     >
                         <Plus size={16} className="mr-2"/> Agregar dirección
                     </button>
                 </div>
             </section>
-
-            <AddAddressModal isOpen={showAddressModal} onClose={() => setShowAddressModal(false)} onSave={handleCreateSubmit} />
         </div>
     );
 };

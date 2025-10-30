@@ -4,6 +4,7 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentMethod;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,10 +21,8 @@ import uy.um.edu.pizzumburgum.repository.CardRepository;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.CardServiceInt;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CardService implements CardServiceInt {
@@ -51,34 +50,48 @@ public class CardService implements CardServiceInt {
     }
 
     @Override
+    @Transactional
     public CardResponse createCard(CardRequest cardRequest) {
+        // Verificar si la tarjeta ya existe
+        Card existingCard = cardRepository.findByStripeId(cardRequest.getPaymentMethodId());
+        if (existingCard != null) {
+            return CardMapper.toCardResponse(existingCard);
+        }
 
-        Card card = cardRepository.findByStripeId(cardRequest.getPaymentMethodId());
-        if (card != null) return CardMapper.toCardResponse(card);
-
+        // Buscar el cliente
         Client client = clientRepository.findById(cardRequest.getClientEmail())
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "El cliente para la tarjeta no fue encontrado"
+                        HttpStatus.NOT_FOUND, "No se encontró un cliente con email: " + cardRequest.getClientEmail()
                 ));
 
+        // Obtener el metodo de pago de Stripe
         PaymentMethod paymentMethod;
         try {
             paymentMethod = PaymentMethod.retrieve(cardRequest.getPaymentMethodId());
         } catch (StripeException e) {
+            logger.error("Error al recuperar el método de pago de Stripe: {}", e.getMessage());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, e.getMessage()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error al procesar el método de pago: " + e.getMessage()
             );
         }
 
-        card = CardMapper.toCard(paymentMethod, client);
+        // Mapear a entidad Card
+        Card card = CardMapper.toCard(paymentMethod, client);
 
-        // Si es la primera tarjeta del usuario, se pone como default
-        if (client.getCards() == null || client.getCards().isEmpty()) {
+        // Relación bidireccional consistente
+        card.setClient(client);
+        client.getCards().add(card);
+
+        // Si es la primera tarjeta, establecer como predeterminada
+        if (client.getCards().isEmpty()) {
             card.setDefault(true);
         }
 
-        cardRepository.save(card);
-        return CardMapper.toCardResponse(card);
+        // Guardar
+        Card savedCard = cardRepository.save(card);
+
+        return CardMapper.toCardResponse(savedCard);
     }
 
     @Override
@@ -91,17 +104,18 @@ public class CardService implements CardServiceInt {
     }
 
     @Override
+    @Transactional
     public List<CardResponse> getCardsFromClient(String clientEmail) {
         Client client = clientRepository.findById(clientEmail)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "No se encontro un cliente con id "  + clientEmail
+                        HttpStatus.NOT_FOUND, "No se encontró un cliente con email: " + clientEmail
                 ));
 
-        List<CardResponse> cards = new ArrayList<>();
-        for (Card card : client.getCards()) {
-            cards.add(this.getCardById(card.getId()));
-        }
-        return cards;
+        logger.info(client.getCards().toString());
+
+        return client.getCards().stream()
+                .map(CardMapper::toCardResponse)
+                .collect(Collectors.toList());
     }
 
     @Override

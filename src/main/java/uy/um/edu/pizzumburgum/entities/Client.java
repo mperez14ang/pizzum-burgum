@@ -31,16 +31,8 @@ public class Client extends User {
 
     // El atributo esta en la tabla card
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ToString.Exclude
     private Set<Card> cards;
-
-    // Helper method to add favorite with proper bidirectional sync
-    public void addFavorite(Favorites favorite) {
-        if (this.favorites == null) {
-            this.favorites = new HashSet<>();
-        }
-        this.favorites.add(favorite);
-        favorite.setClient(this);
-    }
 
     @Override
     public String getUserType() {return UserType.CLIENT;}

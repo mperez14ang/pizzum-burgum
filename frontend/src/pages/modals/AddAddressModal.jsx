@@ -1,6 +1,8 @@
 import {Plus} from 'lucide-react';
 import React, {useState} from 'react';
 import {Modal} from "../../components/common/Modal.jsx";
+import {clientService} from "../../services/api.js";
+import toast from "react-hot-toast";
 
 export const AddAddressModal = ({ isOpen, onSave, onClose}) => {
     const [formData, setFormData] = useState({

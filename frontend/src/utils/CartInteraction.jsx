@@ -23,7 +23,8 @@ export const cartInteraction = async ({setLoading, setError, setCartItems}) => {
                     price: item.unitPrice,
                     quantity: item.quantity,
                     subtotal: item.subtotal,
-                    image: imageUrl
+                    image: imageUrl,
+                    type: item.creationType
                 };
             });
 
@@ -84,3 +85,41 @@ export const cartSubtotal = (cartItems) => {
 export const cartItemCount = (cartItems) => {
     return cartItems.reduce((sum, item) => sum + item.quantity, 0);
 }
+
+// Crear datos de creación para API
+export const createCreationData = ({productConfig, favoriteName, selections}) => {
+    const data = {
+        name: favoriteName.trim(),
+        type: productConfig.type
+    };
+
+    // Mapear selecciones a formato de API
+    productConfig.sections.forEach(section => {
+        const value = selections[section.stateKey];
+        if (value) {
+            if (section.type === 'single-select-with-quantity') {
+                data[section.id] = value;
+                data[`${section.id}Quantity`] = selections[section.quantityConfig.stateKey] || 1;
+            } else {
+                data[section.id] = value;
+            }
+        }
+    });
+
+    return data;
+};
+
+export const handleAddFavoriteToCart = async (favorite, isAuthenticated) => {
+    if (!isAuthenticated) {
+        toast.error("Debe autenticarse para agregar al carrito");
+        return;
+    }
+
+    const result = await cartService.addCreationToCart(favorite.creationId, 1);
+
+    if (result) {
+        toast.success(`${favorite.name} agregado al carrito`, { duration: 2000 });
+    } else {
+        toast.error('Error al guardar en carrito: ' + (result.error || 'Intenta de nuevo'), { duration: 2000 });
+    }
+};

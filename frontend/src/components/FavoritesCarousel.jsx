@@ -1,23 +1,19 @@
-import { useEffect, useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Heart, ShoppingBag, Trash2, LogIn, LucideBadgeInfo } from 'lucide-react';
-import { useFavorites } from '../contexts/FavoritesContext';
-import { useAuth } from '../contexts/AuthContext';
-import toast from "react-hot-toast";
-import {FavoriteButton} from "./common/FavoriteButton.jsx";
-import {AddToCartButton} from "./common/AddToCartButton.jsx";
-import FavoriteDetailModal from "../pages/modals/FavoriteDetailModal.jsx";
+import {useEffect, useState} from 'react';
+import {ChevronLeft, ChevronRight, Heart, LogIn} from 'lucide-react';
+import {useFavorites} from '../contexts/FavoritesContext';
+import {useAuth} from '../contexts/AuthContext';
+import {FavoriteInfoModal} from "../pages/modals/FavoritesInfoModal.jsx";
+import {FavoriteComponent} from "./FavoriteComponent.jsx";
+import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
 
-export const FavoritesCarousel = ( { onOpenLogin } ) => {
-    const { favorites, loadFavorites, removeFromFavorites, isLoading } = useFavorites();
+export const FavoritesCarousel = ({ onOpenLogin }) => {
+    const { favorites, loadFavorites, isLoading } = useFavorites();
     const { isAuthenticated } = useAuth();
     const [favoritesData, setFavoritesData] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const carouselRef = useRef(null);
-
-    const [isDetailOpen, setIsDetailOpen] = useState(false);
-    const [selectedFavorite, setSelectedFavorite] = useState(null);
-
     const [itemsVisible, setItemsVisible] = useState(3);
+    const [showInfoModal, setShowInfoModal] = useState(false);
+    const [selectedFavorite, setSelectedFavorite] = useState(null);
 
     // Responsive: ajustar items visibles según el tamaño de pantalla
     useEffect(() => {
@@ -59,7 +55,9 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                         : 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop',
                     description: `${firstCreation.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'} personalizada`,
                     creationCount: fav.creations.length,
-                    available: fav.available
+                    available: fav.available,
+                    selections: firstCreation.selections,
+                    creationId: firstCreation.id
                 };
             }).filter(Boolean);
 
@@ -72,6 +70,11 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
     const totalItems = favoritesData.length;
     const maxIndex = Math.max(0, totalItems - itemsVisible);
 
+    const handleInfo = (favorite) => {
+        setSelectedFavorite(favorite);
+        setShowInfoModal(true);
+    };
+
     const handleNext = () => {
         setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
     };
@@ -80,30 +83,8 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
         setCurrentIndex((prev) => Math.max(prev - 1, 0));
     };
 
-    const handleRemove = async (favoriteId) => {
-        if (confirm('¿Eliminar este favorito?')) {
-            const result = await removeFromFavorites(favoriteId);
-            if (!result.success) {
-                toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'), { duration: 2000 });
-            }
-        }
-    };
 
-    const handleInfo = async (favoriteId) => {
-        const fav = favorites?.find(f => f.id === favoriteId);
-        if (fav) {
-            setSelectedFavorite(fav);
-            setIsDetailOpen(true);
-        } else {
-            toast.error('No se encontró el favorito seleccionado');
-        }
-    }
-
-    const handleAddToCart = (favorite) => {
-        toast.success(`${favorite.name} agregado al carrito`, { duration: 2000 })
-    };
-
-    // Si el usuario no está autenticado, mostrar prompt de login
+    // Si el usuario no está autenticado
     if (!isAuthenticated) {
         return (
             <div className="py-12">
@@ -125,16 +106,11 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
                         Iniciar Sesión
                     </button>
                 </div>
-                <FavoriteDetailModal
-                    isOpen={isDetailOpen}
-                    onClose={() => setIsDetailOpen(false)}
-                    favorite={selectedFavorite}
-                />
             </div>
         );
     }
 
-    // Si no hay favoritos, mostrar mensaje
+    // Si no hay favoritos
     if (totalItems === 0 && !isLoading) {
         return (
             <div className="py-12">
@@ -173,154 +149,108 @@ export const FavoritesCarousel = ( { onOpenLogin } ) => {
     }
 
     return (
-        <div className="py-12">
-            {/* Título de la sección */}
-            <div className="mb-6">
-                <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-                    <Heart className="text-red-500" size={32} fill="currentColor" />
-                    Tus Favoritos
-                </h2>
-                <p className="text-gray-600 mt-2">
-                    Tus creaciones guardadas listas para ordenar
-                </p>
-            </div>
-
-            {/* Carrusel */}
-            <div className="relative px-12">
-                {/* Botones de navegación */}
-                {totalItems > itemsVisible && (
-                    <>
-                        <button
-                            onClick={handlePrev}
-                            disabled={currentIndex === 0}
-                            className={`
-                                absolute left-0 top-1/2 -translate-y-1/2 z-10
-                                bg-white rounded-full p-3 shadow-lg
-                                transition-all duration-200
-                                ${currentIndex === 0
-                                    ? 'opacity-50 cursor-not-allowed'
-                                    : 'hover:bg-orange-50 hover:scale-110'
-                                }
-                            `}
-                        >
-                            <ChevronLeft size={24} className="text-gray-700" />
-                        </button>
-
-                        <button
-                            onClick={handleNext}
-                            disabled={currentIndex >= maxIndex}
-                            className={`
-                                absolute right-0 top-1/2 -translate-y-1/2 z-10
-                                bg-white rounded-full p-3 shadow-lg
-                                transition-all duration-200
-                                ${currentIndex >= maxIndex
-                                    ? 'opacity-50 cursor-not-allowed'
-                                    : 'hover:bg-orange-50 hover:scale-110'
-                                }
-                            `}
-                        >
-                            <ChevronRight size={24} className="text-gray-700" />
-                        </button>
-                    </>
-                )}
-
-                {/* Contenedor del carrusel */}
-                <div className="overflow-hidden" ref={carouselRef}>
-                    <div
-                        className="flex transition-transform duration-500 ease-in-out gap-6"
-                        style={{
-                            transform: `translateX(-${currentIndex * (102 / itemsVisible)}%)`
-                        }}
-                    >
-                        {favoritesData.map((favorite) => (
-                            <div
-                                key={favorite.id}
-                                className="flex-shrink-0"
-                                style={{ width: `calc(${100 / itemsVisible}% - ${(itemsVisible - 1) * 24 / itemsVisible}px)` }}
-                            >
-                                <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col">
-                                    {/* Imagen */}
-                                    <div className="relative h-40 overflow-hidden group">
-                                        <img
-                                            src={favorite.image}
-                                            alt={favorite.name}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                            onError={(e) => {
-                                                e.target.src = 'https://via.placeholder.com/400x300?text=Sin+imagen';
-                                            }}
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-
-                                        {/* Botón eliminar */}
-                                        <button
-                                            onClick={() => handleRemove(favorite.favoriteId)}
-                                            className="absolute top-2 right-2 bg-white/90 p-2 rounded-full hover:bg-red-50 transition"
-                                            title="Eliminar de favoritos"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-
-                                        {/* Botón de informacion */}
-                                        <button
-                                            onClick={() => handleInfo(favorite.favoriteId)}
-                                            className="absolute top-2 left-2 bg-white/90 p-2 rounded-full hover:bg-red-50 transition"
-                                            title="Informacion del favorito"
-                                        >
-                                            <LucideBadgeInfo className="w-4 h-4" />
-                                        </button>
-
-                                    </div>
-
-                                    {/* Contenido */}
-                                    <div className="p-4 flex flex-col flex-grow">
-                                        <h3 className="text-lg font-bold text-gray-900 mb-1">
-                                            {favorite.name}
-                                        </h3>
-                                        <p className="text-sm text-gray-600 mb-3 flex-grow">
-                                            {favorite.description}
-                                        </p>
-
-                                        {/* Precio y botón */}
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-xl font-bold text-orange-500">
-                                                    ${favorite.price}
-                                                </span>
-                                            </div>
-                                            <AddToCartButton onClick={() => handleAddToCart(favorite)} isAvailable={favorite.available} />
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+        <>
+            <div className="py-12">
+                {/* Título de la sección */}
+                <div className="mb-6">
+                    <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+                        <Heart className="text-red-500" size={32} fill="currentColor" />
+                        Tus Favoritos
+                    </h2>
+                    <p className="text-gray-600 mt-2">
+                        Tus creaciones guardadas listas para ordenar
+                    </p>
                 </div>
 
-                {/* Indicadores de página */}
-                {totalItems > itemsVisible && (
-                    <div className="flex justify-center gap-2 mt-6">
-                        {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
+                {/* Carrusel */}
+                <div className="relative px-12">
+                    {/* Botones de navegación */}
+                    {totalItems > itemsVisible && (
+                        <>
                             <button
-                                key={idx}
-                                onClick={() => setCurrentIndex(idx)}
+                                onClick={handlePrev}
+                                disabled={currentIndex === 0}
                                 className={`
-                                    h-2 rounded-full transition-all duration-300
-                                    ${currentIndex === idx
+                                    absolute left-0 top-1/2 -translate-y-1/2 z-10
+                                    bg-white rounded-full p-3 shadow-lg
+                                    transition-all duration-200
+                                    ${currentIndex === 0
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'hover:bg-orange-50 hover:scale-110'
+                                }
+                                `}
+                            >
+                                <ChevronLeft size={24} className="text-gray-700" />
+                            </button>
+
+                            <button
+                                onClick={handleNext}
+                                disabled={currentIndex >= maxIndex}
+                                className={`
+                                    absolute right-0 top-1/2 -translate-y-1/2 z-10
+                                    bg-white rounded-full p-3 shadow-lg
+                                    transition-all duration-200
+                                    ${currentIndex >= maxIndex
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'hover:bg-orange-50 hover:scale-110'
+                                }
+                                `}
+                            >
+                                <ChevronRight size={24} className="text-gray-700" />
+                            </button>
+                        </>
+                    )}
+
+                    <div className="overflow-hidden">
+                        <div
+                            className="flex transition-transform duration-500 ease-in-out gap-6"
+                            style={{
+                                transform: `translateX(-${currentIndex * (100 / itemsVisible)}%)`
+                            }}
+                        >
+                            {favoritesData.map((favorite) => (
+                                <div
+                                    key={favorite.favoriteId} // ✅ Usar favoriteId en lugar de id
+                                    className="flex-shrink-0"
+                                    style={{ width: `calc(${100 / itemsVisible}% - ${(itemsVisible - 1) * 24 / itemsVisible}px)` }}
+                                >
+                                    <FavoriteComponent
+                                        favorite={favorite}
+                                        handleInfo={handleInfo}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Indicadores de página */}
+                    {totalItems > itemsVisible && (
+                        <div className="flex justify-center gap-2 mt-6">
+                            {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setCurrentIndex(idx)}
+                                    className={`
+                                        h-2 rounded-full transition-all duration-300
+                                        ${currentIndex === idx
                                         ? 'bg-orange-500 w-8'
                                         : 'bg-gray-300 w-2 hover:bg-gray-400'
                                     }
-                                `}
-                            />
-                        ))}
-                    </div>
-                )}
+                                    `}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
-                <FavoriteDetailModal
-                    isOpen={isDetailOpen}
-                    onClose={() => setIsDetailOpen(false)}
-                    favorite={selectedFavorite}
-                />
-        </div>
+
+            {/* Modal de información */}
+            <FavoriteInfoModal
+                isOpen={showInfoModal}
+                onClose={() => setShowInfoModal(false)}
+                favorite={selectedFavorite}
+                onOrder={() => handleAddFavoriteToCart(selectedFavorite, isAuthenticated)}
+            />
+        </>
     );
 };

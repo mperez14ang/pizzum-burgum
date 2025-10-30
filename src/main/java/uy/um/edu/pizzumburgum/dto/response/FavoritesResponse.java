@@ -21,4 +21,6 @@ public class FavoritesResponse {
     private String clientEmail;
 
     private Set<CreationResponse> creations;
+
+    private boolean available;
 }

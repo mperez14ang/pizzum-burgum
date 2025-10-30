@@ -10,6 +10,8 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
         lastName: '',
         email: '',
         password: '',
+        email_register: '',
+        password_register: '',
         birthDate: '',
         dni: ''
     });
@@ -18,6 +20,8 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
         lastName: '',
         email: '',
         password: '',
+        email_register: '',
+        password_register: '',
         birthDate: '',
         dni: ''
     });
@@ -35,24 +39,42 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
             setTimeout(() => reject(new Error("timeout")), ms)
         );
 
+    const validatePassword = (password) => {
+        if (!password) {
+            return  'La contraseña es requerida';
+        } else if (password.length < 8) {
+            return  'La contraseña debe tener al menos 8 caracteres';
+        }
+        return ''
+    }
+
+    const validateEmail = (email) => {
+        if (!email.trim()) {
+            return  'El correo electrónico es requerido';
+        } else if (!/\S+@\S+\.\S+/.test(email)) {
+            return  'Correo electrónico inválido';
+        }
+        return ''
+    }
+
     const validateForm = () => {
         const newErrors = {};
 
-        // Validarciones de login y register
-        if (!formData.email.trim()) {
-            newErrors.email = 'El correo electrónico es requerido';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Correo electrónico inválido';
+        if (!isRegister){
+            const emailError = validateEmail(formData.email);
+            if (emailError) newErrors.email = emailError;
+
+            const passwordError = validatePassword(formData.password);
+            if (passwordError) newErrors.password = passwordError;
         }
 
-        if (!formData.password) {
-            newErrors.password = 'La contraseña es requerida';
-        } else if (formData.password.length < 8) {
-            newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
-        }
+        if (isRegister){
+            const emailError = validateEmail(formData.email_register);
+            if (emailError) newErrors.email_register = emailError;
 
-        // Validaciones solo de register
-        if (isRegister) {
+            const passwordError = validatePassword(formData.password_register);
+            if (passwordError) newErrors.password_register = passwordError;
+
             if (!formData.firstName.trim()) {
                 newErrors.firstName = 'El nombre es requerido';
             }
@@ -91,7 +113,7 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
             let response = null
             if (isRegister){
                 response = await Promise.race([
-                    register(formData.email, formData.password, formData.firstName, formData.lastName, formData.birthDate, formData.dni),
+                    register(formData.email_register, formData.password_register, formData.firstName, formData.lastName, formData.birthDate, formData.dni),
                     timeout(5000),
                 ]);
             }
@@ -110,15 +132,13 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                 return;
             }
 
-            // Solo mostrar toast en registro exitoso
-            // El login exitoso cierra el modal automáticamente sin necesidad de toast
             if (response && response.token && isRegister) {
                 toast.success('Registro de usuario exitoso', { duration: 2000 });
             }
             setIsLoading(false);
         } catch (err) {
             if (err.message === "timeout") {
-                setErrors(prev => ({ ...prev, email: "El servidor tardó demasiado en responder (timeout)" }));
+                toast.error("El servidor tardó demasiado en responder (timeout)", { duration: 2000 });
             }
             setIsLoading(false);
         }
@@ -127,27 +147,8 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
     return (
         <div>
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-                        {isRegister && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <InputField
-                                    label="Nombre"
-                                    id="firstName"
-                                    value={formData.firstName}
-                                    onChange={(e) => handleInputChange("firstName", e.target.value)}
-                                    error={errors.firstName}
-                                    isLoading={isLoading}
-                                />
-                                <InputField
-                                    label="Apellido"
-                                    id="lastName"
-                                    value={formData.lastName}
-                                    onChange={(e) => handleInputChange("lastName", e.target.value)}
-                                    error={errors.lastName}
-                                    isLoading={isLoading}
-                                />
-                            </div>
-                        )}
-
+                {!isRegister && (
+                    <>
                         <InputField
                             label="Correo electrónico"
                             id="email"
@@ -167,29 +168,71 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                             error={errors.password}
                             isLoading={isLoading}
                         />
+                    </>
+                )}
 
-                        {isRegister && (
-                            <>
-                                <InputField
-                                    label="Cédula"
-                                    id="dni"
-                                    value={formData.dni}
-                                    onChange={(e) => handleInputChange("dni", e.target.value)}
-                                    error={errors.dni}
-                                    isLoading={isLoading}
-                                />
+                {isRegister && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <InputField
+                            label="Nombre"
+                            id="firstName"
+                            value={formData.firstName}
+                            onChange={(e) => handleInputChange("firstName", e.target.value)}
+                            error={errors.firstName}
+                            isLoading={isLoading}
+                        />
+                        <InputField
+                            label="Apellido"
+                            id="lastName"
+                            value={formData.lastName}
+                            onChange={(e) => handleInputChange("lastName", e.target.value)}
+                            error={errors.lastName}
+                            isLoading={isLoading}
+                        />
 
-                                <InputField
-                                    label="Fecha de nacimiento"
-                                    id="birthDate"
-                                    type="date"
-                                    value={formData.birthDate}
-                                    onChange={(e) => handleInputChange("birthDate", e.target.value)}
-                                    error={errors.birthDate}
-                                    isLoading={isLoading}
-                                />
-                            </>
-                        )}
+                        <InputField
+                            label="Correo electrónico"
+                            id="email_register"
+                            type="email"
+                            value={formData.email_register}
+                            onChange={(e) => handleInputChange("email_register", e.target.value)}
+                            error={errors.email_register}
+                            isLoading={isLoading}
+                            autoComplete={'current-email'}
+                        />
+
+                        <InputField
+                            label="Contraseña"
+                            id="password_register"
+                            type="password"
+                            value={formData.password_register}
+                            onChange={(e) => handleInputChange("password_register", e.target.value)}
+                            error={errors.password_register}
+                            isLoading={isLoading}
+                            autoComplete={'current-password'}
+                        />
+
+                        <InputField
+                            label="Cédula"
+                            id="dni"
+                            value={formData.dni}
+                            onChange={(e) => handleInputChange("dni", e.target.value)}
+                            error={errors.dni}
+                            isLoading={isLoading}
+                            maxLength={8}
+                        />
+
+                        <InputField
+                            label="Fecha de nacimiento"
+                            id="birthDate"
+                            type="date"
+                            value={formData.birthDate}
+                            onChange={(e) => handleInputChange("birthDate", e.target.value)}
+                            error={errors.birthDate}
+                            isLoading={isLoading}
+                        />
+                    </div>
+                )}
 
                 <button
                     type="submit"
@@ -225,7 +268,6 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                     )}
                 </button>
 
-                {/* Toggle between Login and Register */}
                 {canSwitch && (
                     <div className="text-center pt-4 border-t border-gray-200">
                         <p className="text-sm text-gray-600">
@@ -235,7 +277,8 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                                     <button
                                         type="button"
                                         onClick={onToggleAuthType}
-                                        className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
+                                        disabled={isLoading}
+                                        className="text-orange-600 hover:text-orange-700 font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         Inicia sesión
                                     </button>
@@ -246,7 +289,8 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                                     <button
                                         type="button"
                                         onClick={onToggleAuthType}
-                                        className="text-orange-600 hover:text-orange-700 font-semibold transition-colors"
+                                        disabled={isLoading}
+                                        className="text-orange-600 hover:text-orange-700 font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         Regístrate aquí
                                     </button>
@@ -261,7 +305,7 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
     );
 };
 
-function InputField({ label, id, type = "text", value, onChange, error, isLoading }) {
+function InputField({ label, id, type = "text", value, onChange, error, isLoading, maxLength, autoComplete='off' }) {
     return (
         <div className="text-left">
             <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
@@ -274,7 +318,10 @@ function InputField({ label, id, type = "text", value, onChange, error, isLoadin
                 value={value}
                 onChange={onChange}
                 disabled={isLoading}
-                className={`w-full border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2 
+                autoComplete={autoComplete || "off"}
+                {...(maxLength && maxLength > 0 && { maxLength })}
+                className={`w-full border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2
+                 
           ${
                     error
                         ? "border-red-500 focus:ring-red-500"

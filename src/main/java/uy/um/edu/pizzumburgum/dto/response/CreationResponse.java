@@ -23,4 +23,6 @@ public class CreationResponse {
     private float price;
 
     private Set<CreationHasProductsResponse> products;
+
+    private Boolean available;
 }

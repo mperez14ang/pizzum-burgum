@@ -88,11 +88,24 @@ export const ingredientsService = {
 
 export const adminService = {
     // Products
-    getAllProducts: async () => {
-        return fetchFromAPI('/products', {
-            method: 'GET'
-        });
-    },
+    getAllProducts: async ({ category, type, available, deleted = false } = {}) => {
+        const params = new URLSearchParams();
+
+        if (category) params.append('category', category);
+        if (type) params.append('type', type);
+
+        if (available !== undefined && available !== null ) {
+            params.append('available', available);
+        }
+
+        params.append('deleted', deleted);
+
+        return fetchFromAPI(
+            `/products?${params.toString()}`,
+            { method: 'GET' }
+        );
+    }
+    ,
 
     createProduct: async (product) => {
         return fetchFromAPI('/products', {
@@ -162,39 +175,31 @@ export const adminService = {
             method: 'POST',
             body: JSON.stringify(admin)
         });
+    },
+
+    getAllClients: async () => {
+        return fetchFromAPI('/client/v1');
     }
 };
+
 export const cartService = {
     //Agrega una creación personalizada al carrito
-    addToCart: async (clientEmail, creationData, quantity) => {
-
+    addToCart: async ( creationData, quantity) => {
         const transformedCreation = transformCreationData(creationData);
 
         return fetchFromAPI('/cart/v1/add', {
             method: 'POST',
             body: JSON.stringify({
-                clientEmail,
                 type: transformedCreation.type.toUpperCase(), // PIZZA o BURGER
                 products: transformedCreation.products,
                 quantity
             })
         });
     },
-    //Agrega un producto extra al carrito (bebida, postre, papas, etc.)
 
-    addExtraProduct: async (clientEmail, productId, productName, quantity = 1) => {
-        return fetchFromAPI('/cart/v1/add', {
-            method: 'POST',
-            body: JSON.stringify({
-                clientEmail,
-                type: 'EXTRA',
-                productIds: [productId], // Solo un producto
-                quantity
-            })
-        });
-    },
     //Obtiene el carrito activo del cliente
     getActiveCart: async () => {
+        console.log("Get Active Cart")
         try {
             return await fetchFromAPI(`/cart/v1/my`);
         } catch (error) {
@@ -206,38 +211,31 @@ export const cartService = {
         }
     },
 
-    //Obtiene un carrito por su ID
-    getCartById: async (orderId) => {
-        return fetchFromAPI(`/cart/v1/${orderId}`);
-    },
-
     //Actualiza la cantidad de un item
-    updateCartItem: async (orderId, itemId, quantity) => {
-        return fetchFromAPI(`/cart/v1/${orderId}/items/${itemId}`, {
+    updateCartItem: async (itemId, quantity) => {
+        return fetchFromAPI(`/cart/v1/items/${itemId}`, {
             method: 'PUT',
             body: JSON.stringify({ quantity })
         });
     },
 
     //Elimina un item del carrito
-
-    removeCartItem: async (orderId, itemId) => {
-        return fetchFromAPI(`/cart/v1/${orderId}/items/${itemId}`, {
+    removeCartItem: async (itemId) => {
+        return fetchFromAPI(`/cart/v1/items/${itemId}`, {
             method: 'DELETE'
         });
     },
 
-    //Vacía el carrito
-
-    clearCart: async (orderId) => {
-        return fetchFromAPI(`/cart/v1/${orderId}/clear`, {
+    //Vacía el carrito activo
+    clearCart: async () => {
+        return fetchFromAPI(`/cart/v1/clear`, {
             method: 'DELETE'
         });
     },
 
-    //Finaliza la compra (checkout)
-    checkout: async (orderId, addressId, paymentMethod) => {
-        return fetchFromAPI(`/cart/v1/${orderId}/checkout`, {
+    //Finaliza la compra (checkout) del carrito activo
+    checkout: async (addressId, paymentMethod) => {
+        return fetchFromAPI(`/cart/v1/checkout`, {
             method: 'POST',
             body: JSON.stringify({
                 addressId,
@@ -246,3 +244,22 @@ export const cartService = {
         });
     }
 };
+
+export const clientService = {
+    getAddresses(){
+        return fetchFromAPI(`/address/my`, {
+            method: 'GET'
+        });
+    },
+
+    addAddress(clientEmail, street, city, postalCode){
+        return fetchFromAPI(`/client/v1/${clientEmail}/address`, {
+            method: 'POST',
+            body: JSON.stringify({
+                street,
+                city,
+                postalCode
+            })
+        });
+    }
+}

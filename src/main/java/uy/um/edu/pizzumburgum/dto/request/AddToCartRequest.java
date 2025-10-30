@@ -17,9 +17,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class AddToCartRequest {
 
-    @NotNull(message = "El email del cliente es obligatorio")
-    private String clientEmail;
-
     @NotNull(message = "El tipo de creación es obligatorio")
     private CreationType type;
 

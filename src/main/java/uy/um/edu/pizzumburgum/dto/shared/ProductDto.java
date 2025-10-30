@@ -25,4 +25,6 @@ public class ProductDto {
 
     private Boolean available;
 
+    private Boolean deleted;
+
 }

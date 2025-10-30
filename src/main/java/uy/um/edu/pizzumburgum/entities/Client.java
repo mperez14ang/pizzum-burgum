@@ -15,7 +15,7 @@ import java.util.Set;
 @EqualsAndHashCode(exclude = "addresses", callSuper = false)
 @DiscriminatorValue(UserType.CLIENT)
 public class Client extends User {
-
+    // TODO: Que tener por lo menos un address sea obligatorio
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private Set<Address> addresses = new HashSet<>();

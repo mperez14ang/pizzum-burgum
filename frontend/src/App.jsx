@@ -12,6 +12,7 @@ import {SessionExpiredPage} from "./pages/SessionExpiredPage.jsx";
 import toast from "react-hot-toast";
 import FavoritesPage from "./pages/FavoritesPage.jsx";
 import OrderHistoryPage from "./pages/OrderHistoryPage.jsx";
+import {CheckoutPage} from "./pages/CheckoutPage.jsx";
 
 function App() {
     const [currentPage, setCurrentPage] = useState('home');
@@ -61,6 +62,8 @@ function App() {
         }
         else if (type === 'orders'){
             newPage = 'orders'
+        else if (type === 'checkout'){
+            newPage = 'checkout'
         }
         else{
             console.log("No hay ninguna pagina definida!")
@@ -115,6 +118,8 @@ function App() {
                     )}
                     {currentPage === 'orders' && (
                         <OrderHistoryPage onBack={() => handleNavigate('home')} onNavigate={handleNavigate}/>
+                    {currentPage === 'checkout' && (
+                        <CheckoutPage onNavigate={handleNavigate} onBack={handleBack}/>
                     )}
                     {currentPage === 'session-expired' && (
                         <SessionExpiredPage onLogin={onLogin} onBack={() => handleNavigate('home')} isAuthenticated={isAuthenticated} />

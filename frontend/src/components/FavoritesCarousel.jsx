@@ -123,6 +123,11 @@ export const FavoritesCarousel = ({ onOpenLogin }) => {
                         Crea una pizza o hamburguesa personalizada y guárdala como favorita
                     </p>
                 </div>
+                <FavoriteDetailModal
+                    isOpen={isDetailOpen}
+                    onClose={() => setIsDetailOpen(false)}
+                    favorite={selectedFavorite}
+                />
             </div>
         );
     }
@@ -134,6 +139,11 @@ export const FavoritesCarousel = ({ onOpenLogin }) => {
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
                     <p className="text-gray-600">Cargando favoritos...</p>
                 </div>
+                <FavoriteDetailModal
+                    isOpen={isDetailOpen}
+                    onClose={() => setIsDetailOpen(false)}
+                    favorite={selectedFavorite}
+                />
             </div>
         );
     }

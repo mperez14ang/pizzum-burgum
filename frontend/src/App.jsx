@@ -11,6 +11,7 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import {SessionExpiredPage} from "./pages/SessionExpiredPage.jsx";
 import toast from "react-hot-toast";
 import FavoritesPage from "./pages/FavoritesPage.jsx";
+import OrderHistoryPage from "./pages/OrderHistoryPage.jsx";
 import {CheckoutPage} from "./pages/CheckoutPage.jsx";
 
 function App() {
@@ -58,6 +59,9 @@ function App() {
         }
         else if (type === 'favorites'){
             newPage = 'favorites'
+        }
+        else if (type === 'orders') {
+            newPage = 'orders'
         }
         else if (type === 'checkout'){
             newPage = 'checkout'
@@ -112,6 +116,9 @@ function App() {
                     )}
                     {currentPage === 'favorites' && (
                         <FavoritesPage onBack={() => handleNavigate('home')} onNavigate={handleNavigate}/>
+                    )}
+                    {currentPage === 'orders' && (
+                        <OrderHistoryPage onBack={() => handleNavigate('home')} onNavigate={handleNavigate}/>
                     )}
                     {currentPage === 'checkout' && (
                         <CheckoutPage onNavigate={handleNavigate} onBack={handleBack}/>

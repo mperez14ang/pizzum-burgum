@@ -27,6 +27,9 @@ const UserDropdown = ({
         onClose();
 
         switch (action){
+            case "Historial de Pedidos":
+                onNavigate('orders')
+                break
             case "Mi Perfil":
                 onNavigate('profile')
                 break

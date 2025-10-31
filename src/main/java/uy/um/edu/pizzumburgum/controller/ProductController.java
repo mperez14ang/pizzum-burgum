@@ -96,7 +96,36 @@ public class ProductController {
 
         return ResponseEntity.ok(ingredients);
     }
+    @GetMapping("/extras")
+    public ResponseEntity<Map<String, List<ProductDto>>> getExtrasGrouped() {
+        List<ProductDto> allProducts = productService.getAllProducts();
 
+        // Filter only available products from EXTRA category
+        List<ProductDto> availableExtras = allProducts.stream()
+                .filter(p -> p.getAvailable() != null && p.getAvailable())
+                .filter(p -> p.getProductCategory() != null && p.getProductCategory().equals(ProductCategory.EXTRA))
+                .toList();
+
+        Map<String, List<ProductDto>> extras = new HashMap<>();
+
+        extras.put("BEBIDA", availableExtras.stream()
+                .filter(p -> p.getProductType().equals(ProductType.BEBIDA))
+                .toList());
+
+        extras.put("POSTRE", availableExtras.stream()
+                .filter(p -> p.getProductType().equals(ProductType.POSTRE))
+                .toList());
+
+        extras.put("ACOMPANAMIENTO", availableExtras.stream()
+                .filter(p -> p.getProductType().equals(ProductType.ACOMPANAMIENTO))
+                .toList());
+
+        extras.put("OTROS", availableExtras.stream()
+                .filter(p -> p.getProductType().equals(ProductType.OTROS))
+                .toList());
+
+        return ResponseEntity.ok(extras);
+    }
     @PutMapping
     public ResponseEntity<ProductDto> updateProduct(
             @RequestParam Long id,

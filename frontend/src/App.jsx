@@ -10,6 +10,7 @@ import {CardProvider} from "./contexts/CardContext.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import {SessionExpiredPage} from "./pages/SessionExpiredPage.jsx";
 import toast from "react-hot-toast";
+import {ExtrasPage} from './pages/ExtrasPage';
 import FavoritesPage from "./pages/FavoritesPage.jsx";
 import OrderHistoryPage from "./pages/OrderHistoryPage.jsx";
 import {CheckoutPage} from "./pages/CheckoutPage.jsx";
@@ -66,6 +67,9 @@ function App() {
         else if (type === 'checkout'){
             newPage = 'checkout'
         }
+        else if (type === 'extras'){
+            newPage = 'extras'
+        }
         else{
             console.log("No hay ninguna pagina definida!")
             return
@@ -110,6 +114,9 @@ function App() {
                     )}
                     {currentPage === 'creator-burger' && (
                         <CreatorPage productType={"burger"} onBack={handleBack} onNavigate={handleNavigate}/>
+                    )}
+                    {currentPage === 'extras' && (
+                        <ExtrasPage onBack={handleBack} onNavigate={handleNavigate}/>
                     )}
                     {currentPage === 'profile' && (
                         <ProfilePage onBack={() => handleNavigate('home')} user={user} onAddCard={CardModal} onNavigate={handleNavigate}/>

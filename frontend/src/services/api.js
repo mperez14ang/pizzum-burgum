@@ -83,6 +83,25 @@ export const ingredientsService = {
             console.error('Error cargando ingredientes:', error);
             throw error;
         }
+    },
+    getAllExtrasGrouped: async () => {
+        try {
+            const data = await fetchFromAPI('/products/extras');
+
+            // Convertir precios de BigDecimal a Number y procesar cada categoría
+            const processedData = {};
+            for (const [key, value] of Object.entries(data)) {
+                processedData[key] = value.map(item => ({
+                    ...item,
+                    price: Number(item.price) || 0
+                }));
+            }
+
+            return processedData;
+        } catch (error) {
+            console.error('Error cargando extras:', error);
+            throw error;
+        }
     }
 };
 

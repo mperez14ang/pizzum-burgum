@@ -169,7 +169,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
 
     const handleGoToExtras = () => {
         setShowCartModal(false);
-        toast.loading('Funcionalidad en desarrollo', { duration: 2000 });
+        onNavigate('extras');
     };
 
     if (loading) {

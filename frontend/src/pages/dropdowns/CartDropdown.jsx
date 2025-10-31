@@ -27,13 +27,20 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
         return () => document.removeEventListener('mousedown', handleClick);
     }, [onClose, handleClickOutside]);
 
-    // Obtener carrito desde el backend al abrir el dropdown
+    // Obtener carrito cuando se abre el dropdown
     useEffect(() => {
-        // No hacer nada si no está abierto o no está autenticado
         if (!isOpen || !isAuthenticated) return;
-
         cartInteraction({setLoading, setCartItems, setError}).then(r => {});
     }, [isOpen, isAuthenticated]);
+
+    // Obtener carrito al montar el componente o cuando cambia la autenticación
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setCartItems([]);
+            return;
+        }
+        cartInteraction({setLoading, setCartItems, setError}).then(r => {});
+    }, [isAuthenticated]);
 
     const itemCount = cartItemCount(cartItems);
     const subtotal = cartSubtotal(cartItems);

@@ -39,7 +39,9 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                             : 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop',
                         description: `${firstCreation.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'} personalizada`,
                         creationCount: fav.creations.length,
-                        creationId: fav.creations.id
+                        available: fav.available,
+                        selections: firstCreation.selections,
+                        creationId: firstCreation.id
                     };
                 })
                 .filter(Boolean);
@@ -152,7 +154,7 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                 isOpen={showInfoModal}
                 onClose={() => setShowInfoModal(false)}
                 favorite={selectedFavorite}
-                onOrder={() => handleAddFavoriteToCart(items, isAuthenticated)}
+                onOrder={() => handleAddFavoriteToCart(selectedFavorite, isAuthenticated)}
             />
         </div>
     );

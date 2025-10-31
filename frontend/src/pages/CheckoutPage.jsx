@@ -107,7 +107,7 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50">
-                <Header onNavigate={onNavigate} />
+                <Header onNavigate={onNavigate} hideCartButton={true} />
                 <div className="flex justify-center items-center h-[calc(100vh-64px)]">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
@@ -120,7 +120,7 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header onNavigate={onNavigate} />
+            <Header onNavigate={onNavigate} hideCartButton={true} />
 
             <div className="container mx-auto px-4 py-6">
                 {/* Botón volver */}

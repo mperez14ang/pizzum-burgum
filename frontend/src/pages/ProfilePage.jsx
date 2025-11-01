@@ -56,7 +56,6 @@ export const ProfilePage = ({
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header onNavigate={onNavigate} />
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Top bar */}
                 <div className="flex items-center justify-between mb-6">

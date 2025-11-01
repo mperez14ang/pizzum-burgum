@@ -3,12 +3,14 @@ import {ChevronLeft, ChevronRight, Heart, LogIn} from 'lucide-react';
 import {useFavorites} from '../contexts/FavoritesContext';
 import {useAuth} from '../contexts/AuthContext';
 import {FavoriteComponent} from "./FavoriteComponent.jsx";
-import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
 import FavoriteDetailModal from "../pages/modals/FavoriteDetailModal.jsx";
+import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
+import {useCart} from "../contexts/CartContext.jsx";
 
 export const FavoritesCarousel = ({ onOpenLogin }) => {
     const { favorites, loadFavorites, isLoading } = useFavorites();
     const { isAuthenticated } = useAuth();
+    const { itemCount, setCartItemCount } = useCart();
     const [favoritesData, setFavoritesData] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [itemsVisible, setItemsVisible] = useState(3);
@@ -239,7 +241,7 @@ export const FavoritesCarousel = ({ onOpenLogin }) => {
                 isOpen={showInfoModal}
                 onClose={() => setShowInfoModal(false)}
                 favorite={selectedFavorite}
-                onOrder={() => handleAddFavoriteToCart(selectedFavorite, isAuthenticated)}
+                onOrder={() => handleAddFavoriteToCart(selectedFavorite, isAuthenticated, itemCount, setCartItemCount)}
             />
         </>
     );

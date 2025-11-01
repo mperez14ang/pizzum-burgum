@@ -2,12 +2,14 @@ import {AddToCartButton} from "./common/AddToCartButton.jsx";
 import toast from "react-hot-toast";
 import {useFavorites} from "../contexts/FavoritesContext.jsx";
 import {Info, Trash2} from "lucide-react";
-import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
 import {useAuth} from "../contexts/AuthContext.jsx";
+import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
+import {useCart} from "../contexts/CartContext.jsx";
 
 export const FavoriteComponent = ({favorite, handleInfo}) => {
     const { removeFromFavorites } = useFavorites();
     const { isAuthenticated } = useAuth()
+    const { itemCount, setCartItemCount } = useCart();
 
     const handleRemove = async (favoriteId) => {
         if (confirm('¿Eliminar este favorito?')) {
@@ -69,7 +71,7 @@ export const FavoriteComponent = ({favorite, handleInfo}) => {
                                         </span>
                         </div>
                         <AddToCartButton
-                            onClick={() => handleAddFavoriteToCart(favorite, isAuthenticated)}
+                            onClick={() => handleAddFavoriteToCart(favorite, isAuthenticated, itemCount, setCartItemCount)}
                             isAvailable={favorite.available}
                         />
                     </div>

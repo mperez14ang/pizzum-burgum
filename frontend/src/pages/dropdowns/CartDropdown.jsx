@@ -9,9 +9,10 @@ import {
     removeItem,
     updateQuantity
 } from "../../utils/CartInteraction.jsx";
+import {useCart} from "../../contexts/CartContext.jsx";
 
 const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckout }) => {
-    const [cartItems, setCartItems] = useState([]);
+    const { cartItems, setCartItems, itemCount, setCartItemCount } = useCart();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isLoginModals, setIsLoginModals] = useState(null)
@@ -23,28 +24,35 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
     // Cerrar modal al clickear afuera
     useEffect(() => {
         const handleClick = (event) => handleClickOutside(event, dropdownRef, onClose);
-        document.addEventListener('mousedown', handleClick);
-        return () => document.removeEventListener('mousedown', handleClick);
+        document.addEventListener("mousedown", handleClick);
+        return () => document.removeEventListener("mousedown", handleClick);
     }, [onClose, handleClickOutside]);
 
-    // Obtener carrito cuando se abre el dropdown
+    // Obtener carrito cuando se abre el dropdown (solo si está autenticado)
     useEffect(() => {
         if (!isOpen || !isAuthenticated) return;
-        cartInteraction({setLoading, setCartItems, setError}).then(r => {});
+
+        cartInteraction({ setLoading, setCartItems, setError }).then((res) => {
+            // actualizar itemCount al cargar el carrito
+            const count = cartItemCount(res || []);
+            setCartItemCount(count)
+        });
     }, [isOpen, isAuthenticated]);
 
-    // Obtener carrito al montar el componente o cuando cambia la autenticación
+    // Resetear si el usuario se desautentica
     useEffect(() => {
         if (!isAuthenticated) {
             setCartItems([]);
-            return;
+            setCartItemCount(0)
         }
-        cartInteraction({setLoading, setCartItems, setError}).then(r => {});
     }, [isAuthenticated]);
 
-    const itemCount = cartItemCount(cartItems);
-    const subtotal = cartSubtotal(cartItems);
+    // Sincronizar itemCount con localStorage cuando cambie el carrito
+    useEffect(() => {
+        setCartItemCount(cartItemCount(cartItems))
+    }, [cartItems]);
 
+    const subtotal = cartSubtotal(cartItems);
     return (
         <div className="relative inline-block" ref={dropdownRef}>
             <button onClick={onToggle} className="p-2 hover:bg-gray-100 rounded-full relative">

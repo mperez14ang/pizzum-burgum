@@ -4,13 +4,15 @@ import {useFavorites} from '../contexts/FavoritesContext';
 import React, {useEffect, useMemo, useState} from 'react';
 import toast from 'react-hot-toast';
 import {FavoriteComponent} from "../components/FavoriteComponent.jsx";
-import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
 import {useAuth} from "../contexts/AuthContext.jsx";
 import FavoriteDetailModal from "./modals/FavoriteDetailModal.jsx";
+import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
+import {useCart} from "../contexts/CartContext.jsx";
 
 export const FavoritesPage = ({ onNavigate, onBack }) => {
     const { favorites, isLoading, removeFromFavorites } = useFavorites();
     const { isAuthenticated } = useAuth()
+    const { itemCount, setCartItemCount } = useCart();
 
     const [processed, setProcessed] = useState([]);
     const [showInfoModal, setShowInfoModal] = useState(false);
@@ -105,7 +107,6 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header onNavigate={onNavigate} />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
@@ -152,7 +153,7 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                 isOpen={showInfoModal}
                 onClose={() => setShowInfoModal(false)}
                 favorite={selectedFavorite}
-                onOrder={() => handleAddFavoriteToCart(items, isAuthenticated)}
+                onOrder={() => handleAddFavoriteToCart(items, isAuthenticated, itemCount, setCartItemCount)}
             />
         </div>
     );

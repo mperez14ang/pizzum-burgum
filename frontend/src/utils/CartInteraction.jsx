@@ -1,5 +1,6 @@
 import {cartService} from "../services/api.js";
 import toast from "react-hot-toast";
+import {useCart} from "../contexts/CartContext.jsx";
 
 export const cartInteraction = async ({setLoading, setError, setCartItems}) => {
     setLoading(true);
@@ -109,7 +110,7 @@ export const createCreationData = ({productConfig, favoriteName, selections}) =>
     return data;
 };
 
-export const handleAddFavoriteToCart = async (favorite, isAuthenticated) => {
+export const handleAddFavoriteToCart = async (favorite, isAuthenticated, itemCount, setCartItemCount) => {
     if (!isAuthenticated) {
         toast.error("Debe autenticarse para agregar al carrito");
         return;
@@ -118,8 +119,50 @@ export const handleAddFavoriteToCart = async (favorite, isAuthenticated) => {
     const result = await cartService.addCreationToCart(favorite.creationId, 1);
 
     if (result) {
+        setCartItemCount(itemCount + 1)
         toast.success(`${favorite.name} agregado al carrito`, { duration: 2000 });
     } else {
         toast.error('Error al guardar en carrito: ' + (result.error || 'Intenta de nuevo'), { duration: 2000 });
+    }
+};
+
+// Agregar al carrito
+export const handleAddToCart = async (
+    {isAuthenticated, productConfig, favoriteName, selections, setCartItemCount, itemCount, setShowCartModal = null, validateSelections = null,
+                                      }) => {
+    if (!isAuthenticated) {
+        toast.error("Debes iniciar sesión para agregar al carrito");
+        return;
+    }
+
+    if (validateSelections && !validateSelections()) return;
+
+    const creationData = createCreationData({ productConfig, favoriteName, selections });
+    if (!creationData) {
+        toast.error("Datos de producto inválidos");
+        return;
+    }
+
+    if (setShowCartModal) {
+        setShowCartModal(true);
+    }
+
+    try {
+        const result = await cartService.addToCart(creationData, 1);
+
+        if (!result) {
+            toast.error("No se pudo agregar al carrito");
+            return;
+        }
+
+        toast.success("Agregado al carrito");
+
+        const newCount = (itemCount || 0) + 1;
+        setCartItemCount(newCount);
+        localStorage.setItem("cartItemCount", newCount);
+
+    } catch (error) {
+        console.error("Error al agregar al carrito:", error);
+        toast.error("Ocurrió un error al agregar al carrito");
     }
 };

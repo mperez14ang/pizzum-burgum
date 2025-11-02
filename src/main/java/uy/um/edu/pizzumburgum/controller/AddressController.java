@@ -10,6 +10,7 @@ import uy.um.edu.pizzumburgum.services.AddressService;
 import uy.um.edu.pizzumburgum.services.AuthService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/address")
@@ -33,6 +34,12 @@ public class AddressController {
     public ResponseEntity<List<AddressResponse>> getClientAddresses(HttpServletRequest request){
         String clientEmail = authService.getUserEmail(request);
         return new ResponseEntity<>(addressService.getClientAddresses(clientEmail), HttpStatus.OK) ;
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Map<String, Object>> deleteAddress(HttpServletRequest request, @PathVariable Long id){
+        String clientEmail = authService.getUserEmail(request);
+        return new ResponseEntity<>(addressService.deleteAddress(clientEmail, id), HttpStatus.OK);
     }
 
 }

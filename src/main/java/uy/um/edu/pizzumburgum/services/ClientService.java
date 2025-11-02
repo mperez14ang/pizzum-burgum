@@ -1,5 +1,8 @@
 package uy.um.edu.pizzumburgum.services;
 
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
+import com.stripe.param.CustomerCreateParams;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -54,14 +57,38 @@ public class ClientService implements ClientServiceInt {
         Client client = ClientMapper.toClient(clientCreateRequest);
 
         // Agregar addresses
+        boolean shouldSetActive = client.getAddresses() == null || client.getAddresses().isEmpty();
+        boolean[] firstProcessed = {false};
+
         Client finalClient = client;
         Set<Address> addresses = clientCreateRequest.getAddresses().stream()
-                .map(obj -> {
-                    Address address = AddressMapper.toAddress(obj);
+                .map(addressRequest -> {
+                    Address address = AddressMapper.toAddress(addressRequest);
+                    // Solo la primera dirección será activa
+                    address.setActive(shouldSetActive && !firstProcessed[0]);
+                    if (shouldSetActive && !firstProcessed[0]) {
+                        firstProcessed[0] = true;
+                    }
                     address.setClient(finalClient);
                     return address;
                 })
                 .collect(Collectors.toSet());
+
+        // Crear stripeCustomerId
+        CustomerCreateParams params = CustomerCreateParams.builder()
+                .setEmail(client.getEmail())
+                .setName(client.getFirstName() + " " + client.getLastName())
+                .build();
+
+        Customer customer;
+        try {
+            customer = Customer.create(params);
+        } catch (StripeException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "No se pudo crear stripeCustomerId"
+            );
+        }
+        client.setStripeCustomerId(customer.getId());
 
         // Encriptar contraseña
         client.setPassword(passwordEncoder.encode(clientCreateRequest.getPassword()));

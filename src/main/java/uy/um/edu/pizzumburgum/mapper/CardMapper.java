@@ -21,6 +21,7 @@ public class CardMapper {
                 .country(cardData.getCountry())
                 .funding(cardData.getFunding())
                 .fingerprint(cardData.getFingerprint())
+                .deleted(false)
                 .build();
     }
 
@@ -33,7 +34,8 @@ public class CardMapper {
                 .expirationYear(card.getExpirationYear())
                 .expirationMonth(card.getExpirationMonth())
                 .clientId(card.getClient().getEmail())
-                .isDefault(card.isDefault())
+                .active(card.isActive())
+                .deleted(card.isDeleted())
                 .build();
     }
 }

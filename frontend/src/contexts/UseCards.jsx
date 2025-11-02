@@ -39,8 +39,10 @@ export const useCards = () => {
                 await getCards();
                 return true;
             }
+            else {
+                toast.error("No se pudo agregar la tarjeta");
+            }
 
-            toast.error("No se pudo agregar la tarjeta");
             return false;
         } catch (error) {
             console.error('Error al crear tarjeta:', error);
@@ -49,10 +51,21 @@ export const useCards = () => {
         }
     };
 
+    const handleDeleteCard = async (cardId) => {
+        const response = await clientService.deleteCard(cardId)
+
+        if (response){
+            toast.success("Tarjeta " + cardId + " borrada con exito")
+            return true
+        }
+        toast.success(response.error)
+    }
+
     return {
         cards,
         isLoadingCards,
         getCards,
-        handleCreateCard
+        handleCreateCard,
+        handleDeleteCard
     };
 };

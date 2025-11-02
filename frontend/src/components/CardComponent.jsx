@@ -1,7 +1,10 @@
 import React from "react";
-import { Edit3, CreditCard, Plus, Check } from "lucide-react";
+import {Edit3, CreditCard, Plus, Check, Trash2} from "lucide-react";
+import {useCards} from "../contexts/UseCards.jsx";
 
 export const CardComponent = ({ cards, onEditCard, onOpenCreateCard, hasTitle = true }) => {
+    const { handleDeleteCard } = useCards();
+
     const getBrandIcon = (brand) => {
         const brandName = brand?.toLowerCase();
 
@@ -101,6 +104,14 @@ export const CardComponent = ({ cards, onEditCard, onOpenCreateCard, hasTitle = 
                                                 className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border text-sm font-medium border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
                                             >
                                                 <Edit3 size={16} className="mr-1.5" /> Editar
+                                            </button>
+
+                                            <button
+                                                onClick={() => handleDeleteCard(card.id)}
+                                                className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-red-300 text-red-600 hover:bg-red-50"
+                                                type="button"
+                                            >
+                                                <Trash2 size={16} className="mr-1.5"/> Eliminar
                                             </button>
                                         </div>
                                     </div>

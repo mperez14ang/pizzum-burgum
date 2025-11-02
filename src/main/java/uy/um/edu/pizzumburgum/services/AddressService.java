@@ -14,7 +14,9 @@ import uy.um.edu.pizzumburgum.repository.AddressRepository;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.AddressServiceInt;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -34,9 +36,14 @@ public class AddressService implements AddressServiceInt {
         }
 
         Address address = AddressMapper.toAddress(addressRequest);
+        Client client = clientRepository.getReferenceById(clientEmail);
+
+        // Seleccionar address como predeteminada
+        if (client.getAddresses().isEmpty()){
+            address.setActive(true);
+        }
 
         // Setear el cliente
-        Client client = clientRepository.getReferenceById(clientEmail);
         address.setClient(client);
 
         addressRepository.save(address);
@@ -83,17 +90,33 @@ public class AddressService implements AddressServiceInt {
 
     @Transactional
     @Override
-    public void deleteAddress(String clientEmail, Long addressId) {
+    public Map<String, Object> deleteAddress(String clientEmail, Long addressId) {
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "No se pudo encontrar una direccion perteneciente a " + clientEmail));
 
         if (!address.getClient().getEmail().equals(clientEmail)) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,  "La direccion no pertenece a " + clientEmail
+                    HttpStatus.BAD_REQUEST, "La direccion no pertenece a " + clientEmail
             );
         }
 
-        addressRepository.delete(address);
+        address.setActive(false);
+        address.setDeleted(true);
+
+        Client client = address.getClient();
+
+        if (!client.getAddresses().isEmpty()) {
+            client.getAddresses().stream()
+                    .filter(a -> !a.isDeleted())
+                    .findFirst()
+                    .ifPresent(a -> a.setActive(true));
+        }
+
+        addressRepository.save(address);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "La dirección " + addressId + " fue eliminada");
+        return response;
     }
 }

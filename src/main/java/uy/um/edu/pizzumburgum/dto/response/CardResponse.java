@@ -22,5 +22,7 @@ public class CardResponse {
 
     private String clientId;
 
-    private boolean isDefault;
+    private boolean active;
+
+    private boolean deleted;
 }

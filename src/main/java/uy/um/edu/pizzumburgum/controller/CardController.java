@@ -1,7 +1,6 @@
 package uy.um.edu.pizzumburgum.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uy.um.edu.pizzumburgum.dto.request.CardRequest;
@@ -46,7 +45,8 @@ public class CardController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Map<String, Object>> deleteCard(@PathVariable Long id){
-        return cardService.deleteCard(id);
+    public ResponseEntity<Map<String, Object>> deleteCard(HttpServletRequest httpRequest, @PathVariable Long id){
+        String clientEmail = authService.getUserEmail(httpRequest);
+        return cardService.deleteCard(id, clientEmail);
     }
 }

@@ -3,8 +3,10 @@ import { AlertCircle, CreditCard, Check, Loader2 } from 'lucide-react';
 import { useCard } from '../../contexts/CardContext.jsx';
 import toast from "react-hot-toast";
 import {Modal} from "../../components/common/Modal.jsx";
+import {useCards} from "../../contexts/UseCards.jsx";
+import {cartService, clientService} from "../../services/api.js";
 
-export const CardModal = ({ isOpen, onClose, onSave }) => {
+export const CardModal = ({ isOpen, onClose }) => {
     const {
         stripe,
         user,
@@ -18,6 +20,8 @@ export const CardModal = ({ isOpen, onClose, onSave }) => {
         email,
         setEmail,
     } = useCard();
+
+    const { isLoadingCards, getCards, handleCreateCard } = useCards();
 
     useEffect(() => {
         if (!isOpen || !stripe) return;
@@ -58,6 +62,15 @@ export const CardModal = ({ isOpen, onClose, onSave }) => {
             card.destroy();
         };
     }, [stripe, isOpen]);
+
+    const handleCreateCardSubmit = async (cardData) => {
+        const response = await handleCreateCard(cardData, user);
+        console.log("card response :" + response)
+        if (response) {
+            onClose();
+            await getCards()
+        }
+    };
 
     return (
         <>
@@ -126,6 +139,7 @@ export const CardModal = ({ isOpen, onClose, onSave }) => {
                     <button
                         type="submit"
                         disabled={loading || !stripe}
+                        onClick={handleCreateCardSubmit}
                         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center disabled:bg-gray-400"
                     >
                         {loading ? (

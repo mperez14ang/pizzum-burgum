@@ -16,5 +16,5 @@ public interface CardServiceInt {
 
     CardResponse updateCard(Long id, CardRequest cardRequest);
 
-    ResponseEntity<Map<String, Object>> deleteCard(Long id);
+    ResponseEntity<Map<String, Object>> deleteCard(Long id, String clientEmail);
 }

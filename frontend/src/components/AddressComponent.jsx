@@ -2,9 +2,12 @@ import {Edit3, MapPin, Plus, Trash2} from "lucide-react";
 import React, {useEffect, useMemo, useState} from "react";
 import {clientService} from "../services/api.js";
 import toast from "react-hot-toast";
+import {useCards} from "../contexts/UseCards.jsx";
+import {useAddresses} from "../contexts/UseAddresses.jsx";
 
 export const AddressComponent = ({user, addresses, onSelectAddress, onEditAddress, onDeleteAddress, onOpenCreateAddress, onCreateAddress, hasTitle=true}) => {
     const [selectedAddressId, setSelectedAddressId] = useState('');
+    const { handleCreateAddress, handleDeleteAddress } = useAddresses();
 
     useEffect(() => {
         if (addresses.length > 0 && !selectedAddressId) {
@@ -63,7 +66,7 @@ export const AddressComponent = ({user, addresses, onSelectAddress, onEditAddres
                     </button>
 
                     <button
-                        onClick={() => selectedAddress && onDeleteAddress && onDeleteAddress(selectedAddress.id)}
+                        onClick={() => selectedAddress && handleDeleteAddress(selectedAddress.id)}
                         disabled={!selectedAddress}
                         className="inline-flex items-center justify-center px-4 py-2 rounded-lg border text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-red-300 text-red-600 hover:bg-red-50"
                         type="button"

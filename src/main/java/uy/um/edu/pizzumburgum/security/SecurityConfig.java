@@ -65,6 +65,7 @@ public class SecurityConfig {
                         // ============ CLIENT + ADMIN ============
                         // Client
                         .requestMatchers("/api/favorites/**").hasRole(CLIENT)
+                        .requestMatchers("/api/payments/**").hasRole(CLIENT)
 
                         // Admin
                         .requestMatchers("/api/client/**").hasAnyRole(CLIENT, ADMIN)

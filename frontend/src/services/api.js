@@ -263,12 +263,11 @@ export const cartService = {
     },
 
     //Finaliza la compra (checkout) del carrito activo
-    checkout: async (addressId, paymentMethod) => {
+    checkout: async (currency) => {
         return fetchFromAPI(`/cart/v1/checkout`, {
             method: 'POST',
             body: JSON.stringify({
-                addressId,
-                paymentMethod
+                currency
             })
         });
     }
@@ -292,6 +291,12 @@ export const clientService = {
         });
     },
 
+    deleteAddress(addressId){
+        return fetchFromAPI(`/address/${addressId}`, {
+            method: 'DELETE'}
+        );
+    },
+
     addCards(clientEmail, paymentMethodId){
         return fetchFromAPI('/card/v1', {
             method: 'POST',
@@ -305,6 +310,23 @@ export const clientService = {
     getCards(){
         return fetchFromAPI('/card/v1/my', {
             method: 'GET'
+        })
+    },
+
+    deleteCard(cardId){
+        return fetchFromAPI(`/card/v1/${cardId}`, {
+            method: 'DELETE'
+        })
+    },
+
+    processCartPayment(addressId, currency){
+        // Hara el pago con la tarjeta activa
+        return fetchFromAPI(`/card/v1/checkout`, {
+            method: 'POST',
+            body: JSON.stringify({
+                addressId,
+                currency
+            })
         })
     }
 }

@@ -12,23 +12,22 @@ import CardModal from "./modals/CardModal.jsx";
 import {AddAddressModal} from "./modals/AddAddressModal.jsx";
 import {useCards} from "../contexts/UseCards.jsx";
 import {useAddresses} from "../contexts/UseAddresses.jsx";
+import {useCart} from "../contexts/CartContext.jsx";
 
 export const CheckoutPage = ({ onNavigate, onBack }) => {
     const { user, isAuthenticated } = useAuth();
+    const { cartItems, setCartItems, itemCount, setCartItemCount } = useCart()
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [cartItems, setCartItems] = useState([]);
     const debounceTimers = useRef({});
     const [showCardModal, setShowCardModal] = useState(false);
     const [showAddressModal, setShowAddressModal] = useState(false);
-    const itemCount = cartItemCount(cartItems);
     const subtotal = cartSubtotal(cartItems);
-
     const calculateDelivery = () => {return 50; };
     const total = subtotal + calculateDelivery();
 
-    const { cards, isLoadingCards, getCards, handleCreateCard } = useCards();
+    const { cards, getCards} = useCards();
     const { addresses, isLoadingAddresses, getAddresses, handleCreateAddress } = useAddresses();
 
     // Datos del formulario
@@ -71,12 +70,23 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
 
         try {
 
-            // TODO: Aqui iria el procesamiento del pedido
+            // Aqui iria el procesamiento del pedido
+            const currency = "uyu";
+            const response = await cartService.checkout(currency)
 
-            // Limpiar carrito
-            await cartService.clearCart();
+            if (response.paymentStatus !== "succeeded"){
+                try{
+                    toast.error(response.error)
+                }catch (e){
+                    toast.error("No se pudo procesar el pago")
+                }
 
-            toast.loading('Falta implementar pedido', { duration: 3000 });
+                console.log(response.error)
+                return
+            }
+            setCartItems([])
+            setCartItemCount(0)
+            toast.success('Pago realizado con exito!', { duration: 3000 });
 
             // TODO: Aqui la idea seria que llevase al usuario a una pagina donde pueda ver el estado de su pedido
             onNavigate('home');
@@ -93,14 +103,6 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
         if (success) {
             setShowAddressModal(false);
             getAddresses()
-        }
-    };
-
-    const handleCreateCardSubmit = async (cardData) => {
-        const success = await handleCreateCard(cardData, user);
-        if (success) {
-            setShowCardModal(false);
-            getCards()
         }
     };
 
@@ -301,7 +303,7 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
                     </div>
                 </div>
             </div>
-            <CardModal isOpen={showCardModal} onClose={() => setShowCardModal(false)} onSave={handleCreateCardSubmit} />
+            <CardModal isOpen={showCardModal} onClose={() => setShowCardModal(false)} />
             <AddAddressModal isOpen={showAddressModal} onClose={() => setShowAddressModal(false)} onSave={handleCreateAddressSubmit} />
         </div>
     );

@@ -30,9 +30,12 @@ public class Client extends User {
     private Set<OrderBy> orders = new HashSet<>();
 
     // El atributo esta en la tabla card
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @ToString.Exclude
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Card> cards;
+
+    @Column(name = "stripe_customer_id", unique = true)
+    private String stripeCustomerId;
 
     @Override
     public String getUserType() {return UserType.CLIENT;}

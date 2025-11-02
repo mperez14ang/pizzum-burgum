@@ -37,11 +37,23 @@ export const useAddresses = () => {
 
     };
 
+    const handleDeleteAddress = async (addressId) => {
+        const response = await clientService.deleteAddress(addressId)
+
+        if (response){
+            toast.success("Address " + addressId + " borrada con exito")
+            return true
+        }
+        toast.success(response.error)
+
+    }
+
     return {
         addresses,
         isLoadingAddresses,
         handleCreateAddress,
-        getAddresses
+        getAddresses,
+        handleDeleteAddress
 
     };
 };

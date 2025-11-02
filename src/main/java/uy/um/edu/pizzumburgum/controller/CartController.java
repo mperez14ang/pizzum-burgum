@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uy.um.edu.pizzumburgum.dto.request.*;
+import uy.um.edu.pizzumburgum.dto.response.CartCheckoutResponse;
 import uy.um.edu.pizzumburgum.dto.response.CartResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.services.AuthService;
@@ -101,13 +102,13 @@ public class CartController {
     //POST /api/cart/v1/checkout: finaliza la compra: selecciona dirección, metodo de pago y confirma (UNPAID → IN_QUEUE)
 
     @PostMapping("/checkout")
-    public ResponseEntity<OrderByResponse> checkout(
+    public ResponseEntity<CartCheckoutResponse> checkout(
             HttpServletRequest httpRequest,
             @Valid @RequestBody CheckoutRequest request) {
 
         String clientEmail = authService.getUserEmail(httpRequest);
         log.info("POST /api/cart/v1/checkout");
-        OrderByResponse response = cartService.checkout(clientEmail, request);
+        CartCheckoutResponse response = cartService.checkout(clientEmail, request);
         return ResponseEntity.ok(response);
     }
 }

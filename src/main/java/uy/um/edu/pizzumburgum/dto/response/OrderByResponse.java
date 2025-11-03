@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uy.um.edu.pizzumburgum.dto.request.OrderHasCreationsRequest;
 import uy.um.edu.pizzumburgum.entities.OrderState;
 
 import java.util.Set;
@@ -18,7 +17,11 @@ public class OrderByResponse {
 
     private OrderState state;
 
-    private AddressResponse address;
+    private String deliveryStreet;
+
+    private String deliveryCity;
+
+    private String deliveryPostalCode;
 
     private Set<OrderHasCreationsResponse> creations;
 

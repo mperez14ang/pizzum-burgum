@@ -82,7 +82,9 @@ public class CartService {
 
                     OrderBy newCart = OrderBy.builder()
                             .client(client)
-                            .address(tempAddress) // Temporal, se cambiará en checkout
+                            .deliveryPostalCode(tempAddress.getPostalCode())
+                            .deliveryStreet(tempAddress.getStreet())
+                            .deliveryCity(tempAddress.getCity())
                             .state(OrderState.UNPAID)
                             .creations(new HashSet<>())
                             .build();

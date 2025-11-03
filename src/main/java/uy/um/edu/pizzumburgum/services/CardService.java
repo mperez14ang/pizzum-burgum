@@ -17,8 +17,6 @@ import uy.um.edu.pizzumburgum.dto.request.CardRequest;
 import uy.um.edu.pizzumburgum.dto.response.CardResponse;
 import uy.um.edu.pizzumburgum.entities.Card;
 import uy.um.edu.pizzumburgum.entities.Client;
-import uy.um.edu.pizzumburgum.entities.OrderBy;
-import uy.um.edu.pizzumburgum.entities.OrderState;
 import uy.um.edu.pizzumburgum.mapper.CardMapper;
 import uy.um.edu.pizzumburgum.repository.CardRepository;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
@@ -54,12 +52,12 @@ public class CardService implements CardServiceInt {
 
     @Override
     @Transactional
-    public CardResponse createCard(CardRequest cardRequest) {
+    public ResponseEntity<CardResponse> createCard(CardRequest cardRequest) {
         // Verificar si la tarjeta ya existe
         Card existingCard = cardRepository.findByStripeId(cardRequest.getPaymentMethodId());
         if (existingCard != null) {
             existingCard.setDeleted(false);
-            return CardMapper.toCardResponse(existingCard);
+            return new ResponseEntity<>(CardMapper.toCardResponse(existingCard), HttpStatus.OK);
         }
 
         // Buscar el cliente
@@ -68,39 +66,15 @@ public class CardService implements CardServiceInt {
                         HttpStatus.NOT_FOUND, "No se encontró un cliente con email: " + cardRequest.getClientEmail()
                 ));
 
-        // Obtener el metodo de pago de Stripe
-        PaymentMethod paymentMethod;
-        try {
-            paymentMethod = PaymentMethod.retrieve(cardRequest.getPaymentMethodId());
-        } catch (StripeException e) {
-            logger.error("Error al recuperar el método de pago de Stripe: {}", e.getMessage());
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Error al procesar el método de pago: " + e.getMessage()
-            );
-        }
-        try {
-            if (client.getStripeCustomerId() != null) {
-                PaymentMethodAttachParams attachParams = PaymentMethodAttachParams.builder()
-                        .setCustomer(client.getStripeCustomerId())
-                        .build();
-
-                paymentMethod = paymentMethod.attach(attachParams);
-                logger.info("PaymentMethod {} adjuntado al customer {}",
-                        paymentMethod.getId(), client.getStripeCustomerId());
-            } else {
-                logger.warn("Cliente {} no tiene stripeCustomerId", client.getEmail());
-            }
-        } catch (StripeException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "No se puede crear una tarjeta sin stripeCustomerId: " + e.getMessage()
-            );
-        }
-
+        PaymentMethod paymentMethod = this.adjustPaymentMethod(cardRequest.getPaymentMethodId(), client);
 
         // Mapear a entidad Card
         Card card = CardMapper.toCard(paymentMethod, client);
+
+        if (card.isActive()) {
+            client.getCards().forEach(a -> a.setActive(false));
+            card.setActive(true);
+        }
 
         // Si es la primera tarjeta, establecer como predeterminada
         if (client.getCards().isEmpty()) {
@@ -114,16 +88,16 @@ public class CardService implements CardServiceInt {
         // Guardar
         Card savedCard = cardRepository.save(card);
 
-        return CardMapper.toCardResponse(savedCard);
+        return new ResponseEntity<>(CardMapper.toCardResponse(savedCard), HttpStatus.OK);
     }
 
     @Override
-    public CardResponse getCardById(Long id) {
-        return CardMapper.toCardResponse(
-                cardRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "No se encontro una tarjeta con id " + id
-                ))
-        );
+    public ResponseEntity<CardResponse> getCardById(Long id) {
+        Card card = cardRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "No se encontro una tarjeta con id " + id
+        ));
+
+        return new ResponseEntity<>(CardMapper.toCardResponse(card), HttpStatus.OK);
     }
 
     @Override
@@ -141,9 +115,29 @@ public class CardService implements CardServiceInt {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
-    public CardResponse updateCard(Long id, CardRequest cardRequest) {
-        return null;
+    public ResponseEntity<CardResponse> updateCard(Long id, CardRequest cardRequest) {
+        logger.info(cardRequest.toString());
+        logger.info(id.toString());
+        Client client = clientRepository.findById(cardRequest.getClientEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un cliente con email: " + cardRequest.getClientEmail()));
+
+        Set<Card> cards = client.getCards();
+
+        Card card = cards.stream()
+                .filter(card1 -> card1.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro una tarjeta con el id " + id + " perteneciente a " + cardRequest.getClientEmail()));
+
+
+        PaymentMethod paymentMethod = this.adjustPaymentMethod(cardRequest.getPaymentMethodId(), client);
+
+        card.setStripeId(paymentMethod.getId());
+
+        // Guardar
+        cardRepository.save(card);
+        return new ResponseEntity<>(CardMapper.toCardResponse(card), HttpStatus.OK);
     }
 
     @Transactional
@@ -182,5 +176,38 @@ public class CardService implements CardServiceInt {
         response.put("message", "Tarjeta " + id + " fue borrada");
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private PaymentMethod adjustPaymentMethod(String paymentMethodId, Client client) {
+        // Obtener el metodo de pago de Stripe
+        PaymentMethod paymentMethod;
+        try {
+            paymentMethod = PaymentMethod.retrieve(paymentMethodId);
+        } catch (StripeException e) {
+            logger.error("Error al recuperar el método de pago de Stripe: {}", e.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error al procesar el método de pago: " + e.getMessage()
+            );
+        }
+        try {
+            if (client.getStripeCustomerId() != null) {
+                PaymentMethodAttachParams attachParams = PaymentMethodAttachParams.builder()
+                        .setCustomer(client.getStripeCustomerId())
+                        .build();
+
+                paymentMethod = paymentMethod.attach(attachParams);
+                logger.info("PaymentMethod {} adjuntado al customer {}",
+                        paymentMethod.getId(), client.getStripeCustomerId());
+            } else {
+                logger.warn("Cliente {} no tiene stripeCustomerId", client.getEmail());
+            }
+        } catch (StripeException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    e.getMessage()
+            );
+        }
+        return paymentMethod;
     }
 }

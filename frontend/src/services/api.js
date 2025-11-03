@@ -291,6 +291,18 @@ export const clientService = {
         });
     },
 
+    updateAddress(addressId, street, city, postalCode){
+        return fetchFromAPI(`/address/${addressId}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                street,
+                city,
+                postalCode
+            })
+            }
+        );
+    },
+
     deleteAddress(addressId){
         return fetchFromAPI(`/address/${addressId}`, {
             method: 'DELETE'}
@@ -316,17 +328,6 @@ export const clientService = {
     deleteCard(cardId){
         return fetchFromAPI(`/card/v1/${cardId}`, {
             method: 'DELETE'
-        })
-    },
-
-    processCartPayment(addressId, currency){
-        // Hara el pago con la tarjeta activa
-        return fetchFromAPI(`/card/v1/checkout`, {
-            method: 'POST',
-            body: JSON.stringify({
-                addressId,
-                currency
-            })
         })
     }
 }

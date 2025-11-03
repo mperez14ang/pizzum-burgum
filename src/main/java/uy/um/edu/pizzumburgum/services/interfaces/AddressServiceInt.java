@@ -15,7 +15,7 @@ public interface AddressServiceInt {
     @Transactional
     List<AddressResponse> getClientAddresses(String clientEmail);
 
-    AddressResponse updateAddress(Long id, AddressResponse addressResponse);
+    AddressResponse updateAddress(Long id, AddressRequest addressRequest);
 
     Map<String, Object> deleteAddress(String clientEmail, Long addressId);
 }

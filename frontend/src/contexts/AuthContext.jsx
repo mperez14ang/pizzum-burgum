@@ -142,6 +142,40 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const changePassword = async (email, oldPassword, newPassword, passwordConfirmation) => {
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/v1/password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email,
+                    oldPassword,
+                    password: newPassword,
+                    passwordConfirmation
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                return {
+                    success: false,
+                    error: data.message || data.error || 'Error al cambiar la contraseña'
+                };
+            }
+
+            return {
+                success: true
+            }
+
+        } catch (error) {
+            console.error('Error al actualizar la contraseña:', error);
+            return { success: false, error: 'Error de conexión. Intente nuevamente.' };
+        }
+    };
+
     const validate = async (token) => {
         try {
             const response = await fetch('http://localhost:8080/api/auth/v1/verify', {
@@ -176,7 +210,8 @@ export const AuthProvider = ({ children }) => {
         logout,
         register,
         validate,
-        checkUser
+        checkUser,
+        changePassword
     };
 
     return (

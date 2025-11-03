@@ -10,10 +10,6 @@ export const ProfilePage = ({
   const lastName = user?.lastName ?? '';
   const [editPasswordModal, setEditPasswordModal] = useState(false);
 
-  const handleEditPassword = () =>{
-      setEditPasswordModal(true)
-    }
-
   return (
     <div>
       <div className="mb-6">
@@ -40,7 +36,10 @@ export const ProfilePage = ({
         </p>
       </div>
 
-      <EditPasswordModal isOpen={editPasswordModal} onClose={() => setEditPasswordModal(false)} />
+      <EditPasswordModal isOpen={editPasswordModal}
+                         onClose={() => setEditPasswordModal(false)}
+                         onSave={() => setEditPasswordModal(false)}
+      />
     </div>
   );
 };

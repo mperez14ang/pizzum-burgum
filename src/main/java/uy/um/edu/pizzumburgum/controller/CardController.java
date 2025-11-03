@@ -24,7 +24,7 @@ public class CardController {
     }
 
     @PostMapping
-    public CardResponse createCard(@RequestBody CardRequest cardRequest) {
+    public ResponseEntity<CardResponse> createCard(@RequestBody CardRequest cardRequest) {
         return this.cardService.createCard(cardRequest);
     }
 
@@ -35,12 +35,12 @@ public class CardController {
     }
 
     @GetMapping("{id}")
-    public CardResponse getCard(@PathVariable Long id) {
+    public ResponseEntity<CardResponse> getCard(@PathVariable Long id) {
         return this.cardService.getCardById(id);
     }
 
-    @PutMapping
-    public CardResponse updateCard(Long id, CardRequest cardRequest) {
+    @PutMapping("{id}")
+    public ResponseEntity<CardResponse> updateCard(@PathVariable Long id, @RequestBody CardRequest cardRequest) {
         return this.cardService.updateCard(id, cardRequest);
     }
 

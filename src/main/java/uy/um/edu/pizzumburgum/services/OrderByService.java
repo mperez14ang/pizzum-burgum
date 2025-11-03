@@ -40,7 +40,7 @@ public class OrderByService implements OrderByInt {
 
     @Override
     public OrderByResponse createOrder(OrderByRequest orderByDtoRequest) {
-        OrderBy orderBy = OrderByMapper.toOrderBy(orderByDtoRequest);
+        OrderBy orderBy = OrderByMapper.toOrderBy(orderByDtoRequest, addressRepository);
 
         // Convertir OrderHasCreationsDto a OrderHasCreations
         Set<OrderHasCreations> orderHasCreations = new HashSet<>();
@@ -68,7 +68,7 @@ public class OrderByService implements OrderByInt {
 
         Address address;
         // Si la direccion es null, obtener la primera del cliente
-        if (orderBy.getAddress() == null) {
+        if (orderBy.getDeliveryStreet() == null) {
             address = client.getAddresses().stream()
                     .findFirst()
                     .orElseThrow(() -> new ResponseStatusException(

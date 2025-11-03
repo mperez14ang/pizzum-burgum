@@ -16,7 +16,9 @@ public class CartResponse {
     private String state;
     private String clientEmail;
     private String clientName;
-    private AddressResponse deliveryAddress;
+    private String deliveryStreet;
+    private String deliveryCity;
+    private String deliveryPostalCode;
     private List<CartItemResponse> items;
     private Float total;
     private Integer totalItems;

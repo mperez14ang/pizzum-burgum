@@ -42,3 +42,17 @@ export function transformCreationData(creationData) {
         quantity: creationData.quantity
     };
 }
+
+export function getBackendErrorMessage(error){
+    let message = error.message;
+
+    // Intentar extraer el texto del JSON que devolvió el backend
+    try {
+        const parsed = JSON.parse(message);
+        if (parsed.error) message = parsed.error;
+    } catch {
+        // Si no es JSON, usar el mensaje tal cual
+    }
+
+    return message;
+}

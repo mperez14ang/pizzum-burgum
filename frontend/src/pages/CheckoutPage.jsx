@@ -2,16 +2,11 @@ import React, {useEffect, useRef, useState} from 'react';
 import {ChevronLeft, CreditCard, MapPin, Minus, Plus, User} from 'lucide-react';
 import toast from 'react-hot-toast';
 import {cartService} from "../services/api.js";
-import {Header} from "../components/common/header.jsx";
 import {useAuth} from "../contexts/AuthContext.jsx";
 import {capitalize} from "../utils/StringUtils.jsx";
 import {AddressComponent} from "../components/AddressComponent.jsx";
 import {CardComponent} from "../components/CardComponent.jsx";
-import {cartInteraction, cartItemCount, cartSubtotal, updateQuantity} from "../utils/CartInteraction.jsx";
-import CardModal from "./modals/CardModal.jsx";
-import {AddAddressModal} from "./modals/AddAddressModal.jsx";
-import {useCards} from "../contexts/UseCards.jsx";
-import {useAddresses} from "../contexts/UseAddresses.jsx";
+import {cartInteraction, cartSubtotal, updateQuantity} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
 
 export const CheckoutPage = ({ onNavigate, onBack }) => {
@@ -21,14 +16,9 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const debounceTimers = useRef({});
-    const [showCardModal, setShowCardModal] = useState(false);
-    const [showAddressModal, setShowAddressModal] = useState(false);
     const subtotal = cartSubtotal(cartItems);
     const calculateDelivery = () => {return 50; };
     const total = subtotal + calculateDelivery();
-
-    const { cards, getCards} = useCards();
-    const { addresses, isLoadingAddresses, getAddresses, handleCreateAddress } = useAddresses();
 
     // Datos del formulario
     const [formData, setFormData] = useState({
@@ -40,10 +30,7 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
         if (!isAuthenticated) return;
 
         cartInteraction({setLoading, setError, setCartItems}).then(r => {});
-        getAddresses();
-        getCards();
     }, [isAuthenticated]);
-
 
     // Manejar cambios en el formulario
     const handleInputChange = (e) => {
@@ -69,7 +56,6 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
         setSubmitting(true);
 
         try {
-
             // Aqui iria el procesamiento del pedido
             const currency = "uyu";
             const response = await cartService.checkout(currency)
@@ -98,14 +84,6 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
         }
     };
 
-    const handleCreateAddressSubmit = async (addressData) => {
-        const success = await handleCreateAddress(addressData, user);
-        if (success) {
-            setShowAddressModal(false);
-            getAddresses()
-        }
-    };
-
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50">
@@ -121,7 +99,6 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-
             <div className="container mx-auto px-4 py-6">
                 {/* Botón volver */}
                 <button
@@ -136,73 +113,67 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Formulario de checkout */}
-                    <div className="lg:col-span-2">
-                        <form className="space-y-6">
-                            {/* Datos personales */}
-                            <div className="bg-white rounded-lg shadow p-6">
-                                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                    <User size={24} className="text-orange-500" />
-                                    Datos Personales
-                                </h2>
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Datos personales */}
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <User size={24} className="text-orange-500" />
+                                Datos Personales
+                            </h2>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                                            Nombre completo
-                                        </label>
-                                        <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg">
-                                            <p className="text-gray-900 font-medium">{capitalize(user.firstName) + ' ' + capitalize(user.lastName) || 'No disponible'}</p>
-                                        </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                                        Nombre completo
+                                    </label>
+                                    <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg">
+                                        <p className="text-gray-900 font-medium">{capitalize(user.firstName) + ' ' + capitalize(user.lastName) || 'No disponible'}</p>
                                     </div>
+                                </div>
 
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-600 mb-2">
-                                            Email
-                                        </label>
-                                        <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg">
-                                            <p className="text-gray-900 font-medium">{user.email || 'No disponible'}</p>
-                                        </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                                        Email
+                                    </label>
+                                    <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg">
+                                        <p className="text-gray-900 font-medium">{user.email || 'No disponible'}</p>
                                     </div>
-
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Dirección de entrega */}
-                            <div className="bg-white rounded-lg shadow p-6">
-                                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                    <MapPin size={24} className="text-orange-500" />
-                                    Dirección de Entrega
-                                </h2>
+                        {/* Dirección de entrega */}
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <MapPin size={24} className="text-orange-500" />
+                                Dirección de Entrega
+                            </h2>
 
-                                <AddressComponent user={user}
-                                                  addresses={addresses}
-                                                  hasTitle={false}
-                                                  onOpenCreateAddress={() => setShowAddressModal(true)} />
-                            </div>
+                            <AddressComponent user={user} hasTitle={false} />
+                        </div>
 
-                            {/* Metodo de pago */}
-                            <div className="bg-white rounded-lg shadow p-6">
-                                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                    <CreditCard size={24} className="text-orange-500" />
-                                    Método de Pago
-                                </h2>
+                        {/* Metodo de pago */}
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <CreditCard size={24} className="text-orange-500" />
+                                Método de Pago
+                            </h2>
 
-                                <CardComponent cards={cards} hasTitle={false} onOpenCreateCard={() => setShowCardModal(true)}/>
-                            </div>
+                            <CardComponent user={user} hasTitle={false}  />
+                        </div>
 
-                            {/* Notas del pedido */}
-                            <div className="bg-white rounded-lg shadow p-6">
-                                <h2 className="text-xl font-bold mb-4">Notas adicionales</h2>
-                                <textarea
-                                    name="orderNotes"
-                                    value={formData.orderNotes}
-                                    onChange={handleInputChange}
-                                    rows="3"
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                    placeholder="Ej: Sin cebolla, extra salsa picante..."
-                                />
-                            </div>
-                        </form>
+                        {/* Notas del pedido */}
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <h2 className="text-xl font-bold mb-4">Notas adicionales</h2>
+                            <textarea
+                                name="orderNotes"
+                                value={formData.orderNotes}
+                                onChange={handleInputChange}
+                                rows="3"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                placeholder="Ej: Sin cebolla, extra salsa picante..."
+                            />
+                        </div>
                     </div>
 
                     {/* Resumen del pedido */}
@@ -303,8 +274,6 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
                     </div>
                 </div>
             </div>
-            <CardModal isOpen={showCardModal} onClose={() => setShowCardModal(false)} />
-            <AddAddressModal isOpen={showAddressModal} onClose={() => setShowAddressModal(false)} onSave={handleCreateAddressSubmit} />
         </div>
     );
 };

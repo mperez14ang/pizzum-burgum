@@ -1,54 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ChevronLeft, KeyRound } from 'lucide-react';
-import { Header } from "../components/common/header.jsx";
 import { EditPasswordModal } from "./modals/EditPasswordModal.jsx";
 import { capitalize } from "../utils/StringUtils.jsx";
 import { AddressComponent } from "../components/AddressComponent.jsx";
 import { CardComponent } from "../components/CardComponent.jsx";
-import CardModal from "./modals/CardModal.jsx";
-import { AddAddressModal } from "./modals/AddAddressModal.jsx";
-import {useCards} from "../contexts/UseCards.jsx";
-import {useAddresses} from "../contexts/UseAddresses.jsx";
 
 export const ProfilePage = ({
                                 user = {},
                                 onBack,
-                                onEditCard,
-                                onAddCard,
-                                onEditPassword,
                                 onNavigate
                             }) => {
     const firstName = user?.firstName ?? '';
     const lastName = user?.lastName ?? '';
 
-    const { cards, isLoadingCards, getCards, handleCreateCard } = useCards();
-    const { addresses, isLoadingAddresses, getAddresses, handleCreateAddress } = useAddresses();
-
     // Modals
     const [showPasswordModal, setShowPasswordModal] = useState(false);
-    const [showCardModal, setShowCardModal] = useState(false);
-    const [showAddressModal, setShowAddressModal] = useState(false);
-
-    useEffect(() => {
-        getAddresses();
-        getCards();
-    }, []);
-
-    const handleCreateAddressSubmit = async (addressData) => {
-        const success = await handleCreateAddress(addressData, user);
-        if (success) {
-            setShowAddressModal(false);
-            getAddresses()
-        }
-    };
-
-    const handleCreateCardSubmit = async (cardData) => {
-        const success = await handleCreateCard(cardData, user);
-        if (success) {
-            setShowCardModal(false);
-            getCards()
-        }
-    };
 
     const handleChangePassword = () => {
         setShowPasswordModal(true);
@@ -85,34 +51,16 @@ export const ProfilePage = ({
                     </h1>
                 </div>
 
-                <AddressComponent
-                    user={user}
-                    addresses={addresses}
-                    onOpenCreateAddress={() => setShowAddressModal(true)}
-                />
+                <AddressComponent user={user} />
 
-                <CardComponent
-                    cards={cards}
-                    onOpenCreateCard={() => setShowCardModal(true)}
-                />
+                <CardComponent user={user} />
 
                 <EditPasswordModal
                     isOpen={showPasswordModal}
                     onClose={() => setShowPasswordModal(false)}
+                    onSave={() => setShowPasswordModal(false)}
                 />
             </div>
-
-            <CardModal
-                isOpen={showCardModal}
-                onClose={() => setShowCardModal(false)}
-                onSave={handleCreateCardSubmit}
-            />
-
-            <AddAddressModal
-                isOpen={showAddressModal}
-                onClose={() => setShowAddressModal(false)}
-                onSave={handleCreateAddressSubmit}
-            />
         </div>
     );
 };

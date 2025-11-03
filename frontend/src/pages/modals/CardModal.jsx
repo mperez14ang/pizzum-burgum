@@ -3,10 +3,8 @@ import { AlertCircle, CreditCard, Check, Loader2 } from 'lucide-react';
 import { useCard } from '../../contexts/CardContext.jsx';
 import toast from "react-hot-toast";
 import {Modal} from "../../components/common/Modal.jsx";
-import {useCards} from "../../contexts/UseCards.jsx";
-import {cartService, clientService} from "../../services/api.js";
 
-export const CardModal = ({ isOpen, onClose }) => {
+export const CardModal = ({ isOpen, onClose, onSuccess }) => {
     const {
         stripe,
         user,
@@ -20,8 +18,6 @@ export const CardModal = ({ isOpen, onClose }) => {
         email,
         setEmail,
     } = useCard();
-
-    const { isLoadingCards, getCards, handleCreateCard } = useCards();
 
     useEffect(() => {
         if (!isOpen || !stripe) return;
@@ -63,12 +59,13 @@ export const CardModal = ({ isOpen, onClose }) => {
         };
     }, [stripe, isOpen]);
 
-    const handleCreateCardSubmit = async (cardData) => {
-        const response = await handleCreateCard(cardData, user);
-        console.log("card response :" + response)
-        if (response) {
-            onClose();
-            await getCards()
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const result = await createCard(e);
+
+        if (result) {
+            onSuccess()
         }
     };
 
@@ -102,7 +99,7 @@ export const CardModal = ({ isOpen, onClose }) => {
                     </div>
                 )}
 
-                <form onSubmit={createCard} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="cardholder-name" className="block text-sm font-medium text-gray-700 mb-2">
                             Nombre del titular *
@@ -139,8 +136,7 @@ export const CardModal = ({ isOpen, onClose }) => {
                     <button
                         type="submit"
                         disabled={loading || !stripe}
-                        onClick={handleCreateCardSubmit}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center disabled:bg-gray-400"
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
                         {loading ? (
                             <>

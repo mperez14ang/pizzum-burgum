@@ -128,7 +128,7 @@ function App() {
                             <ExtrasPage onBack={handleBack} onNavigate={handleNavigate}/>
                         )}
                         {currentPage === 'profile' && (
-                            <ProfilePage onBack={() => handleNavigate('home')} user={user} onAddCard={CardModal} onNavigate={handleNavigate}/>
+                            <ProfilePage onBack={() => handleNavigate('home')} user={user} onNavigate={handleNavigate}/>
                         )}
                         {currentPage === 'favorites' && (
                             <FavoritesPage onBack={() => handleNavigate('home')} onNavigate={handleNavigate}/>

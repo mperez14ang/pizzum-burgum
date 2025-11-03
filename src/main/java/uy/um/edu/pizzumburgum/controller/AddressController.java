@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uy.um.edu.pizzumburgum.dto.request.AddressRequest;
 import uy.um.edu.pizzumburgum.dto.response.AddressResponse;
 import uy.um.edu.pizzumburgum.services.AddressService;
 import uy.um.edu.pizzumburgum.services.AuthService;
@@ -33,7 +34,12 @@ public class AddressController {
     @GetMapping("/my")
     public ResponseEntity<List<AddressResponse>> getClientAddresses(HttpServletRequest request){
         String clientEmail = authService.getUserEmail(request);
-        return new ResponseEntity<>(addressService.getClientAddresses(clientEmail), HttpStatus.OK) ;
+        return new ResponseEntity<>(addressService.getClientNonDeletedAddresses(clientEmail), HttpStatus.OK) ;
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<AddressResponse> updateAddress(@PathVariable Long id, @RequestBody AddressRequest addressRequest){
+        return new ResponseEntity<>(addressService.updateAddress(id, addressRequest), HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")

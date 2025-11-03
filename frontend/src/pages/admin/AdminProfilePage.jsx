@@ -17,7 +17,7 @@ export const ProfilePage = ({
           <h2 className="text-2xl font-bold text-gray-900">Perfil</h2>
 
           <button
-            onClick={handleEditPassword}
+            onClick={() => setEditPasswordModal(true)}
             className="inline-flex items-center text-sm text-gray-500 hover:text-gray-800"
             title="Editar contraseña"
           >

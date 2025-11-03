@@ -29,8 +29,8 @@ export const OrderDetailModal = ({isOpen, onClose, selectedOrder, ORDER_STATE_CO
                     <div>
                         <h4 className="font-semibold text-gray-900 mb-2">Dirección de entrega</h4>
                         <p className="text-gray-600">
-                            {selectedOrder.address.street}, {selectedOrder.address.city}{" "}
-                            (CP: {selectedOrder.address.postalCode})
+                            {selectedOrder.deliveryStreet}, {selectedOrder.deliveryCity}{" "}
+                            (CP: {selectedOrder.deliveryPostalCode})
                         </p>
                     </div>
 

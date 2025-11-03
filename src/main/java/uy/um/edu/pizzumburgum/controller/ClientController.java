@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uy.um.edu.pizzumburgum.dto.request.AddressRequest;
+import uy.um.edu.pizzumburgum.dto.request.ChangePasswordRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientUpdateRequest;
 import uy.um.edu.pizzumburgum.dto.response.AddressResponse;

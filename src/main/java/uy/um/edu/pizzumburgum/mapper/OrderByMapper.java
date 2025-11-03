@@ -2,12 +2,9 @@ package uy.um.edu.pizzumburgum.mapper;
 
 import uy.um.edu.pizzumburgum.dto.request.OrderByRequest;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
-import uy.um.edu.pizzumburgum.dto.request.OrderHasCreationsRequest;
 import uy.um.edu.pizzumburgum.dto.response.OrderHasCreationsResponse;
-import uy.um.edu.pizzumburgum.entities.Client;
-import uy.um.edu.pizzumburgum.entities.Creation;
-import uy.um.edu.pizzumburgum.entities.OrderBy;
-import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
+import uy.um.edu.pizzumburgum.entities.*;
+import uy.um.edu.pizzumburgum.repository.AddressRepository;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,9 +13,15 @@ public class OrderByMapper {
 
 
     // To OrderByCreateRequest -> OrderBy
-    public static OrderBy toOrderBy(OrderByRequest orderByRequest) {
+    public static OrderBy toOrderBy(OrderByRequest orderByRequest, AddressRepository addressRepository) {
+        Address address = addressRepository.findById(orderByRequest.getAddress())
+                .orElseThrow(() -> new IllegalArgumentException("La dirección no existe"));
+
         return OrderBy.builder()
                 .state(orderByRequest.getState())
+                .deliveryCity(address.getCity())
+                .deliveryStreet(address.getStreet())
+                .deliveryPostalCode(address.getPostalCode())
                 .build();
     }
 
@@ -40,7 +43,9 @@ public class OrderByMapper {
                 .state(orderBy.getState())
                 .clientEmail(client.getEmail())
                 .clientName(client.getFirstName())
-                .address(AddressMapper.toAddressResponse(orderBy.getAddress()))
+                .deliveryStreet(orderBy.getDeliveryStreet())
+                .deliveryPostalCode(orderBy.getDeliveryPostalCode())
+                .deliveryCity(orderBy.getDeliveryCity())
                 .creations(orderHasCreationsResponses)
                 .available(creationsAvailable)
                 .build();

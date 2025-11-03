@@ -7,11 +7,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import uy.um.edu.pizzumburgum.dto.request.ChangePasswordRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.LoginRequest;
 import uy.um.edu.pizzumburgum.dto.response.AuthResponse;
 import uy.um.edu.pizzumburgum.dto.response.TokenResponse;
 import uy.um.edu.pizzumburgum.services.AuthService;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth/v1")
@@ -50,6 +53,11 @@ public class AuthController {
     @GetMapping("/verify")
     public TokenResponse verifyUser(HttpServletRequest request) {
         return authService.verifyUser(request);
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<Map<String, Object>> changeUserPassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        return authService.updateUserPassword(changePasswordRequest);
     }
 
 }

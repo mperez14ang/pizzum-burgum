@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useAuth} from './contexts/AuthContext';
 import {CreatorProvider} from './contexts/CreatorContext';
 import {FavoritesProvider} from './contexts/FavoritesContext';
@@ -9,16 +9,19 @@ import {CardModal} from "./pages/modals/CardModal.jsx";
 import {CardProvider} from "./contexts/CardContext.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import {SessionExpiredPage} from "./pages/SessionExpiredPage.jsx";
-import toast from "react-hot-toast";
 import {ExtrasPage} from './pages/ExtrasPage';
 import FavoritesPage from "./pages/FavoritesPage.jsx";
 import OrderHistoryPage from "./pages/OrderHistoryPage.jsx";
 import {CheckoutPage} from "./pages/CheckoutPage.jsx";
+import {Header} from "./components/common/header.jsx";
+import {CartProvider} from "./contexts/CartContext.jsx";
 
 function App() {
+    const headerRef = useRef()
     const [currentPage, setCurrentPage] = useState('home');
     const [prevPageType, setPrevPageType] = useState('home');
     const { user, isAuthenticated, isLoading, checkUser } = useAuth();
+    const [hideCart, setHideCart] = useState(false)
 
     useEffect(() => {
         window.history.replaceState({ page: 'home' }, '', window.location.href);
@@ -44,6 +47,10 @@ function App() {
         requestAnimationFrame(() => {
             window.scrollTo(0, 0);
         });
+    }, [currentPage]);
+
+    useEffect(() => {
+        setHideCart(currentPage === 'checkout');
     }, [currentPage]);
 
     const handleNavigate = async (type, validate=true) => {
@@ -106,35 +113,38 @@ function App() {
 
     return (
         <CardProvider>
-            <FavoritesProvider>
-                <CreatorProvider>
-                    {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
-                    {currentPage === 'creator-pizza' && (
-                        <CreatorPage productType={"pizza"} onBack={handleBack} onNavigate={handleNavigate}/>
-                    )}
-                    {currentPage === 'creator-burger' && (
-                        <CreatorPage productType={"burger"} onBack={handleBack} onNavigate={handleNavigate}/>
-                    )}
-                    {currentPage === 'extras' && (
-                        <ExtrasPage onBack={handleBack} onNavigate={handleNavigate}/>
-                    )}
-                    {currentPage === 'profile' && (
-                        <ProfilePage onBack={() => handleNavigate('home')} user={user} onAddCard={CardModal} onNavigate={handleNavigate}/>
-                    )}
-                    {currentPage === 'favorites' && (
-                        <FavoritesPage onBack={() => handleNavigate('home')} onNavigate={handleNavigate}/>
-                    )}
-                    {currentPage === 'orders' && (
-                        <OrderHistoryPage onBack={() => handleNavigate('home')} onNavigate={handleNavigate}/>
-                    )}
-                    {currentPage === 'checkout' && (
-                        <CheckoutPage onNavigate={handleNavigate} onBack={handleBack}/>
-                    )}
-                    {currentPage === 'session-expired' && (
-                        <SessionExpiredPage onLogin={onLogin} onBack={() => handleNavigate('home')} isAuthenticated={isAuthenticated} />
-                    )}
-                </CreatorProvider>
-            </FavoritesProvider>
+            <CartProvider>
+                <Header ref={headerRef} onNavigate={handleNavigate} hideCartButton={hideCart}/>
+                <FavoritesProvider>
+                    <CreatorProvider>
+                        {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
+                        {currentPage === 'creator-pizza' && (
+                            <CreatorPage productType={"pizza"} onBack={handleBack} onNavigate={handleNavigate}/>
+                        )}
+                        {currentPage === 'creator-burger' && (
+                            <CreatorPage productType={"burger"} onBack={handleBack} onNavigate={handleNavigate}/>
+                        )}
+                        {currentPage === 'extras' && (
+                            <ExtrasPage onBack={handleBack} onNavigate={handleNavigate}/>
+                        )}
+                        {currentPage === 'profile' && (
+                            <ProfilePage onBack={() => handleNavigate('home')} user={user} onNavigate={handleNavigate}/>
+                        )}
+                        {currentPage === 'favorites' && (
+                            <FavoritesPage onBack={() => handleNavigate('home')} onNavigate={handleNavigate}/>
+                        )}
+                        {currentPage === 'orders' && (
+                            <OrderHistoryPage onBack={() => handleNavigate('home')} onNavigate={handleNavigate}/>
+                        )}
+                        {currentPage === 'checkout' && (
+                            <CheckoutPage onNavigate={handleNavigate} onBack={handleBack}/>
+                        )}
+                        {currentPage === 'session-expired' && (
+                            <SessionExpiredPage onLogin={onLogin} onBack={() => handleNavigate('home')} isAuthenticated={isAuthenticated} />
+                        )}
+                    </CreatorProvider>
+                </FavoritesProvider>
+            </CartProvider>
         </CardProvider>
     );
 }

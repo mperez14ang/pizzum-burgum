@@ -1,7 +1,43 @@
-import React from "react";
-import { Edit3, CreditCard, Plus, Check } from "lucide-react";
+import React, {useEffect, useState} from "react";
+import {Check, CreditCard, Plus, Trash2} from "lucide-react";
+import {useCard} from "../contexts/CardContext.jsx";
+import CardModal from "../pages/modals/CardModal.jsx";
 
-export const CardComponent = ({ cards, onEditCard, onOpenCreateCard, hasTitle = true }) => {
+export const CardComponent = ({
+                                  user,
+                                  onSelectCard,
+                                  hasTitle = true
+                              }) => {
+    const {
+        cards,
+        loading,
+        getCards,
+        createCard,
+        deleteCard
+    } = useCard();
+
+    const [selectedCardId, setSelectedCardId] = useState('');
+    const [showCardModal, setShowCardModal] = useState(false);
+
+    // Cargar tarjetas al montar el componente
+    useEffect(() => {
+        getCards();
+    }, []);
+
+    useEffect(() => {
+        // Buscar la tarjeta activa primero
+        const activeCard = cards.find(c => c.active);
+
+        if (activeCard) {
+            setSelectedCardId(activeCard.id);
+            if (onSelectCard) onSelectCard(activeCard.id);
+        } else if (cards.length > 0 && !selectedCardId) {
+            // Si no hay tarjeta activa, usar la primera
+            setSelectedCardId(cards[0].id);
+            if (onSelectCard) onSelectCard(cards[0].id);
+        }
+    }, [cards]);
+
     const getBrandIcon = (brand) => {
         const brandName = brand?.toLowerCase();
 
@@ -28,9 +64,32 @@ export const CardComponent = ({ cards, onEditCard, onOpenCreateCard, hasTitle = 
         return year < currentYear || (year === currentYear && month < currentMonth);
     };
 
+    const handleCardSelection = (cardId) => {
+        setSelectedCardId(cardId);
+        if (onSelectCard) onSelectCard(cardId);
+    };
+
+    const handleOpenCreateCard = () => {
+        setShowCardModal(true);
+    };
+
+    const handleSaveCard = async () => {
+        setShowCardModal(false);
+        await getCards();
+
+    };
+
+    const handleCardDeletion = async (cardId) => {
+        const response = await deleteCard(cardId);
+        if (response){
+            await getCards();
+        }
+    }
+
+
     return (
-        <div>
-            <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <>
+            <div>
                 {hasTitle && (
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center">
@@ -57,16 +116,30 @@ export const CardComponent = ({ cards, onEditCard, onOpenCreateCard, hasTitle = 
                     <div className="space-y-3 mb-6">
                         {cards.map(card => {
                             const expired = isExpired(card.expirationMonth, card.expirationYear);
+                            const isSelected = selectedCardId === card.id;
 
                             return (
                                 <div
                                     key={card.id}
-                                    className="relative p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+                                    onClick={() => handleCardSelection(card.id)}
+                                    className={`relative p-4 rounded-lg border transition-all cursor-pointer ${
+                                        isSelected
+                                            ? 'border-indigo-500 bg-indigo-50/50 ring-2 ring-indigo-500'
+                                            : 'border-gray-200 hover:border-gray-300'
+                                    }`}
                                 >
-                                    {card.default && (
+                                    {card.active && (
                                         <div className="absolute top-3 right-3">
                                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
-                                                <Check size={12} className="mr-1" /> Predeterminada
+                                                <Check size={12} className="mr-1" /> Activa
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {isSelected && !card.active && (
+                                        <div className="absolute top-3 right-3">
+                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
+                                                <Check size={12} className="mr-1" /> Seleccionada
                                             </span>
                                         </div>
                                     )}
@@ -97,11 +170,16 @@ export const CardComponent = ({ cards, onEditCard, onOpenCreateCard, hasTitle = 
                                             </div>
 
                                             <button
-                                                onClick={() => onEditCard && onEditCard(card.id)}
-                                                className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border text-sm font-medium border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleCardDeletion(card.id);
+                                                }}
+                                                className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-red-300 text-red-600 hover:bg-red-50"
+                                                type="button"
                                             >
-                                                <Edit3 size={16} className="mr-1.5" /> Editar
+                                                <Trash2 size={16} className="mr-1.5" /> Eliminar
                                             </button>
+
                                         </div>
                                     </div>
                                 </div>
@@ -111,13 +189,19 @@ export const CardComponent = ({ cards, onEditCard, onOpenCreateCard, hasTitle = 
                 )}
 
                 <button
-                    onClick={onOpenCreateCard}
+                    onClick={handleOpenCreateCard}
                     type="button"
-                    className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors"
+                    className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors"
                 >
                     <Plus size={16} className="mr-2" /> Agregar tarjeta
                 </button>
-            </section>
-        </div>
+            </div>
+
+            <CardModal
+                isOpen={showCardModal}
+                onClose={() => setShowCardModal(false)}
+                onSuccess={handleSaveCard}
+            />
+        </>
     );
 };

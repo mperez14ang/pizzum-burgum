@@ -1,22 +1,31 @@
 package uy.um.edu.pizzumburgum.services;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import uy.um.edu.pizzumburgum.dto.request.ChangePasswordRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.LoginRequest;
 import uy.um.edu.pizzumburgum.dto.response.AuthResponse;
 import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
 import uy.um.edu.pizzumburgum.dto.response.TokenResponse;
+import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.entities.User;
+import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.repository.UserRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.AuthServiceInt;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -25,14 +34,17 @@ public class AuthService implements AuthServiceInt {
 
     private final ClientService clientService;
 
+    private final ClientRepository clientRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, ClientService clientService, JwtService jwtService) {
+    public AuthService(UserRepository userRepository, ClientService clientService, ClientRepository clientRepository, JwtService jwtService) {
         this.userRepository = userRepository;
         this.clientService = clientService;
+        this.clientRepository = clientRepository;
         this.jwtService = jwtService;
     }
 
@@ -120,6 +132,39 @@ public class AuthService implements AuthServiceInt {
             }
         }
         return null;
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<Map<String, Object>> updateUserPassword(ChangePasswordRequest changePasswordRequest) {
+        String email = changePasswordRequest.getEmail();
+        log.info(changePasswordRequest.toString());
+        User user = userRepository.findById(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no encontrado"));
+
+        // Validar contraseña antigua
+        String oldPassword = changePasswordRequest.getOldPassword();
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Contraseña incorrecta");
+        }
+
+        // Validar que las contraseñas coincidan
+        if (!changePasswordRequest.getPassword().equals(changePasswordRequest.getPasswordConfirmation())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Las contraseñas no coinciden");
+        }
+
+        // La nueva contraseña debe de ser diferente a la antigua
+        if (changePasswordRequest.getPassword().equals(oldPassword)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La nueva contraseña no debe coincidir con la antigua");
+        }
+
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
+
+        userRepository.save(user);
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "Contraseña actualizada");
+        return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     private boolean verifyToken(String jwtToken) {

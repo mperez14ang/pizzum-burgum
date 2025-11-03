@@ -37,5 +37,9 @@ public class Address {
     @Builder.Default
     private Boolean active = true;
 
+    @Column(name = "deleted")
+    @Builder.Default
+    private boolean deleted = false;
+
 }
 

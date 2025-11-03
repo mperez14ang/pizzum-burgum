@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import {createContext, useContext, useEffect, useState} from 'react';
+import {useAuth} from './AuthContext';
 import toast from "react-hot-toast";
+import {clientService} from "../services/api.js";
 
 const CardContext = createContext();
 
@@ -14,6 +15,8 @@ export const CardProvider = ({ children }) => {
     const [success, setSuccess] = useState(false);
     const [cardholderName, setCardholderName] = useState('');
     const [email, setEmail] = useState('');
+    const [cards, setCards] = useState([]);
+    const [isLoadingCards, setIsLoadingCards] = useState(false);
 
     // Cargar stripe
     useEffect(() => {
@@ -42,41 +45,20 @@ export const CardProvider = ({ children }) => {
         setSuccess(false);
 
         try {
-            const { paymentMethod, error: stripeError } = await stripe.createPaymentMethod({
-                type: 'card',
-                card: cardElement,
-                billing_details: {
-                    name: cardholderName,
-                    email: email || undefined,
-                },
-            });
-
-            if (stripeError) {
-                setError(stripeError.message);
-                return;
-            }
+            const paymentMethod = await createPaymentMethod();
 
             console.log('PaymentMethod ID:', paymentMethod.id);
 
-            const response = await fetch('http://localhost:8080/api/card/v1', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${tokenAuth}`
-                },
-                body: JSON.stringify({
-                    clientEmail: user.email,
-                    paymentMethodId: paymentMethod.id
-                }),
-            });
-
-            if (response.ok) {
+            const response = await clientService.addCards(user.email, paymentMethod.id);
+            console.log(response)
+            if (response) {
                 toast.success("La tarjeta se guardo con exito", { duration: 2000 })
                 setSuccess(true);
                 setCardholderName('');
                 setEmail('');
                 cardElement.clear();
                 setTimeout(() => setSuccess(false), 3000);
+                return response
             } else {
                 setError('Backend no disponible. PaymentMethod ID creado: ' + paymentMethod.id);
             }
@@ -88,10 +70,52 @@ export const CardProvider = ({ children }) => {
         }
     };
 
+    const getCards = async () => {
+        setIsLoadingCards(true);
+        try {
+            const newCards = await clientService.getCards();
+            setCards(newCards);
+            console.log(newCards);
+        } catch (error) {
+            console.error('Error al cargar las tarjetas:', error);
+            toast.error('Error al cargar las tarjetas');
+        } finally {
+            setIsLoadingCards(false);
+        }
+    };
+
+    const deleteCard = async (cardId) => {
+        const response = await clientService.deleteCard(cardId)
+
+        if (response){
+            toast.success("Tarjeta " + cardId + " borrada con exito")
+            return true
+        }
+        toast.error(response.error)
+    }
+
+    const createPaymentMethod = async () => {
+        const { paymentMethod, error: stripeError } = await stripe.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+            billing_details: {
+                name: cardholderName,
+                email: email || undefined,
+            },
+        });
+
+        if (stripeError) {
+            setError(stripeError.message);
+            return;
+        }
+        return paymentMethod;
+    }
+
     return (
         <CardContext.Provider
             value={{
                 isAuthenticated,
+                cards,
                 user,
                 logout,
                 isLoading,
@@ -106,6 +130,8 @@ export const CardProvider = ({ children }) => {
                 email,
                 setEmail,
                 createCard,
+                getCards,
+                deleteCard
             }}
         >
             {children}

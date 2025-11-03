@@ -5,6 +5,7 @@ import uy.um.edu.pizzumburgum.dto.request.AddressRequest;
 import uy.um.edu.pizzumburgum.dto.response.AddressResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AddressServiceInt {
     AddressResponse createAddress(AddressRequest addressRequest, String clientEmail);
@@ -14,7 +15,7 @@ public interface AddressServiceInt {
     @Transactional
     List<AddressResponse> getClientAddresses(String clientEmail);
 
-    AddressResponse updateAddress(Long id, AddressResponse addressResponse);
+    AddressResponse updateAddress(Long id, AddressRequest addressRequest);
 
-    void deleteAddress(String clientEmail, Long addressId);
+    Map<String, Object> deleteAddress(String clientEmail, Long addressId);
 }

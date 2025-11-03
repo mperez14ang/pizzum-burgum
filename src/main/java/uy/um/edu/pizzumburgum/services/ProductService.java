@@ -91,6 +91,7 @@ public class ProductService implements ProductServiceInt {
                 );
 
         // Setear eliminate a true
+        product.setAvailable(false);
         product.setDeleted(true);
 
         // Borrar solo si no esta referenciado
@@ -119,7 +120,7 @@ public class ProductService implements ProductServiceInt {
         if (price != null) product.setPrice(price);
         if (productType != null) product.setType(productType);
         if (productCategory != null) product.setCategory(productCategory);
-        if (available != null) product.setAvailable(available);
+        if (available != null && product.getDeleted() == false) product.setAvailable(available);
 
         product = productRepository.save(product);
         return ProductMapper.toProductDto(product);

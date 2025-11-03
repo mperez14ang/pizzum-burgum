@@ -1,25 +1,24 @@
 package uy.um.edu.pizzumburgum.services;
 
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
+import com.stripe.param.CustomerCreateParams;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import uy.um.edu.pizzumburgum.controller.CreationController;
+import uy.um.edu.pizzumburgum.dto.request.ChangePasswordRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.request.ClientUpdateRequest;
 import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
 import uy.um.edu.pizzumburgum.entities.Address;
 import uy.um.edu.pizzumburgum.entities.Client;
-import uy.um.edu.pizzumburgum.entities.Favorites;
 import uy.um.edu.pizzumburgum.mapper.AddressMapper;
 import uy.um.edu.pizzumburgum.mapper.ClientMapper;
-import uy.um.edu.pizzumburgum.mapper.FavoritesMapper;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.repository.CreationRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.ClientServiceInt;
@@ -54,14 +53,38 @@ public class ClientService implements ClientServiceInt {
         Client client = ClientMapper.toClient(clientCreateRequest);
 
         // Agregar addresses
+        boolean shouldSetActive = client.getAddresses() == null || client.getAddresses().isEmpty();
+        boolean[] firstProcessed = {false};
+
         Client finalClient = client;
         Set<Address> addresses = clientCreateRequest.getAddresses().stream()
-                .map(obj -> {
-                    Address address = AddressMapper.toAddress(obj);
+                .map(addressRequest -> {
+                    Address address = AddressMapper.toAddress(addressRequest);
+                    // Solo la primera dirección será activa
+                    address.setActive(shouldSetActive && !firstProcessed[0]);
+                    if (shouldSetActive && !firstProcessed[0]) {
+                        firstProcessed[0] = true;
+                    }
                     address.setClient(finalClient);
                     return address;
                 })
                 .collect(Collectors.toSet());
+
+        // Crear stripeCustomerId
+        CustomerCreateParams params = CustomerCreateParams.builder()
+                .setEmail(client.getEmail())
+                .setName(client.getFirstName() + " " + client.getLastName())
+                .build();
+
+        Customer customer;
+        try {
+            customer = Customer.create(params);
+        } catch (StripeException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "No se pudo crear stripeCustomerId"
+            );
+        }
+        client.setStripeCustomerId(customer.getId());
 
         // Encriptar contraseña
         client.setPassword(passwordEncoder.encode(clientCreateRequest.getPassword()));

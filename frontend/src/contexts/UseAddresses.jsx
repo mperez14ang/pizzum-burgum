@@ -37,11 +37,37 @@ export const useAddresses = () => {
 
     };
 
+    const handleUpdateAddress = async (addressId, addressData) => {
+
+        console.log(addressData, addressId)
+        const response = await clientService.updateAddress(addressId, addressData.street, addressData.city, addressData.postalCode)
+
+        if (response){
+            toast.success("Address " + addressData.addressId + " actualizada con exito")
+            return true
+        }
+        toast.error(response.error)
+    }
+
+    const handleDeleteAddress = async (addressId) => {
+        const response = await clientService.deleteAddress(addressId)
+
+        if (response){
+            toast.success('Address borrado con exito')
+            return true
+        }
+        toast.error(response.error)
+        return false
+
+    }
+
     return {
         addresses,
         isLoadingAddresses,
         handleCreateAddress,
-        getAddresses
+        getAddresses,
+        handleDeleteAddress,
+        handleUpdateAddress
 
     };
 };

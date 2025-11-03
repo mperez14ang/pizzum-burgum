@@ -165,7 +165,7 @@ export const OrderManagement = () => {
                                         </div>
                                         <div className="text-sm text-gray-600 space-y-1">
                                             <p>Cliente: {order.clientEmail}</p>
-                                            <p>Dirección: {order.address.street}, {order.address.city}</p>
+                                            <p>Dirección: {order.deliveryStreet}, {order.deliveryCity}</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2">

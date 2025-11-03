@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.*;
+import uy.um.edu.pizzumburgum.dto.response.CartCheckoutResponse;
 import uy.um.edu.pizzumburgum.dto.response.CartResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.entities.*;
@@ -15,7 +16,9 @@ import uy.um.edu.pizzumburgum.mapper.*;
 import uy.um.edu.pizzumburgum.repository.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,6 +46,12 @@ public class CartService {
 
     @Autowired
     private AddressRepository addressRepository;
+
+    @Autowired
+    private CardRepository cardRepository;
+
+    @Autowired
+    private PaymentService paymentService;
 
     //Agrega una creación personalizada al carrito: si no existe carrito activo, lo crea (SIN DIRECCIÓN todavía)
 
@@ -73,7 +82,9 @@ public class CartService {
 
                     OrderBy newCart = OrderBy.builder()
                             .client(client)
-                            .address(tempAddress) // Temporal, se cambiará en checkout
+                            .deliveryPostalCode(tempAddress.getPostalCode())
+                            .deliveryStreet(tempAddress.getStreet())
+                            .deliveryCity(tempAddress.getCity())
                             .state(OrderState.UNPAID)
                             .creations(new HashSet<>())
                             .build();
@@ -283,31 +294,29 @@ public class CartService {
 
     //Finaliza la compra: asigna dirección, metodo de pago y cambia estado (UNPAID → IN_QUEUE)
     @Transactional
-    public OrderByResponse checkout(String clientEmail, CheckoutRequest request) {
-        log.info("Finalizando compra del carrito del usuario {}", clientEmail);
+    public CartCheckoutResponse checkout(String clientEmail, CheckoutRequest request) {
+        log.info("Pagando compra del carrito del usuario {}", clientEmail);
 
         OrderBy cart = this.getActiveCart(clientEmail);
 
         // Validar que tenga items
-        if (cart.getCreations().isEmpty()) {
+        if (cart.getCreations() == null || cart.getCreations().isEmpty()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "No se puede finalizar un carrito vacío"
+                    "No se puede pagar un carrito vacío"
             );
         }
+        Address deliveryAddress = null;
+        try{
+            deliveryAddress = addressRepository.findByClientEmailAndActiveTrueAndDeletedFalse(clientEmail);
+        } catch (Exception e){
+            log.error(e.getMessage());
+        }
 
-        // Validar y asignar dirección de entrega
-        Address deliveryAddress = addressRepository.findById(request.getAddressId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Dirección con ID " + request.getAddressId() + " no encontrada"
-                ));
-
-        // Verificar que la dirección pertenece al cliente
-        if (!deliveryAddress.getClient().getEmail().equals(cart.getClient().getEmail())) {
+        if (deliveryAddress == null){
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "La dirección seleccionada no pertenece al cliente"
+                    "El cliente no tiene ninguna direccion activa"
             );
         }
 
@@ -316,7 +325,47 @@ public class CartService {
 
         // El metodo de pago se puede mostrar en frontend pero no lo guardamos en BD
         // Si quisieras guardarlo, tendrías que agregar un campo en OrderBy
-        log.info("Método de pago seleccionado: {}", request.getPaymentMethod());
+        log.info("Divisa para el pago seleccionada: {}", request.getCurrency());
+
+        Card card = null;
+        try{
+            card = cardRepository.findByClientEmailAndActiveTrueAndDeletedFalse(clientEmail);
+        } catch (Exception e){
+            log.error(e.getMessage());
+        }
+
+        if (card == null){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El cliente no tiene ninguna tarjeta activa"
+            );
+        }
+
+        // Obtener monto total
+        BigDecimal totalPrice = cart.getCreations().stream()
+                .flatMap(c -> c.getCreation().getProducts().stream())
+                .map(product -> product.getProduct().getPrice())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+
+
+        // Realizar el pago con stripe
+        Map<String , Object> paymentResult = paymentService.createPaymentIntent(
+                clientEmail,
+                card.getId(),
+                totalPrice,
+                request.getCurrency(),
+                clientEmail
+        );
+
+        // erificar que el pago fue exitoso
+        String paymentStatus = (String) paymentResult.get("status");
+        if (!"succeeded".equals(paymentStatus)) {
+            throw new ResponseStatusException(
+                    HttpStatus.PAYMENT_REQUIRED,
+                    "El pago no pudo ser procesado. Estado: " + paymentStatus
+            );
+        }
 
         // Cambiar estado a IN_QUEUE
         cart.setState(OrderState.IN_QUEUE);
@@ -324,7 +373,15 @@ public class CartService {
 
         log.info("Compra finalizada exitosamente. Orden en cola de preparación");
 
-        return OrderByMapper.toOrderByDto(cart);
+        OrderByResponse orderResponse = OrderByMapper.toOrderByDto(cart);
+        return CartCheckoutResponse.builder()
+                .orderBy(orderResponse)
+                .total(totalPrice)
+                .date(LocalDateTime.now())
+                .currency(request.getCurrency())
+                .paymentStatus(paymentStatus)
+                .address(AddressMapper.toAddressResponse(deliveryAddress))
+                .build();
     }
 
     private OrderBy getActiveCart(String clientEmail){

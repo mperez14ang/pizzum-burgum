@@ -12,7 +12,7 @@ public class AddressMapper {
                 .city(addressRequest.getCity())
                 .street(addressRequest.getStreet())
                 .postalCode(addressRequest.getPostalCode())
-                .active(true)
+                .deleted(false)
                 .build();
     }
 
@@ -24,6 +24,8 @@ public class AddressMapper {
                 .city(address.getCity())
                 .street(address.getStreet())
                 .postalCode(address.getPostalCode())
+                .deleted(address.isDeleted())
+                .active(address.getActive())
                 .build();
     }
 }

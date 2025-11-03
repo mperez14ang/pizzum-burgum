@@ -12,13 +12,14 @@ import {LoginAndRegisterModal} from "./modals/LoginAndRegisterModal.jsx";
 import {PRODUCT_CONFIG} from "../utils/ProductsConfig.jsx";
 import {ProductSection} from "../components/ProductSection.jsx";
 import {SummaryPanel} from "../components/summary/SummaryPanel.jsx";
-import {createCreationData} from "../utils/CartInteraction.jsx";
+import {createCreationData, handleAddToCart} from "../utils/CartInteraction.jsx";
+import {useCart} from "../contexts/CartContext.jsx";
 
 export const CreatorPage = ({ productType, onBack, onNavigate }) => {
-    const headerRef = useRef();
     const { creation, updateCreation, resetCreation } = useCreatorStore();
     const { addToFavorites } = useFavorites();
     const { isAuthenticated, user } = useAuth();
+    const { itemCount, setCartItemCount } = useCart();
 
     // Estado unificado para todas las selecciones
     const [selections, setSelections] = useState({});
@@ -138,29 +139,6 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
         }
     };
 
-    // Agregar al carrito
-    const handleAddToCart = async () => {
-        if (!isAuthenticated || !user) {
-            toast.error("Debes iniciar sesión para agregar al carrito");
-            return;
-        }
-
-        if (!validateSelections()) return null;
-
-        const creationData = createCreationData({productConfig, favoriteName, selections});
-        if (!creationData) return;
-
-        setShowCartModal(true);
-        const result = await cartService.addToCart(creationData, 1);
-
-        if (!result) {
-            toast.error("No se pudo agregar al carrito");
-            return;
-        }
-
-        toast.success("Agregado al carrito");
-    };
-
     const handleContinueShopping = () => {
         setShowCartModal(false);
         resetCreation();
@@ -175,7 +153,6 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50">
-                <Header ref={headerRef} onNavigate={onNavigate}/>
                 <div className="flex justify-center items-center h-[calc(100vh-64px)]">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
@@ -189,7 +166,6 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
     if (error) {
         return (
             <div className="min-h-screen bg-gray-50">
-                <Header ref={headerRef} onNavigate={onNavigate} />
                 <div className="flex justify-center items-center h-[calc(100vh-64px)]">
                     <div className="text-center">
                         <p className="text-red-600 mb-4">{error}</p>
@@ -207,7 +183,6 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header ref={headerRef} onNavigate={onNavigate} />
 
             <div className="container mx-auto px-4 py-6">
                 <button
@@ -249,7 +224,17 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
                         favoriteName={favoriteName}
                         onFavoriteNameChange={setFavoriteName}
                         onSaveFavorite={handleSaveFavorite}
-                        onAddToCart={handleAddToCart}
+                        onAddToCart={() =>
+                            handleAddToCart({
+                                isAuthenticated,
+                                validateSelections,
+                                productConfig,
+                                favoriteName,
+                                selections,
+                                setCartItemCount,
+                                itemCount
+                            })
+                    }
                         isSavingFavorite={isSavingFavorite}
                         isAuthenticated={isAuthenticated}
                     />

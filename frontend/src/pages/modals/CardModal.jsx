@@ -4,7 +4,7 @@ import { useCard } from '../../contexts/CardContext.jsx';
 import toast from "react-hot-toast";
 import {Modal} from "../../components/common/Modal.jsx";
 
-export const CardModal = ({ isOpen, onClose, onSave }) => {
+export const CardModal = ({ isOpen, onClose, onSuccess }) => {
     const {
         stripe,
         user,
@@ -59,6 +59,16 @@ export const CardModal = ({ isOpen, onClose, onSave }) => {
         };
     }, [stripe, isOpen]);
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const result = await createCard(e);
+
+        if (result) {
+            onSuccess()
+        }
+    };
+
     return (
         <>
             <Modal
@@ -89,7 +99,7 @@ export const CardModal = ({ isOpen, onClose, onSave }) => {
                     </div>
                 )}
 
-                <form onSubmit={createCard} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="cardholder-name" className="block text-sm font-medium text-gray-700 mb-2">
                             Nombre del titular *
@@ -126,7 +136,7 @@ export const CardModal = ({ isOpen, onClose, onSave }) => {
                     <button
                         type="submit"
                         disabled={loading || !stripe}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center disabled:bg-gray-400"
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
                         {loading ? (
                             <>

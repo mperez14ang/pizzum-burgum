@@ -51,12 +51,16 @@ public class Card {
     private String country; // El codigo ISO
 
     @Column(name = "is_default")
-    private boolean isDefault = false;
+    private boolean active = false;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "has_cards", nullable = false)
     @ToString.Exclude
     private Client client;
+
+    @Column(name = "deleted")
+    @Builder.Default
+    private boolean deleted = false;
 
     public boolean isExpired() {
         LocalDate now = LocalDate.now();

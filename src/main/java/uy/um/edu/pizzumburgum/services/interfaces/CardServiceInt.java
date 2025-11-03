@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 public interface CardServiceInt {
-    CardResponse createCard(CardRequest cardRequest);
+    ResponseEntity<CardResponse> createCard(CardRequest cardRequest);
 
-    CardResponse getCardById(Long id);
+    ResponseEntity<CardResponse> getCardById(Long id);
 
     List<CardResponse> getCardsFromClient(String clientEmail);
 
-    CardResponse updateCard(Long id, CardRequest cardRequest);
+    ResponseEntity<CardResponse> updateCard(Long id, CardRequest cardRequest);
 
-    ResponseEntity<Map<String, Object>> deleteCard(Long id);
+    ResponseEntity<Map<String, Object>> deleteCard(Long id, String clientEmail);
 }

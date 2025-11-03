@@ -6,6 +6,8 @@ import { ExtrasCard } from '../components/ExtrasCard';
 import { useAuth } from '../contexts/AuthContext';
 import { ingredientsService } from '../services/api';
 import toast from 'react-hot-toast';
+import {handleAddToCart} from "../utils/CartInteraction.jsx";
+import {useCart} from "../contexts/CartContext.jsx";
 
 // Imágenes genéricas por categoría
 const CATEGORY_IMAGES = {
@@ -25,8 +27,8 @@ const CATEGORY_NAMES = {
 const MAX_QUANTITY_PER_EXTRA = 10; // Variable configurable
 
 export const ExtrasPage = ({ onNavigate, onBack }) => {
-    const headerRef = useRef();
     const { isAuthenticated, user } = useAuth();
+    const { itemCount, setCartItem } = useCart()
 
     const [extras, setExtras] = useState({
         BEBIDA: [],
@@ -114,30 +116,9 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
         return items;
     };
 
-    // Agregar al carrito
-    const handleAddToCart = () => {
-        if (!isAuthenticated || !user) {
-            toast.error("Debes iniciar sesión para agregar al carrito");
-            return;
-        }
-
-        if (Object.keys(selectedExtras).length === 0) {
-            toast.error("Selecciona al menos un extra");
-            return;
-        }
-
-        // TODO: Implementar lógica para agregar extras al carrito
-        // const selectedItems = getSelectedItems();
-        // await cartService.addExtrasToCart(selectedItems);
-
-        toast.success("Extras agregados al carrito");
-        onNavigate('cart'); // Navegar al carrito
-    };
-
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50">
-                <Header ref={headerRef} onNavigate={onNavigate} />
                 <div className="flex justify-center items-center h-[calc(100vh-64px)]">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
@@ -151,7 +132,6 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
     if (error) {
         return (
             <div className="min-h-screen bg-gray-50">
-                <Header ref={headerRef} onNavigate={onNavigate} />
                 <div className="flex justify-center items-center h-[calc(100vh-64px)]">
                     <div className="text-center">
                         <p className="text-red-600 mb-4">{error}</p>
@@ -173,7 +153,6 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header ref={headerRef} onNavigate={onNavigate} />
 
             <div className="container mx-auto px-4 py-6">
                 <button
@@ -267,7 +246,17 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
 
                                         {/* Botón agregar al carrito */}
                                         <button
-                                            onClick={handleAddToCart}
+                                            onClick={
+                                            // TODO
+                                            () => handleAddToCart(
+                                                {
+                                                    isAuthenticated,
+                                                    productConfig,
+                                                    favoriteName,
+                                                    selections,
+                                                    setCartItemCount,
+                                                    itemCount,
+                                                    setShowCartModal})}
                                             className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
                                         >
                                             <ShoppingCart size={20} />

@@ -1,7 +1,6 @@
 package uy.um.edu.pizzumburgum.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uy.um.edu.pizzumburgum.dto.request.CardRequest;
@@ -25,7 +24,7 @@ public class CardController {
     }
 
     @PostMapping
-    public CardResponse createCard(@RequestBody CardRequest cardRequest) {
+    public ResponseEntity<CardResponse> createCard(@RequestBody CardRequest cardRequest) {
         return this.cardService.createCard(cardRequest);
     }
 
@@ -36,17 +35,18 @@ public class CardController {
     }
 
     @GetMapping("{id}")
-    public CardResponse getCard(@PathVariable Long id) {
+    public ResponseEntity<CardResponse> getCard(@PathVariable Long id) {
         return this.cardService.getCardById(id);
     }
 
-    @PutMapping
-    public CardResponse updateCard(Long id, CardRequest cardRequest) {
+    @PutMapping("{id}")
+    public ResponseEntity<CardResponse> updateCard(@PathVariable Long id, @RequestBody CardRequest cardRequest) {
         return this.cardService.updateCard(id, cardRequest);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Map<String, Object>> deleteCard(@PathVariable Long id){
-        return cardService.deleteCard(id);
+    public ResponseEntity<Map<String, Object>> deleteCard(HttpServletRequest httpRequest, @PathVariable Long id){
+        String clientEmail = authService.getUserEmail(httpRequest);
+        return cardService.deleteCard(id, clientEmail);
     }
 }

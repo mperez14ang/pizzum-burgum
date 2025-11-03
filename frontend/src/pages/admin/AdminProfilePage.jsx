@@ -10,10 +10,6 @@ export const ProfilePage = ({
   const lastName = user?.lastName ?? '';
   const [editPasswordModal, setEditPasswordModal] = useState(false);
 
-  const handleEditPassword = () =>{
-      setEditPasswordModal(true)
-    }
-
   return (
     <div>
       <div className="mb-6">
@@ -21,7 +17,7 @@ export const ProfilePage = ({
           <h2 className="text-2xl font-bold text-gray-900">Perfil</h2>
 
           <button
-            onClick={handleEditPassword}
+            onClick={() => setEditPasswordModal(true)}
             className="inline-flex items-center text-sm text-gray-500 hover:text-gray-800"
             title="Editar contraseña"
           >
@@ -40,7 +36,10 @@ export const ProfilePage = ({
         </p>
       </div>
 
-      <EditPasswordModal isOpen={editPasswordModal} onClose={() => setEditPasswordModal(false)} />
+      <EditPasswordModal isOpen={editPasswordModal}
+                         onClose={() => setEditPasswordModal(false)}
+                         onSave={() => setEditPasswordModal(false)}
+      />
     </div>
   );
 };

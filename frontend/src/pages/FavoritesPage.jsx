@@ -43,7 +43,8 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                         creationCount: fav.creations.length,
                         available: fav.available,
                         selections: firstCreation.selections,
-                        creationId: firstCreation.id
+                        creationId: firstCreation.id,
+                        creations: fav.creations // ✅ Agregar las creations completas para el modal
                     };
                 })
                 .filter(Boolean);

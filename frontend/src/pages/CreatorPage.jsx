@@ -1,6 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {ChevronLeft} from 'lucide-react';
 import {Header} from '../components/common/Header';
+import {AddToCartModalLogin} from './modals/AddToCartModalLogin.jsx';
 import {AddToCartModal} from './modals/AddToCartModal.jsx';
 import {useCreatorStore} from '../contexts/CreatorContext';
 import {useFavorites} from '../contexts/FavoritesContext';
@@ -25,6 +26,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
     const [selections, setSelections] = useState({});
     const [favoriteName, setFavoriteName] = useState('');
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+    const [showCartLoginPrompt, setShowCartLoginPrompt] = useState(false);
     const [isSavingFavorite, setIsSavingFavorite] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [showCartModal, setShowCartModal] = useState(false);
@@ -224,7 +226,14 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
                         favoriteName={favoriteName}
                         onFavoriteNameChange={setFavoriteName}
                         onSaveFavorite={handleSaveFavorite}
-                        onAddToCart={() =>
+                        onAddToCart={() => {
+                            // Verificar autenticación primero
+                            if (!isAuthenticated) {
+                                setShowCartLoginPrompt(true);
+                                return;
+                            }
+
+                            // Si está autenticado, ejecutar la lógica normal
                             handleAddToCart({
                                 isAuthenticated,
                                 validateSelections,
@@ -233,13 +242,14 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
                                 selections,
                                 setCartItemCount,
                                 itemCount
-                            })
-                    }
+                            });
+                        }}
                         isSavingFavorite={isSavingFavorite}
                         isAuthenticated={isAuthenticated}
                     />
                 </div>
             </div>
+
 
             <FavoritesLoginModal
                 isOpen={showLoginPrompt}
@@ -248,6 +258,16 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
                     setIsAuthModalOpen(true);
                 }}
                 onClose={() => setShowLoginPrompt(false)}
+            />
+
+
+            <AddToCartModalLogin
+                isOpen={showCartLoginPrompt}
+                onOpenLogin={() => {
+                    setShowCartLoginPrompt(false);
+                    setIsAuthModalOpen(true);
+                }}
+                onClose={() => setShowCartLoginPrompt(false)}
             />
 
             <LoginAndRegisterModal

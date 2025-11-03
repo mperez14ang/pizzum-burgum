@@ -36,7 +36,7 @@ export const AddToCartModal = ({ isOpen, onClose, onContinueShopping, onGoToExtr
                         <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </button>
 
-                    {/* Botón para ir a productos extra - Sin funcionalidad (pendiente) */}
+                    {/* Botón para ir a productos extra*/}
                     <button
                         onClick={onGoToExtras}
                         className="w-full bg-orange-500 text-white py-4 px-6 rounded-lg hover:bg-orange-600 transition flex items-center justify-between group"

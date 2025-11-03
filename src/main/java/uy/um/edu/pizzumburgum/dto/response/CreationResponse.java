@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uy.um.edu.pizzumburgum.dto.request.CreationHasProductsRequest;
 import uy.um.edu.pizzumburgum.entities.CreationType;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Data
@@ -20,7 +20,7 @@ public class CreationResponse {
 
     private CreationType type;
 
-    private float price;
+    private BigDecimal price;
 
     private Set<CreationHasProductsResponse> products;
 

@@ -6,6 +6,7 @@ import uy.um.edu.pizzumburgum.dto.response.OrderHasCreationsResponse;
 import uy.um.edu.pizzumburgum.entities.*;
 import uy.um.edu.pizzumburgum.repository.AddressRepository;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ public class OrderByMapper {
                 .deliveryCity(address.getCity())
                 .deliveryStreet(address.getStreet())
                 .deliveryPostalCode(address.getPostalCode())
+                .extraAmount(orderByRequest.getExtraAmount())
                 .build();
     }
 
@@ -38,6 +40,20 @@ public class OrderByMapper {
                 .map(OrderHasCreations::getCreation)
                 .allMatch(Creation::getAvailable);
 
+        // Total Price
+        if (orderBy.getExtraAmount() == null) {
+            orderBy.setExtraAmount(BigDecimal.ZERO);
+        }
+
+        // Obtener monto total (suma de prodcutos*quantity)*creation_quantity + extra
+        BigDecimal totalPrice = orderBy.getCreations().stream()
+                .flatMap(c -> c.getCreation().getProducts().stream()
+                        .map(product -> product.getProduct().getPrice()
+                                .multiply(BigDecimal.valueOf(product.getQuantity()))
+                                .multiply(BigDecimal.valueOf(c.getQuantity()))))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .add(orderBy.getExtraAmount());
+
         return OrderByResponse.builder()
                 .id(orderBy.getId())
                 .state(orderBy.getState())
@@ -48,6 +64,8 @@ public class OrderByMapper {
                 .deliveryCity(orderBy.getDeliveryCity())
                 .creations(orderHasCreationsResponses)
                 .available(creationsAvailable)
+                .extraAmount(orderBy.getExtraAmount())
+                .totalPrice(totalPrice)
                 .build();
     }
 }

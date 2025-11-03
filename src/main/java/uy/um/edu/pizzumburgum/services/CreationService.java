@@ -67,26 +67,13 @@ public class CreationService implements CreationServiceInt {
 
         creation.setProducts(creationsHasProducts);
 
-        // Calcular el precio real basándose en los productos
-        log.info("   Calculando precio...");
-        BigDecimal calculatedPrice = creationsHasProducts.stream()
-                .map(chp -> {
-                    BigDecimal productPrice = chp.getProduct().getPrice();
-                    int quantity = chp.getQuantity();
-                    BigDecimal subtotal = productPrice.multiply(BigDecimal.valueOf(quantity));
-                    log.info("      {} x {} = {}", chp.getProduct().getName(), quantity, subtotal);
-                    return subtotal;
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        creation.setPrice(calculatedPrice.floatValue());
-        log.info("💰 Precio total calculado: {} (basado en {} productos)", calculatedPrice, creationsHasProducts.size());
-
         creationRepository.save(creation);
 
-        log.info("✅ Creation guardada con {} productos y precio {}", creation.getProducts().size(), calculatedPrice);
+        CreationResponse creationResponse = CreationMapper.toCreationDto(creation);
 
-        return CreationMapper.toCreationDto(creation);
+        log.info("Creation guardada con {} productos y precio {}", creation.getProducts().size(), creationResponse.getPrice());
+
+        return creationResponse;
     }
 
     @Override

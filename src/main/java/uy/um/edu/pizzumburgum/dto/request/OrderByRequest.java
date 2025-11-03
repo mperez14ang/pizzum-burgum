@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uy.um.edu.pizzumburgum.entities.OrderState;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Data
@@ -20,4 +21,6 @@ public class OrderByRequest {
     private Set<OrderHasCreationsRequest> creations;
 
     private String clientEmail;
+
+    private BigDecimal extraAmount;
 }

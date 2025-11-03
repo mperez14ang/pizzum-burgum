@@ -26,10 +26,6 @@ public class Creation {
     @Column(name = "type", nullable = false)
     private CreationType type;
 
-    @Min(0)
-    @Column(name="price")
-    private float price;
-
     @Column(name = "available")
     private Boolean available;
 

@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -16,4 +18,6 @@ public class CheckoutRequest {
     @Pattern(regexp = "^(usd|eur|gbp|jpy|cad|aud|chf|cny|uyu)$",
             message = "Moneda no soportada. Use: usd, eur, gbp, jpy, cad, aud, chf, cny, uyu")
     private String currency;
+
+    private BigDecimal extraAmount;
 }

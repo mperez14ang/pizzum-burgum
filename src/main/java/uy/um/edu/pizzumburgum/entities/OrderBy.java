@@ -1,8 +1,11 @@
 package uy.um.edu.pizzumburgum.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,6 +35,9 @@ public class OrderBy {
 
     @Column(nullable = false)
     private String deliveryPostalCode;
+
+    @Min(0)
+    private BigDecimal extraAmount;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default

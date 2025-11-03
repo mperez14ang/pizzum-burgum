@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Data
@@ -18,8 +19,8 @@ public class CartItemResponse {
     private String creationName; // "Pizza Personalizada"
     private String creationType; // PIZZA / BURGER
     private Set<ProductDto> ingredients;
-    private Float unitPrice;
+    private BigDecimal unitPrice;
     private Integer quantity;
-    private Float subtotal;
+    private BigDecimal subtotal;
     private String image;
 }

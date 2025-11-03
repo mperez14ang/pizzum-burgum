@@ -8,6 +8,7 @@ import uy.um.edu.pizzumburgum.entities.CreationType;
 import uy.um.edu.pizzumburgum.entities.OrderBy;
 import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,9 +22,10 @@ public class CartMapper {
                 .collect(Collectors.toList());
 
         // Calcular total
-        float total = items.stream()
+        BigDecimal total = items.stream()
                 .map(CartItemResponse::getSubtotal)
-                .reduce(0f, Float::sum);
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
 
         // Contar items totales
         int totalItems = items.stream()
@@ -58,8 +60,8 @@ public class CartMapper {
             image = "assets/burger.jpg";
         }
 
-        float unitPrice = orderHasCreations.getCreation().getPrice();
-        float subtotal = unitPrice * orderHasCreations.getQuantity();
+        BigDecimal unitPrice = CreationMapper.toCreationDto(orderHasCreations.getCreation()).getPrice();
+        BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(orderHasCreations.getQuantity()));
 
         return CartItemResponse.builder()
                 .itemId(orderHasCreations.getId())

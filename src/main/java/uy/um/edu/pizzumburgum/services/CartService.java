@@ -110,10 +110,18 @@ public class CartService {
                     .build());
         }
 
-        // 4. Calcular precio (suma de precios de productos)
-        BigDecimal totalPrice = products.stream()
-                .map(Product::getPrice)
+        // 4. Calcular precio (suma de precios de productos × cantidad)
+        log.info("💰 Calculando precio para nueva creación directa al carrito");
+        BigDecimal totalPrice = creationHasProducts.stream()
+                .map(chp -> {
+                    BigDecimal productPrice = chp.getProduct().getPrice();
+                    int quantity = chp.getQuantity();
+                    BigDecimal subtotal = productPrice.multiply(BigDecimal.valueOf(quantity));
+                    log.info("   {} x {} = {}", chp.getProduct().getName(), quantity, subtotal);
+                    return subtotal;
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        log.info("💰 Precio total calculado: {}", totalPrice);
 
         // 5. Crear nombre default según tipo
         String creationName = request.getType() == CreationType.PIZZA
@@ -131,7 +139,7 @@ public class CartService {
                 .build();
 
         creation = creationRepository.save(creation);
-        log.info("Creation creada con ID: {} y precio: {}", creation.getId(), totalPrice);
+        log.info("✅ Creation creada con ID: {} y precio: {}", creation.getId(), totalPrice);
 
         // 7. Vincular productos a la creation (CreationHasProducts)
         for (CreationHasProducts creationHasProducts1 : creationHasProducts) {
@@ -180,13 +188,20 @@ public class CartService {
                 .quantity(request.getQuantity())
                 .build();
 
-        // 4. Calcular precio (suma de precios de productos)
+        // 4. Calcular precio (suma de precios de productos × cantidad)
+        log.info("💰 Recalculando precio para creation ID: {}", creation.getId());
+
         BigDecimal totalPrice = creation.getProducts().stream()
-                .map(product -> {
-                    return product.getProduct().getPrice();
+                .map(chp -> {
+                    BigDecimal productPrice = chp.getProduct().getPrice();
+                    int quantity = chp.getQuantity();
+                    BigDecimal subtotal = productPrice.multiply(BigDecimal.valueOf(quantity));
+                    log.info("   {} x {} = {}", chp.getProduct().getName(), quantity, subtotal);
+                    return subtotal;
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        log.info("💰 Precio total recalculado: {} (era: {})", totalPrice, creation.getPrice());
         creation.setPrice(totalPrice.floatValue());
 
         cartItem = orderHasCreationsRepository.save(cartItem);

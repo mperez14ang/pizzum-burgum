@@ -88,11 +88,35 @@ export const cartItemCount = (cartItems) => {
 }
 
 // Crear datos de creación para API
-export const createCreationData = ({productConfig, favoriteName, selections}) => {
+export const createCreationData = ({productConfig, favoriteName, selections, price = null, quantity = 1}) => {
     const data = {
         name: favoriteName.trim(),
-        type: productConfig.type
+        type: productConfig.type,
+        quantity: quantity
     };
+
+    // Calcular precio si no se proporciona
+    if (price !== null) {
+        data.price = price;
+    } else {
+        let calculatedPrice = 0;
+        productConfig.sections.forEach(section => {
+            const value = selections[section.stateKey];
+            if (!value) return;
+
+            if (section.type === 'multi-select' && Array.isArray(value)) {
+                value.forEach(item => {
+                    calculatedPrice += item.price || 0;
+                });
+            } else if (section.type === 'single-select-with-quantity') {
+                const qty = selections[section.quantityConfig.stateKey] || 1;
+                calculatedPrice += (value.price || 0) * qty;
+            } else {
+                calculatedPrice += value.price || 0;
+            }
+        });
+        data.price = calculatedPrice;
+    }
 
     // Mapear selecciones a formato de API
     productConfig.sections.forEach(section => {

@@ -18,6 +18,7 @@ import uy.um.edu.pizzumburgum.repository.OrderByRepository;
 import uy.um.edu.pizzumburgum.repository.ProductRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.CreationServiceInt;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +33,10 @@ public class CreationService implements CreationServiceInt {
     @Transactional
     @Override
     public CreationResponse createCreation(CreationRequest creationDto) {
+        Logger log = LoggerFactory.getLogger(CreationService.class);
+        log.info("📥 Creando creation: {}", creationDto.getName());
+        log.info("   Productos recibidos: {}", creationDto.getProducts() != null ? creationDto.getProducts().size() : 0);
+
         // Convertir a creation
         Creation creation = CreationMapper.toCreation(creationDto);
 
@@ -39,6 +44,7 @@ public class CreationService implements CreationServiceInt {
         Set<CreationHasProducts> creationsHasProducts = new HashSet<>();
         List<Product> products = productRepository.findAll();
         if (creationDto.getProducts() != null) {
+            log.info("   Mapeando productos...");
             creationsHasProducts = creationDto.getProducts().stream()
                     .map(c -> {
                         CreationHasProducts creationHasProducts1 = CreationHasProductMapper.toCreationHasProducts(c);
@@ -49,14 +55,36 @@ public class CreationService implements CreationServiceInt {
 
                         creationHasProducts1.setProduct(product);
                         creationHasProducts1.setCreation(creation);
+                        log.info("      - Producto ID {}: {} - Cantidad: {} - Precio unitario: {}",
+                                productId, product.getName(), creationHasProducts1.getQuantity(), product.getPrice());
                         return creationHasProducts1;
                     }).collect(Collectors.toSet());
+            log.info("   ⚠️  Set resultante tiene {} elementos (deberían ser {})",
+                    creationsHasProducts.size(),
+                    creationDto.getProducts().size());
         }
 
 
         creation.setProducts(creationsHasProducts);
 
+        // Calcular el precio real basándose en los productos
+        log.info("   Calculando precio...");
+        BigDecimal calculatedPrice = creationsHasProducts.stream()
+                .map(chp -> {
+                    BigDecimal productPrice = chp.getProduct().getPrice();
+                    int quantity = chp.getQuantity();
+                    BigDecimal subtotal = productPrice.multiply(BigDecimal.valueOf(quantity));
+                    log.info("      {} x {} = {}", chp.getProduct().getName(), quantity, subtotal);
+                    return subtotal;
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        creation.setPrice(calculatedPrice.floatValue());
+        log.info("💰 Precio total calculado: {} (basado en {} productos)", calculatedPrice, creationsHasProducts.size());
+
         creationRepository.save(creation);
+
+        log.info("✅ Creation guardada con {} productos y precio {}", creation.getProducts().size(), calculatedPrice);
 
         return CreationMapper.toCreationDto(creation);
     }

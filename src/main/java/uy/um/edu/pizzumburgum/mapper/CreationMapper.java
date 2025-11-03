@@ -8,6 +8,7 @@ import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
 import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
 import uy.um.edu.pizzumburgum.entities.Product;
 
+import java.math.BigDecimal;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -27,10 +28,19 @@ public class CreationMapper {
 
         creation.setAvailable(productsAvailable);
 
+        // Calcular precio (suma de precios de productos * quantity)
+        BigDecimal totalPrice = creation.getProducts().stream()
+                .map(chp -> {
+                    BigDecimal productPrice = chp.getProduct().getPrice();
+                    int quantity = chp.getQuantity();
+                    return productPrice.multiply(BigDecimal.valueOf(quantity));
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         return CreationResponse.builder()
                 .id(creation.getId())
                 .name(creation.getName())
-                .price(creation.getPrice())
+                .price(totalPrice)
                 .type(creation.getType())
                 .products(creationsHasProductsDtos)
                 .available(productsAvailable)
@@ -40,7 +50,6 @@ public class CreationMapper {
     public static Creation toCreation(CreationRequest creationDto) {
         Creation creation = Creation.builder()
                 .name(creationDto.getName())
-                .price(creationDto.getPrice())
                 .type(creationDto.getType())
                 .available(true)
                 .build();

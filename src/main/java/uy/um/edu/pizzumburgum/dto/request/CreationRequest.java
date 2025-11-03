@@ -19,7 +19,5 @@ public class CreationRequest {
 
     private CreationType type;
 
-    private float price;
-
     private Set<CreationHasProductsRequest> products;
 }

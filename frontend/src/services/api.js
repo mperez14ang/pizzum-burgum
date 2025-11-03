@@ -263,11 +263,12 @@ export const cartService = {
     },
 
     //Finaliza la compra (checkout) del carrito activo
-    checkout: async (currency) => {
+    checkout: async (currency, extraAmount) => {
         return fetchFromAPI(`/cart/v1/checkout`, {
             method: 'POST',
             body: JSON.stringify({
-                currency
+                currency,
+                extraAmount
             })
         });
     }

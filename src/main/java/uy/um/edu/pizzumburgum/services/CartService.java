@@ -110,19 +110,6 @@ public class CartService {
                     .build());
         }
 
-        // 4. Calcular precio (suma de precios de productos × cantidad)
-        log.info("💰 Calculando precio para nueva creación directa al carrito");
-        BigDecimal totalPrice = creationHasProducts.stream()
-                .map(chp -> {
-                    BigDecimal productPrice = chp.getProduct().getPrice();
-                    int quantity = chp.getQuantity();
-                    BigDecimal subtotal = productPrice.multiply(BigDecimal.valueOf(quantity));
-                    log.info("   {} x {} = {}", chp.getProduct().getName(), quantity, subtotal);
-                    return subtotal;
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        log.info("💰 Precio total calculado: {}", totalPrice);
-
         // 5. Crear nombre default según tipo
         String creationName = request.getType() == CreationType.PIZZA
                 ? "Pizza Personalizada"
@@ -132,14 +119,13 @@ public class CartService {
         Creation creation = Creation.builder()
                 .name(creationName)
                 .type(request.getType())
-                .price(totalPrice.floatValue())
                 .products(new HashSet<>())
                 .order(new HashSet<>())
                 .available(true)
                 .build();
 
         creation = creationRepository.save(creation);
-        log.info("✅ Creation creada con ID: {} y precio: {}", creation.getId(), totalPrice);
+        log.info("✅ Creation creada con ID: {} ", creation.getId());
 
         // 7. Vincular productos a la creation (CreationHasProducts)
         for (CreationHasProducts creationHasProducts1 : creationHasProducts) {
@@ -187,22 +173,6 @@ public class CartService {
                 .creation(creation)
                 .quantity(request.getQuantity())
                 .build();
-
-        // 4. Calcular precio (suma de precios de productos × cantidad)
-        log.info("💰 Recalculando precio para creation ID: {}", creation.getId());
-
-        BigDecimal totalPrice = creation.getProducts().stream()
-                .map(chp -> {
-                    BigDecimal productPrice = chp.getProduct().getPrice();
-                    int quantity = chp.getQuantity();
-                    BigDecimal subtotal = productPrice.multiply(BigDecimal.valueOf(quantity));
-                    log.info("   {} x {} = {}", chp.getProduct().getName(), quantity, subtotal);
-                    return subtotal;
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        log.info("💰 Precio total recalculado: {} (era: {})", totalPrice, creation.getPrice());
-        creation.setPrice(totalPrice.floatValue());
 
         cartItem = orderHasCreationsRepository.save(cartItem);
 
@@ -338,6 +308,9 @@ public class CartService {
         // Asignar dirección de entrega
         cart.setAddress(deliveryAddress);
 
+        // Asignar el extra
+        cart.setExtraAmount(request.getExtraAmount());
+
         // El metodo de pago se puede mostrar en frontend pero no lo guardamos en BD
         // Si quisieras guardarlo, tendrías que agregar un campo en OrderBy
         log.info("Divisa para el pago seleccionada: {}", request.getCurrency());
@@ -356,24 +329,20 @@ public class CartService {
             );
         }
 
-        // Obtener monto total
-        BigDecimal totalPrice = cart.getCreations().stream()
-                .flatMap(c -> c.getCreation().getProducts().stream())
-                .map(product -> product.getProduct().getPrice())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-
+        OrderByResponse orderResponse = OrderByMapper.toOrderByDto(cart);
 
         // Realizar el pago con stripe
         Map<String , Object> paymentResult = paymentService.createPaymentIntent(
                 clientEmail,
                 card.getId(),
-                totalPrice,
+                orderResponse.getTotalPrice(),
                 request.getCurrency(),
                 clientEmail
         );
 
-        // erificar que el pago fue exitoso
+        log.info("SE REALIZO UN PAGO DE " + orderResponse.getTotalPrice() + " " + request.getCurrency());
+
+        // Verificar que el pago fue exitoso
         String paymentStatus = (String) paymentResult.get("status");
         if (!"succeeded".equals(paymentStatus)) {
             throw new ResponseStatusException(
@@ -387,11 +356,9 @@ public class CartService {
         orderByRepository.save(cart);
 
         log.info("Compra finalizada exitosamente. Orden en cola de preparación");
-
-        OrderByResponse orderResponse = OrderByMapper.toOrderByDto(cart);
         return CartCheckoutResponse.builder()
                 .orderBy(orderResponse)
-                .total(totalPrice)
+                .total(orderResponse.getTotalPrice())
                 .date(LocalDateTime.now())
                 .currency(request.getCurrency())
                 .paymentStatus(paymentStatus)

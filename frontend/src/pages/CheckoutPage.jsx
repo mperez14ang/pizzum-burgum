@@ -58,7 +58,8 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
         try {
             // Aqui iria el procesamiento del pedido
             const currency = "uyu";
-            const response = await cartService.checkout(currency)
+            const extraAmount = calculateDelivery();
+            const response = await cartService.checkout(currency, extraAmount)
 
             if (response.paymentStatus !== "succeeded"){
                 try{

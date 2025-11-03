@@ -84,6 +84,7 @@ function App() {
 
         // Check if token is verified
         if (user && validate && type !== 'home'){
+            console.log("Validating")
             const result = await checkUser();
             if (!result) {
                 setPrevPageType(type)

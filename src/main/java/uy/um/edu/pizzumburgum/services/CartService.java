@@ -5,6 +5,7 @@ import org.hibernate.query.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.*;
@@ -277,13 +278,36 @@ public class CartService {
         log.info("Carrito vaciado exitosamente");
     }
 
+    public CartCheckoutResponse checkout(String clientEmail, CheckoutRequest request) throws InterruptedException {
+        OrderBy cart = getActiveCart(clientEmail);
+        cart.setState(OrderState.PROCESSING_PAYMENT);
+        orderByRepository.saveAndFlush(cart);
+
+        try {
+            return doCheckout(cart, clientEmail, request);
+        } catch (Exception e) {
+            log.error("Error durante el checkout del cliente {}: {}", clientEmail, e.getMessage());
+
+            try {
+                cart.setState(OrderState.UNPAID);
+                orderByRepository.saveAndFlush(cart);
+            } catch (Exception restoreEx) {
+                log.error("No se pudo restaurar el carrito a UNPAID: {}", restoreEx.getMessage());
+            }
+
+            throw e;
+        }
+    }
+
     //Finaliza la compra: asigna dirección, metodo de pago y cambia estado (UNPAID → IN_QUEUE)
     @Transactional
-    public CartCheckoutResponse checkout(String clientEmail, CheckoutRequest request) {
+    protected CartCheckoutResponse doCheckout(OrderBy cart, String clientEmail, CheckoutRequest request) throws InterruptedException {
         log.info("Pagando compra del carrito del usuario {}", clientEmail);
 
-        OrderBy cart = this.getActiveCart(clientEmail);
-
+        Address deliveryAddress = null;
+        Card card = null;
+        OrderByResponse orderResponse = null;
+        String paymentStatus = null;
         // Validar que tenga items
         if (cart.getCreations() == null || cart.getCreations().isEmpty()) {
             throw new ResponseStatusException(
@@ -291,7 +315,6 @@ public class CartService {
                     "No se puede pagar un carrito vacío"
             );
         }
-        Address deliveryAddress = null;
         try{
             deliveryAddress = addressRepository.findByClientEmailAndActiveTrueAndDeletedFalse(clientEmail);
         } catch (Exception e){
@@ -315,7 +338,6 @@ public class CartService {
         // Si quisieras guardarlo, tendrías que agregar un campo en OrderBy
         log.info("Divisa para el pago seleccionada: {}", request.getCurrency());
 
-        Card card = null;
         try{
             card = cardRepository.findByClientEmailAndActiveTrueAndDeletedFalse(clientEmail);
         } catch (Exception e){
@@ -329,8 +351,9 @@ public class CartService {
             );
         }
 
-        OrderByResponse orderResponse = OrderByMapper.toOrderByDto(cart);
+        orderResponse = OrderByMapper.toOrderByDto(cart);
 
+        Thread.sleep(8000);
         // Realizar el pago con stripe
         Map<String , Object> paymentResult = paymentService.createPaymentIntent(
                 clientEmail,
@@ -340,10 +363,8 @@ public class CartService {
                 clientEmail
         );
 
-        log.info("SE REALIZO UN PAGO DE " + orderResponse.getTotalPrice() + " " + request.getCurrency());
-
         // Verificar que el pago fue exitoso
-        String paymentStatus = (String) paymentResult.get("status");
+        paymentStatus = (String) paymentResult.get("status");
         if (!"succeeded".equals(paymentStatus)) {
             throw new ResponseStatusException(
                     HttpStatus.PAYMENT_REQUIRED,
@@ -351,6 +372,8 @@ public class CartService {
             );
         }
 
+
+        log.info("SE REALIZO UN PAGO DE {} {}", orderResponse.getTotalPrice(), request.getCurrency().toUpperCase());
         // Cambiar estado a IN_QUEUE
         cart.setState(OrderState.IN_QUEUE);
         orderByRepository.save(cart);

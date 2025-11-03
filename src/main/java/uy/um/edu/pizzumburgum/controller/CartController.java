@@ -104,7 +104,7 @@ public class CartController {
     @PostMapping("/checkout")
     public ResponseEntity<CartCheckoutResponse> checkout(
             HttpServletRequest httpRequest,
-            @Valid @RequestBody CheckoutRequest request) {
+            @Valid @RequestBody CheckoutRequest request) throws InterruptedException {
 
         String clientEmail = authService.getUserEmail(httpRequest);
         log.info("POST /api/cart/v1/checkout");

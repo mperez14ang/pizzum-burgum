@@ -118,6 +118,12 @@ public class OrderByService implements OrderByInt {
                 .toList();
     }
 
+    private void canModifyOrder(OrderState orderState) {
+        if (orderState != OrderState.UNPAID) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No se puede modificar una orden en estado " + orderState);
+        }
+    }
+
     /** Esto actualiza la orden segun lo que venga **/
     @Transactional
     @Override
@@ -125,17 +131,20 @@ public class OrderByService implements OrderByInt {
         OrderBy existingOrder = orderByRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Orden " + id + " no encontrada"));
 
-        if (orderByDto.getState() != null) {
+        OrderState oldState = existingOrder.getState();
+        if (oldState != null) {
             existingOrder.setState(orderByDto.getState());
         }
 
         if (orderByDto.getAddress() != null) {
+            this.canModifyOrder(oldState);
             Address newAddress = addressRepository.findById(orderByDto.getAddress())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                             "Address con id " + orderByDto.getAddress() + " no encontrado"));
 
             // Si pasa un cliente, verificar relación
             if (orderByDto.getClientEmail() != null) {
+                this.canModifyOrder(oldState);
                 Client client = clientRepository.findById(orderByDto.getClientEmail())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                                 "Cliente con id " + orderByDto.getClientEmail() + " no encontrado"));
@@ -157,6 +166,7 @@ public class OrderByService implements OrderByInt {
 
         // Actualizar cliente (si viene y no vino address)
         if (orderByDto.getClientEmail() != null && orderByDto.getAddress() == null) {
+            this.canModifyOrder(oldState);
             Client client = clientRepository.findById(orderByDto.getClientEmail())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                             "Cliente con id " + orderByDto.getClientEmail() + " no encontrado"));
@@ -165,6 +175,7 @@ public class OrderByService implements OrderByInt {
 
         // Actualizar creations (si vienen)
         if (orderByDto.getCreations() != null) {
+            this.canModifyOrder(oldState);
             Set<OrderHasCreations> updatedCreations = orderByDto.getCreations().stream().map(c -> {
                 OrderHasCreations ohc = OrderHasCreationsMapper.toOrderHasCreations(c);
 

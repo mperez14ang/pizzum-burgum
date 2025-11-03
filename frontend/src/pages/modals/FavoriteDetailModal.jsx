@@ -9,7 +9,8 @@ export const FavoriteDetailModal = ({ isOpen, onClose, favorite, onOrder }) => {
         : [favorite]; // si no hay 'creations', tratamos al favorito como una sola creación
 
     const renderSectionInfo = (creation) => {
-        const productConfig = PRODUCT_CONFIG[creation.type];
+        const typeKey = creation?.type === 'PIZZA' ? 'pizza' : (creation?.type === 'HAMBURGER' ? 'burger' : (creation?.type || '').toLowerCase());
+        const productConfig = PRODUCT_CONFIG[typeKey];
         const selections = creation.selections;
 
         if (!productConfig?.sections) return null;
@@ -80,7 +81,7 @@ export const FavoriteDetailModal = ({ isOpen, onClose, favorite, onOrder }) => {
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title={`Detalle del Favorito${favorite?.id ? ` #${favorite.id}` : ""}`}
+            title={favorite.name || 'Favorito'}
             size="lg"
         >
             {/* Imagen principal */}
@@ -111,15 +112,9 @@ export const FavoriteDetailModal = ({ isOpen, onClose, favorite, onOrder }) => {
                             key={creation.id || idx}
                             className="bg-gray-50 rounded-xl p-4 mb-6 border shadow-sm"
                         >
-                            <div className="flex items-center justify-between mb-2">
-                                <h4 className="font-semibold text-gray-900">
-                                    {creation.name || "Creación sin nombre"}
-                                </h4>
-                                <span className="text-sm text-gray-600">
-                                    {creation.type} — ${creation.price}
-                                </span>
+                            <div className="mb-2">
+                                <h4 className="font-semibold text-gray-900">Ingredientes</h4>
                             </div>
-
                             {/* Ingredientes / Secciones */}
                             <div className="pl-2">{renderSectionInfo(creation)}</div>
 
@@ -175,13 +170,7 @@ export const FavoriteDetailModal = ({ isOpen, onClose, favorite, onOrder }) => {
                         <div>
                             <span className="text-gray-500">Tipo:</span>
                             <span className="ml-2 font-medium text-gray-900">
-                                {PRODUCT_CONFIG[favorite.type]?.displayName}
-                            </span>
-                        </div>
-                        <div>
-                            <span className="text-gray-500">Creaciones:</span>
-                            <span className="ml-2 font-medium text-gray-900">
-                                {safeCreations.length}
+                                {favorite.type === 'PIZZA' ? 'Pizza' : (favorite.type === 'HAMBURGER' ? 'Hamburguesa' : favorite.type)}
                             </span>
                         </div>
                     </div>

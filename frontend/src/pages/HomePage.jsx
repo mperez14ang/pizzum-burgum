@@ -61,7 +61,7 @@ export const HomePage = ({ onNavigate }) => {
                 </div>
 
                 {/* Favorites Carousel - Dinámico desde el backend */}
-                <FavoritesCarousel onOpenLogin={() => setIsShowLoginModal(true)}/>
+                <FavoritesCarousel onOpenLogin={() => setIsShowLoginModal(true)} onNavigateToFavorites={() => onNavigate("favorites")}/>
 
                 {/* Modal de login prompt */}
                 <LoginAndRegisterModal isOpen={isShowLoginModal}

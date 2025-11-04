@@ -24,7 +24,8 @@ export const FavoriteComponent = ({favorite, handleInfo}) => {
 
             <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col">
                 {/* Imagen */}
-                <div className="relative h-40 overflow-hidden group">
+                <div className="relative h-40 overflow-hidden group" onClick={() => handleInfo(favorite)}>
+
                     <img
                         src={favorite.image}
                         alt={favorite.name}
@@ -33,11 +34,14 @@ export const FavoriteComponent = ({favorite, handleInfo}) => {
                             e.target.src = 'https://via.placeholder.com/400x300?text=Sin+imagen';
                         }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
                     {/* Botón eliminar */}
                     <button
-                        onClick={() => handleRemove(favorite.favoriteId)}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            handleRemove(favorite.favoriteId)
+                        }}
                         className="absolute top-2 right-2 bg-white/90 hover:bg-red-50 p-2 rounded-full transition shadow-md"
                         title="Eliminar de favoritos"
                     >

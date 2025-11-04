@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
 
             // Check if token is expired
             if (isTokenExpired(token)) {
+                console.log("Validating token")
                 // Verify with server
                 const validator = await validate(token);
 
@@ -43,10 +44,7 @@ export const AuthProvider = ({ children }) => {
                     return false;
                 }
             } else {
-                // Token is valid locally
-                setUser(userData);
-                setTokenAuth(token);
-                setIsAuthenticated(true);
+                console.log("Token validated!")
                 return true;
             }
         } catch (error) {

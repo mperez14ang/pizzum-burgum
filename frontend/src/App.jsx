@@ -15,6 +15,7 @@ import OrderHistoryPage from "./pages/OrderHistoryPage.jsx";
 import {CheckoutPage} from "./pages/CheckoutPage.jsx";
 import {Header} from "./components/common/header.jsx";
 import {CartProvider} from "./contexts/CartContext.jsx";
+import {useSessionChecker} from "./contexts/UseSessionChecker.jsx";
 
 function App() {
     const headerRef = useRef()
@@ -78,20 +79,20 @@ function App() {
             newPage = 'extras'
         }
         else{
-            console.log("No hay ninguna pagina definida!")
+            setCurrentPage('session-expired');
             return
         }
 
-        // Check if token is verified
-        if (user && validate && type !== 'home'){
-            console.log("Validating")
+        if (user && validate && type !== 'home') {
+            console.log("Validating");
             const result = await checkUser();
             if (!result) {
-                setPrevPageType(type)
+                setPrevPageType(type);
                 setCurrentPage('session-expired');
-                return
+                return;
             }
         }
+
         setCurrentPage(newPage);
         window.history.pushState({ page: newPage }, '', window.location.href);
     };
@@ -103,6 +104,8 @@ function App() {
     const onLogin = async () => {
         await handleNavigate(prevPageType, false)
     }
+
+    useSessionChecker(handleNavigate, setPrevPageType, currentPage, 10000); // Cada 10 segundos
 
     if (isAuthenticated && user?.role === 'ADMIN') {
         return (

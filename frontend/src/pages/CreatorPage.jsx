@@ -211,7 +211,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
                                         ingredients={ingredients[section.ingredientKey] || []}
                                         selections={selections}
                                         onUpdateSelection={updateSelection}
-                                        isOpen={index === 0}
+                                        isOpen={true}
                                     />
                                 ))}
                             </div>

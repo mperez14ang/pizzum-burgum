@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {ChevronLeft, ChevronRight, Heart, LogIn} from 'lucide-react';
+import {ChevronLeft, ChevronRight, Heart, LogIn, ArrowRight} from 'lucide-react';
 import {useFavorites} from '../contexts/FavoritesContext';
 import {useAuth} from '../contexts/AuthContext';
 import {FavoriteComponent} from "./FavoriteComponent.jsx";
@@ -7,7 +7,7 @@ import FavoriteDetailModal from "../pages/modals/FavoriteDetailModal.jsx";
 import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
 
-export const FavoritesCarousel = ({ onOpenLogin }) => {
+export const FavoritesCarousel = ({ onOpenLogin, onNavigateToFavorites, carouselLength = 5 }) => {
     const { favorites, loadFavorites, isLoading } = useFavorites();
     const { isAuthenticated } = useAuth();
     const { itemCount, setCartItemCount } = useCart();
@@ -60,7 +60,7 @@ export const FavoritesCarousel = ({ onOpenLogin }) => {
                     available: fav.available,
                     selections: firstCreation.selections,
                     creationId: firstCreation.id,
-                    creations: fav.creations // ✅ Agregar las creations completas para el modal
+                    creations: fav.creations
                 };
             }).filter(Boolean);
 
@@ -70,7 +70,14 @@ export const FavoritesCarousel = ({ onOpenLogin }) => {
         }
     }, [favorites]);
 
-    const totalItems = favoritesData.length;
+    const totalFavorites = favoritesData.length;
+    const hasMoreFavorites = totalFavorites > (carouselLength + 1);
+
+    const displayFavorites = hasMoreFavorites
+        ? favoritesData.slice(0, carouselLength - 1)
+        : favoritesData;
+
+    const totalItems = hasMoreFavorites ? carouselLength : totalFavorites;
     const maxIndex = Math.max(0, totalItems - itemsVisible);
 
     const handleInfo = (favorite) => {
@@ -114,7 +121,7 @@ export const FavoritesCarousel = ({ onOpenLogin }) => {
     }
 
     // Si no hay favoritos
-    if (totalItems === 0 && !isLoading) {
+    if (totalFavorites === 0 && !isLoading) {
         return (
             <div className="py-12">
                 <div className="text-center bg-gray-50 rounded-lg p-8">
@@ -198,12 +205,12 @@ export const FavoritesCarousel = ({ onOpenLogin }) => {
                         <div
                             className="flex transition-transform duration-500 ease-in-out gap-6"
                             style={{
-                                transform: `translateX(-${currentIndex * (100 / itemsVisible)}%)`
+                                transform: `translateX(-${currentIndex * (102 / itemsVisible)}%)`
                             }}
                         >
-                            {favoritesData.map((favorite) => (
+                            {displayFavorites.map((favorite) => (
                                 <div
-                                    key={favorite.favoriteId} // ✅ Usar favoriteId en lugar de id
+                                    key={favorite.favoriteId}
                                     className="flex-shrink-0"
                                     style={{ width: `calc(${100 / itemsVisible}% - ${(itemsVisible - 1) * 24 / itemsVisible}px)` }}
                                 >
@@ -213,6 +220,31 @@ export const FavoritesCarousel = ({ onOpenLogin }) => {
                                     />
                                 </div>
                             ))}
+
+                            {/* Tarjeta "Ver Todos" - solo si hay más favoritos */}
+                            {hasMoreFavorites && (
+                                <div
+                                    className="flex-shrink-0"
+                                    style={{ width: `calc(${100 / itemsVisible}% - ${(itemsVisible - 1) * 24 / itemsVisible}px)` }}
+                                >
+                                    <button
+                                        onClick={onNavigateToFavorites}
+                                        className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 h-full flex flex-col items-center justify-center text-white p-8 group w-full"
+                                    >
+                                        <div className="bg-white bg-opacity-20 rounded-full p-6 mb-4 group-hover:bg-opacity-30 group-hover:scale-110 transition-all duration-300">
+                                            <Heart size={48} className="text-white" fill="white" />
+                                        </div>
+                                        <h3 className="text-2xl font-bold mb-2 group-hover:scale-105 transition-transform duration-300">Ver Todos</h3>
+                                        <p className="text-white text-opacity-90 mb-4 text-center group-hover:scale-105 transition-transform duration-300">
+                                            Tienes otros {totalFavorites - (carouselLength - 1)} favoritos guardados
+                                        </p>
+                                        <div className="flex items-center gap-2 text-lg font-semibold">
+                                            <span>Explorar</span>
+                                            <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform duration-300" />
+                                        </div>
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 

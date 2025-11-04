@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useAuth } from './AuthContext';
+import {createContext, useCallback, useContext, useEffect, useState} from 'react';
+import {useAuth} from './AuthContext';
 import {transformCreationData} from "../utils/parsers.jsx";
 
 const FavoritesContext = createContext();
@@ -173,9 +173,6 @@ export const FavoritesProvider = ({ children }) => {
             const data = await response.json();
             console.log('✅ Favorito creado:', data);
 
-            // Recargar favoritos
-            await loadFavorites();
-
             return { success: true, data };
 
         } catch (err) {
@@ -205,8 +202,9 @@ export const FavoritesProvider = ({ children }) => {
                 throw new Error('Error al eliminar de favoritos');
             }
 
-            // Recargar favoritos del backend después de eliminar
-            await loadFavorites();
+            setFavorites(prevFavorites => {
+                return prevFavorites.filter(fav => fav.id !== favoriteId);
+            });
 
             return { success: true };
         } catch (err) {

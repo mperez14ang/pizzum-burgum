@@ -5,7 +5,6 @@ import {FavoritesProvider} from './contexts/FavoritesContext';
 import {HomePage} from './pages/HomePage';
 import {CreatorPage} from './pages/CreatorPage';
 import {AdminPage} from './pages/admin/AdminPage';
-import {CardModal} from "./pages/modals/CardModal.jsx";
 import {CardProvider} from "./contexts/CardContext.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import {SessionExpiredPage} from "./pages/SessionExpiredPage.jsx";
@@ -84,7 +83,6 @@ function App() {
         }
 
         if (user && validate && type !== 'home') {
-            console.log("Validating");
             const result = await checkUser();
             if (!result) {
                 setPrevPageType(type);

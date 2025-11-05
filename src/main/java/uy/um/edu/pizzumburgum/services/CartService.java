@@ -73,19 +73,8 @@ public class CartService {
                 .orElseGet(() -> {
                     log.info("No existe carrito activo, creando uno nuevo");
 
-                    // Crear con una dirección temporal (la primera del cliente)
-                    Address tempAddress = client.getAddresses().stream()
-                            .findFirst()
-                            .orElseThrow(() -> new ResponseStatusException(
-                                    HttpStatus.BAD_REQUEST,
-                                    "El cliente no tiene direcciones registradas"
-                            ));
-
                     OrderBy newCart = OrderBy.builder()
                             .client(client)
-                            .deliveryPostalCode(tempAddress.getPostalCode())
-                            .deliveryStreet(tempAddress.getStreet())
-                            .deliveryCity(tempAddress.getCity())
                             .state(OrderState.UNPAID)
                             .creations(new HashSet<>())
                             .build();
@@ -334,9 +323,11 @@ public class CartService {
         // Asignar el extra
         cart.setExtraAmount(request.getExtraAmount());
 
+        // Agregar las notas
+        cart.setNotes(request.getNotes());
+
         // El metodo de pago se puede mostrar en frontend pero no lo guardamos en BD
         // Si quisieras guardarlo, tendrías que agregar un campo en OrderBy
-        log.info("Divisa para el pago seleccionada: {}", request.getCurrency());
 
         try{
             card = cardRepository.findByClientEmailAndActiveTrueAndDeletedFalse(clientEmail);
@@ -353,7 +344,6 @@ public class CartService {
 
         orderResponse = OrderByMapper.toOrderByDto(cart);
 
-        Thread.sleep(8000);
         // Realizar el pago con stripe
         Map<String , Object> paymentResult = paymentService.createPaymentIntent(
                 clientEmail,
@@ -386,6 +376,7 @@ public class CartService {
                 .currency(request.getCurrency())
                 .paymentStatus(paymentStatus)
                 .address(AddressMapper.toAddressResponse(deliveryAddress))
+                .notes(orderResponse.getNotes())
                 .build();
     }
 

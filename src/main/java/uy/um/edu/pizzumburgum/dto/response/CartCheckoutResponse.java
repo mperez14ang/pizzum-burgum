@@ -24,4 +24,6 @@ public class CartCheckoutResponse {
     private LocalDateTime date;
 
     private String paymentStatus;
+
+    private String notes;
 }

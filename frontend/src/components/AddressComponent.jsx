@@ -1,13 +1,15 @@
 import {Edit3, MapPin, Plus, Trash2} from "lucide-react";
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {useAddresses} from "../contexts/UseAddresses.jsx";
 import toast from "react-hot-toast";
 import {AddAddressModal} from "../pages/modals/AddAddressModal.jsx";
 import {getBackendErrorMessage} from "../utils/parsers.jsx";
+import {clientService} from "../services/api.js";
 
 export const AddressComponent = ({
                                      user,
                                      onSelectAddress,
+                                     canInteract = true,
                                      hasTitle = true
                                  }) => {
     const {
@@ -23,6 +25,7 @@ export const AddressComponent = ({
     const [showAddressModal, setShowAddressModal] = useState(false);
     const [isEditingAddress, setIsEditingAddress] = useState(false);
     const [editingAddressId, setEditingAddressId] = useState(null);
+    const debounceTimers = useRef(null);
 
     // Cargar direcciones al montar el componente
     useEffect(() => {
@@ -49,24 +52,50 @@ export const AddressComponent = ({
     );
 
     const handleAddressChange = (e) => {
+        if (!canInteract) return;
+
         const id = Number(e.target.value);
+
+        // Evita repetir el mismo address
+        if (id === selectedAddressId) return;
+
         setSelectedAddressId(id);
         if (onSelectAddress) onSelectAddress(id);
+
+        debounceTimers.current = {};
+
+        debounceTimers.current[id] = setTimeout(async () => {
+            try {
+                const response = await clientService.setAddressAsActive(id);
+                if (response) {
+                    toast.success('Address actualizado');
+                }
+            } catch (error) {
+                console.error('Error actualizando el is address active:', error);
+                toast.error('Error al actualizar');
+            } finally {
+                delete debounceTimers.current[id];
+            }
+        }, 1000);
     };
 
+
     const handleEditAddress = (addressId) => {
+        if (!canInteract)return;
         setIsEditingAddress(true);
         setEditingAddressId(addressId);
         setShowAddressModal(true);
     };
 
     const handleOpenCreateAddress = () => {
+        if (!canInteract)return;
         setIsEditingAddress(false);
         setEditingAddressId(null);
         setShowAddressModal(true);
     };
 
     const handleSaveAddress = async (addressId, addressData) => {
+        if (!canInteract)return;
         let response = null;
         if (isEditingAddress) {
             response = await handleUpdateAddress(addressId, addressData);
@@ -81,6 +110,7 @@ export const AddressComponent = ({
     };
 
     const handleAddressDeletion = async () => {
+        if (!canInteract)return;
         try {
             const response = await handleDeleteAddress(selectedAddress.id);
             if (response) {
@@ -113,6 +143,7 @@ export const AddressComponent = ({
                         value={selectedAddressId}
                         onChange={handleAddressChange}
                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                        disabled={!canInteract}
                     >
                         {addresses.length === 0 ? (
                             <option value="">Sin direcciones disponibles</option>
@@ -120,7 +151,6 @@ export const AddressComponent = ({
                             addresses.map(addr => (
                                 <option key={addr.id} value={addr.id}>
                                     {addr.street}, {addr.city} - CP {addr.postalCode}
-                                    {addr.active && " (Activa)"}
                                 </option>
                             ))
                         )}
@@ -128,7 +158,7 @@ export const AddressComponent = ({
 
                     <button
                         onClick={() => selectedAddress && handleEditAddress(selectedAddress.id)}
-                        disabled={!selectedAddress}
+                        disabled={!selectedAddress || !canInteract}
                         className="inline-flex items-center justify-center px-4 py-2 rounded-lg border text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-gray-300 text-gray-700 hover:bg-gray-50"
                         type="button"
                     >
@@ -137,7 +167,7 @@ export const AddressComponent = ({
 
                     <button
                         onClick={handleAddressDeletion}
-                        disabled={!selectedAddress}
+                        disabled={!selectedAddress || !canInteract}
                         className="inline-flex items-center justify-center px-4 py-2 rounded-lg border text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-red-300 text-red-600 hover:bg-red-50"
                         type="button"
                     >
@@ -150,11 +180,6 @@ export const AddressComponent = ({
                         <p className="text-sm text-gray-600 mb-1">Dirección seleccionada:</p>
                         <p className="text-gray-900 font-medium">{selectedAddress.street}</p>
                         <p className="text-gray-700 text-sm">{selectedAddress.city}, CP {selectedAddress.postalCode}</p>
-                        {selectedAddress.active && (
-                            <span className="inline-block mt-2 px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded">
-                                Dirección activa
-                            </span>
-                        )}
                     </div>
                 )}
 

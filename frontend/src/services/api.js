@@ -35,21 +35,15 @@ const fetchFromAPI = async (endpoint, options = {}) => {
                 window.location.href = '/';
             }
 
-            // Intentar obtener el mensaje de error del servidor
             let errorMessage = `Error: ${response.status}`;
             try {
                 const errorText = await response.text();
-                if (errorText) {
-                    errorMessage = errorText;
-                }
-            } catch (e) {
-                // Si no puede parsear el error, usar el mensaje por defecto
-            }
+                if (errorText) errorMessage = errorText;
+            } catch (_) {}
 
             throw new Error(errorMessage);
         }
 
-        // Si la respuesta es 204 No Content o está vacía, retornar objeto vacío
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
             return {};
@@ -59,7 +53,12 @@ const fetchFromAPI = async (endpoint, options = {}) => {
         return text ? JSON.parse(text) : {};
     } catch (error) {
         console.error(`Error fetching ${endpoint}:`, error);
-        throw error;
+
+        try {
+            return JSON.parse(error.message);
+        } catch {
+            return { error: error.message };
+        }
     }
 };
 
@@ -263,12 +262,13 @@ export const cartService = {
     },
 
     //Finaliza la compra (checkout) del carrito activo
-    checkout: async (currency, extraAmount) => {
+    checkout: async (currency, extraAmount, notes='') => {
         return fetchFromAPI(`/cart/v1/checkout`, {
             method: 'POST',
             body: JSON.stringify({
                 currency,
-                extraAmount
+                extraAmount,
+                notes
             })
         });
     }
@@ -306,7 +306,15 @@ export const clientService = {
 
     deleteAddress(addressId){
         return fetchFromAPI(`/address/${addressId}`, {
-            method: 'DELETE'}
+            method: 'DELETE'
+        }
+        );
+    },
+
+    setAddressAsActive(addressId){
+        return fetchFromAPI(`/address/${addressId}/active`, {
+            method: 'PATCH'
+        }
         );
     },
 
@@ -329,6 +337,12 @@ export const clientService = {
     deleteCard(cardId){
         return fetchFromAPI(`/card/v1/${cardId}`, {
             method: 'DELETE'
+        })
+    },
+
+    setCardAsActive(cardId){
+        return fetchFromAPI(`/card/v1/${cardId}/active`, {
+            method: 'PATCH'
         })
     }
 }

@@ -1,11 +1,14 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Check, CreditCard, Plus, Trash2} from "lucide-react";
 import {useCard} from "../contexts/CardContext.jsx";
 import CardModal from "../pages/modals/CardModal.jsx";
+import {clientService} from "../services/api.js";
+import toast from "react-hot-toast";
 
 export const CardComponent = ({
                                   user,
                                   onSelectCard,
+                                  canInteract = true,
                                   hasTitle = true
                               }) => {
     const {
@@ -18,6 +21,7 @@ export const CardComponent = ({
 
     const [selectedCardId, setSelectedCardId] = useState('');
     const [showCardModal, setShowCardModal] = useState(false);
+    const debounceTimer = useRef(null);
 
     // Cargar tarjetas al montar el componente
     useEffect(() => {
@@ -65,21 +69,49 @@ export const CardComponent = ({
     };
 
     const handleCardSelection = (cardId) => {
-        setSelectedCardId(cardId);
-        if (onSelectCard) onSelectCard(cardId);
+        if (!canInteract) return;
+
+        const numericId = Number(cardId);
+        if (numericId === selectedCardId) return;
+
+        setSelectedCardId(numericId);
+        onSelectCard?.(numericId);
+
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+        }
+
+        debounceTimer.current = setTimeout(async () => {
+            try {
+                const response = await clientService.setCardAsActive(numericId);
+                if (response) {
+                    toast.success('Tarjeta actualizada correctamente');
+                }
+            } catch (error) {
+                console.error('Error actualizando tarjeta activa:', error);
+                toast.error('Error al actualizar');
+            } finally {
+                debounceTimer.current = null;
+            }
+        }, 1000);
     };
 
+
+
     const handleOpenCreateCard = () => {
+        if (!canInteract) return
         setShowCardModal(true);
     };
 
     const handleSaveCard = async () => {
+        if (!canInteract) return
         setShowCardModal(false);
         await getCards();
 
     };
 
     const handleCardDeletion = async (cardId) => {
+        if (!canInteract) return
         const response = await deleteCard(cardId);
         if (response){
             await getCards();
@@ -128,22 +160,6 @@ export const CardComponent = ({
                                             : 'border-gray-200 hover:border-gray-300'
                                     }`}
                                 >
-                                    {card.active && (
-                                        <div className="absolute top-3 right-3">
-                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
-                                                <Check size={12} className="mr-1" /> Activa
-                                            </span>
-                                        </div>
-                                    )}
-
-                                    {isSelected && !card.active && (
-                                        <div className="absolute top-3 right-3">
-                                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
-                                                <Check size={12} className="mr-1" /> Seleccionada
-                                            </span>
-                                        </div>
-                                    )}
-
                                     <div className="flex items-start gap-3">
                                         <div className={`inline-flex items-center justify-center w-10 h-10 rounded-lg ${getBrandIcon(card.brand)}`}>
                                             <CreditCard className="w-5 h-5" />
@@ -176,6 +192,7 @@ export const CardComponent = ({
                                                 }}
                                                 className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-red-300 text-red-600 hover:bg-red-50"
                                                 type="button"
+                                                disabled={!canInteract}
                                             >
                                                 <Trash2 size={16} className="mr-1.5" /> Eliminar
                                             </button>

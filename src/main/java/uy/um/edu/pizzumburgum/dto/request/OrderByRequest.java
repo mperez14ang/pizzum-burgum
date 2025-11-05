@@ -23,4 +23,6 @@ public class OrderByRequest {
     private String clientEmail;
 
     private BigDecimal extraAmount;
+
+    private String notes;
 }

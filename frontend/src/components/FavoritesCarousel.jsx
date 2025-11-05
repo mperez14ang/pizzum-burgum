@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {ChevronLeft, ChevronRight, Heart, LogIn, ArrowRight} from 'lucide-react';
+import {ArrowRight, ChevronLeft, ChevronRight, Heart, LogIn} from 'lucide-react';
 import {useFavorites} from '../contexts/FavoritesContext';
 import {useAuth} from '../contexts/AuthContext';
 import {FavoriteComponent} from "./FavoriteComponent.jsx";
@@ -9,13 +9,19 @@ import {useCart} from "../contexts/CartContext.jsx";
 
 export const FavoritesCarousel = ({ onOpenLogin, onNavigateToFavorites, carouselLength = 5 }) => {
     const { favorites, loadFavorites, isLoading } = useFavorites();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isLoading:authIsLoading } = useAuth();
     const { itemCount, setCartItemCount } = useCart();
     const [favoritesData, setFavoritesData] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [itemsVisible, setItemsVisible] = useState(3);
     const [showInfoModal, setShowInfoModal] = useState(false);
     const [selectedFavorite, setSelectedFavorite] = useState(null);
+
+    useEffect(() => {
+        if (isAuthenticated && !authIsLoading){
+            loadFavorites();
+        }
+    }, [authIsLoading]);
 
     // Responsive: ajustar items visibles según el tamaño de pantalla
     useEffect(() => {
@@ -29,7 +35,6 @@ export const FavoritesCarousel = ({ onOpenLogin, onNavigateToFavorites, carousel
                 setItemsVisible(3);
             }
         };
-
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);

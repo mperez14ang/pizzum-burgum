@@ -15,9 +15,8 @@ export const useSessionChecker = (
         if (currentPage === 'session-expired') return;
 
         const intervalId = setInterval(async () => {
-            console.log("validating...");
             try {
-                const isValid = await checkUser();
+                const isValid = await checkUser(false);
                 if (!isValid) {
                     console.warn('Sesión expirada (checker automático)');
                     await logout();

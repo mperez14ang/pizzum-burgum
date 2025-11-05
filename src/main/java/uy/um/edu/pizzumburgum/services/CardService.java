@@ -52,12 +52,12 @@ public class CardService implements CardServiceInt {
 
     @Override
     @Transactional
-    public ResponseEntity<CardResponse> createCard(CardRequest cardRequest) {
+    public CardResponse createCard(CardRequest cardRequest) {
         // Verificar si la tarjeta ya existe
         Card existingCard = cardRepository.findByStripeId(cardRequest.getPaymentMethodId());
         if (existingCard != null) {
             existingCard.setDeleted(false);
-            return new ResponseEntity<>(CardMapper.toCardResponse(existingCard), HttpStatus.OK);
+            return CardMapper.toCardResponse(existingCard);
         }
 
         // Buscar el cliente
@@ -88,16 +88,16 @@ public class CardService implements CardServiceInt {
         // Guardar
         Card savedCard = cardRepository.save(card);
 
-        return new ResponseEntity<>(CardMapper.toCardResponse(savedCard), HttpStatus.OK);
+        return CardMapper.toCardResponse(savedCard);
     }
 
     @Override
-    public ResponseEntity<CardResponse> getCardById(Long id) {
+    public CardResponse getCardById(Long id) {
         Card card = cardRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.BAD_REQUEST, "No se encontro una tarjeta con id " + id
         ));
 
-        return new ResponseEntity<>(CardMapper.toCardResponse(card), HttpStatus.OK);
+        return CardMapper.toCardResponse(card);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class CardService implements CardServiceInt {
 
     @Transactional
     @Override
-    public ResponseEntity<CardResponse> updateCard(Long id, CardRequest cardRequest) {
+    public CardResponse updateCard(Long id, CardRequest cardRequest) {
         logger.info(cardRequest.toString());
         logger.info(id.toString());
         Client client = clientRepository.findById(cardRequest.getClientEmail())
@@ -137,20 +137,13 @@ public class CardService implements CardServiceInt {
 
         // Guardar
         cardRepository.save(card);
-        return new ResponseEntity<>(CardMapper.toCardResponse(card), HttpStatus.OK);
+        return CardMapper.toCardResponse(card);
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Map<String, Object>> deleteCard(Long id, String clientEmail) {
-        Card card = cardRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tarjeta no encontrada"));
-
-        if (!card.getClient().getEmail().equals(clientEmail)) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,  "La tarjeta no pertenece a " + clientEmail
-            );
-        }
+    public Map<String, Object> deleteCard(Long id, String clientEmail) {
+        Card card = this.getCardAndCheckIfBelongsToClient(id, clientEmail);
 
         // Desconectar la relación bidireccional
         Client client = card.getClient();
@@ -175,7 +168,36 @@ public class CardService implements CardServiceInt {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Tarjeta " + id + " fue borrada");
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return response;
+    }
+
+    @Override
+    public CardResponse setCardAsActive(Long id, String clientEmail) {
+        Card card = getCardAndCheckIfBelongsToClient(id, clientEmail);
+
+        if (card.isDeleted()){return null;}
+
+        Client client = card.getClient();
+
+        // Setear todas las tarjetas del cliente a active = false
+        client.getCards().forEach(a -> a.setActive(false));
+
+        card.setActive(true);
+
+        cardRepository.save(card);
+        return CardMapper.toCardResponse(card);
+    }
+
+    private Card getCardAndCheckIfBelongsToClient(Long id, String clientEmail) {
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tarjeta no encontrada"));
+
+        if (!card.getClient().getEmail().equals(clientEmail)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,  "La tarjeta no pertenece a " + clientEmail
+            );
+        }
+        return card;
     }
 
     private PaymentMethod adjustPaymentMethod(String paymentMethodId, Client client) {

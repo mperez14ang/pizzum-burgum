@@ -1,6 +1,7 @@
 package uy.um.edu.pizzumburgum.services.interfaces;
 
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatusCode;
 import uy.um.edu.pizzumburgum.dto.request.AddressRequest;
 import uy.um.edu.pizzumburgum.dto.response.AddressResponse;
 
@@ -15,7 +16,9 @@ public interface AddressServiceInt {
     @Transactional
     List<AddressResponse> getClientAddresses(String clientEmail);
 
-    AddressResponse updateAddress(Long id, AddressRequest addressRequest);
+    AddressResponse updateAddress(Long id, AddressRequest addressRequest, String clientEmail);
 
     Map<String, Object> deleteAddress(String clientEmail, Long addressId);
+
+    AddressResponse setAsActive(Long id, String clientEmail);
 }

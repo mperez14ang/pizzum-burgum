@@ -47,18 +47,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
-        logger.info("REQUEST: {}", request.getRequestURI());
-        logger.info("HEADER: {}", authHeader);
-
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.info("REQUEST: {} NOT LOGGED IN", request.getRequestURI());
             filterChain.doFilter(request, response);
-            logger.warn("La request no tiene autorizacion!");
             return;
         }
 
         try {
             final String jwt = authHeader.substring(7);
             final String username = jwtService.extractUsername(jwt);
+
+            logger.info("REQUEST: {} USER: {}", request.getRequestURI(), username);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

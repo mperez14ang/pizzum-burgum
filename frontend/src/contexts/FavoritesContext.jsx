@@ -12,15 +12,9 @@ export const FavoritesProvider = ({ children }) => {
 
 
     const loadFavorites = useCallback(async () => {
-        console.log('📥 loadFavorites llamada');
-        console.log('   isAuthenticated:', isAuthenticated);
-        console.log('   user:', user);
-        console.log('   user?.token:', user?.token ? 'exists' : 'null');
-
         // Si no hay usuario autenticado, no cargar favoritos
         if (!isAuthenticated || !user || !user.token) {
             setFavorites([]);
-            console.log("No hay usuario autenticado!")
             return;
         }
 
@@ -229,22 +223,6 @@ export const FavoritesProvider = ({ children }) => {
             return await addToFavorites(creationData);
         }
     };
-
-    useEffect(() => {
-        console.log('🔄 FavoritesContext useEffect disparado');
-        console.log('   isAuthenticated:', isAuthenticated);
-        console.log('   user:', user);
-        console.log('   user?.email:', user?.email);
-        console.log('   user?.token:', user?.token ? 'exists' : 'null');
-
-        if (isAuthenticated && user && user.token) {
-            console.log('✅ Condiciones cumplidas - Llamando loadFavorites para:', user.email);
-            loadFavorites();
-        } else {
-            console.log('❌ Condiciones NO cumplidas - Limpiando favoritos');
-            setFavorites([]);
-        }
-    }, [isAuthenticated, user, loadFavorites]);
 
     const value = {
         favorites,

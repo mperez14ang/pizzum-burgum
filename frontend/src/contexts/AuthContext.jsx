@@ -12,11 +12,11 @@ export const AuthProvider = ({ children }) => {
 
     // Comprobar si hay un usuario guardado al cargar
     useEffect(() => {
-        checkUser().then(r => {})
+        checkUser()
         setIsLoading(false);
     }, []);
 
-    const checkUser = async () => {
+    const checkUser = async (updateVars=true) => {
         const storedUser = localStorage.getItem('user');
         if (!storedUser) {
             setIsLoading(false);
@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }) => {
 
             // Check if token is expired
             if (isTokenExpired(token)) {
-                console.log("Validating token")
                 // Verify with server
                 const validator = await validate(token);
 
@@ -44,7 +43,12 @@ export const AuthProvider = ({ children }) => {
                     return false;
                 }
             } else {
-                console.log("Token validated!")
+                if (updateVars){
+                    setUser(userData);
+                    setTokenAuth(token);
+                    setIsAuthenticated(true);
+                    setIsLoading(false);
+                }
                 return true;
             }
         } catch (error) {
@@ -76,6 +80,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const login = async (email, password, logInAfter=true) => {
+        setIsLoading(true)
         try {
             const response = await fetch('http://localhost:8080/api/auth/v1/login', {
                 method: 'POST',
@@ -101,10 +106,13 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Error en login:', error);
             return { success: false, error: 'Error de conexión. Intente nuevamente.' };
+        } finally {
+            setIsLoading(false)
         }
     };
 
     const register = async (email, password, firstName, lastName, birthDate, dni, logInAfter=true) => {
+        setIsLoading(true)
         try {
             const response = await fetch('http://localhost:8080/api/auth/v1/register', {
                 method: 'POST',
@@ -137,6 +145,9 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Error en register:', error);
             return { success: false, error: 'Error de conexión. Intente nuevamente.' };
+        }
+        finally {
+            setIsLoading(false)
         }
     };
 

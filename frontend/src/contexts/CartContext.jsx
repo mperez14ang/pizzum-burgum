@@ -5,7 +5,7 @@ import { cartService } from "../services/api.js";
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated, isLoading:isAuthLoading } = useAuth();
 
     const [cartItems, setCartItems] = useState([]);
 
@@ -21,32 +21,12 @@ export const CartProvider = ({ children }) => {
         localStorage.setItem("cartCount", value.toString());
     };
 
-    useEffect(() => {
-        const loadUserCart = async () => {
-            console.log("init cart provider " + localStorage.getItem("cartCount"));
-
-            if (isAuthenticated && user) {
-                try {
-                    if (!user.cartItems) {
-                        const activeCart = await cartService.getActiveCart();
-
-                        const items = activeCart?.items || [];
-
-                        setCartItems(Array.isArray(items) ? items : []);
-                    } else {
-                        setCartItems(Array.isArray(user.cartItems) ? user.cartItems : []);
-                    }
-                } catch (error) {
-                    console.error("Error cargando carrito:", error);
-                    setCartItems([]);
-                }
-            } else {
-                setCartItems([]);
-            }
-        };
-
-        loadUserCart();
-    }, [user, isAuthenticated]);
+    // Si se loguea
+    useEffect( () => {
+        if (isAuthenticated){
+            loadUserCart()
+        }
+    }, [isAuthLoading])
 
     // Actualizar el contador cuando cambian los items
     useEffect(() => {
@@ -54,8 +34,31 @@ export const CartProvider = ({ children }) => {
         setCartItemCount(count);
     }, [cartItems]);
 
+    const loadUserCart = async () => {
+        console.log("init cart provider " + localStorage.getItem("cartCount"));
+
+        if (isAuthenticated && user) {
+            try {
+                if (!user.cartItems) {
+                    const activeCart = await cartService.getActiveCart();
+
+                    const items = activeCart?.items || [];
+
+                    setCartItems(Array.isArray(items) ? items : []);
+                } else {
+                    setCartItems(Array.isArray(user.cartItems) ? user.cartItems : []);
+                }
+            } catch (error) {
+                console.error("Error cargando carrito:", error);
+                setCartItems([]);
+            }
+        } else {
+            setCartItems([]);
+        }
+    };
+
     return (
-        <CartContext.Provider value={{ cartItems, setCartItems, itemCount, setCartItemCount }}>
+        <CartContext.Provider value={{ cartItems, setCartItems, itemCount, setCartItemCount, loadUserCart }}>
             {children}
         </CartContext.Provider>
     );

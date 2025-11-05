@@ -32,6 +32,8 @@ public class OrderByResponse {
 
     private String clientEmail;
 
+    private String notes;
+
     private String clientName;
 
     private Boolean available;

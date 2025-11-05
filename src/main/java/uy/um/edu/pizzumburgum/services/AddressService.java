@@ -3,6 +3,7 @@ package uy.um.edu.pizzumburgum.services;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.AddressRequest;
@@ -91,8 +92,10 @@ public class AddressService implements AddressServiceInt {
 
     @Transactional
     @Override
-    public AddressResponse updateAddress(Long id, AddressRequest addressRequest) {
+    public AddressResponse updateAddress(Long id, AddressRequest addressRequest, String clientEmail) {
         Address address = addressRepository.getReferenceById(id);
+
+        isAddressFromClient(clientEmail, address.getClient());
 
         address.setCity(addressRequest.getCity());
         address.setStreet(addressRequest.getStreet());
@@ -111,22 +114,7 @@ public class AddressService implements AddressServiceInt {
 
         Client client = address.getClient();
 
-        if (!client.getEmail().equals(clientEmail)) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "La dirección no pertenece a " + clientEmail
-            );
-        }
-
-        // Evitar eliminar la última dirección
-        long activeAddressesCount = client.getAddresses().stream()
-                .filter(a -> !a.isDeleted())
-                .count();
-
-        if (activeAddressesCount <= 1) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "El cliente debe tener al menos 1 dirección"
-            );
-        }
+        this.isAddressFromClient(clientEmail, client);
 
         // Marcar como eliminada
         address.setDeleted(true);
@@ -146,6 +134,35 @@ public class AddressService implements AddressServiceInt {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "La dirección " + addressId + " fue eliminada correctamente");
         return response;
+    }
+
+    @Override
+    public AddressResponse setAsActive(Long id, String clientEmail) {
+        Address address = addressRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "No se pudo encontrar una dirección perteneciente a " + clientEmail));
+
+        if (address.isDeleted()){return null;}
+
+        Client client = address.getClient();
+
+        isAddressFromClient(clientEmail, client);
+
+        // Setear todas las demas address de client a false
+        client.getAddresses().forEach(a -> a.setActive(false));
+
+        address.setActive(true);
+
+        addressRepository.save(address);
+        return AddressMapper.toAddressResponse(address);
+    }
+
+    private void isAddressFromClient(String clientEmail, Client client) {
+        if (!client.getEmail().equals(clientEmail)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "La dirección no pertenece a " + clientEmail
+            );
+        }
     }
 
 }

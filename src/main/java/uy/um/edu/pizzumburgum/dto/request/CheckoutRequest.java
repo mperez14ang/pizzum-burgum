@@ -20,4 +20,6 @@ public class CheckoutRequest {
     private String currency;
 
     private BigDecimal extraAmount;
+
+    private String notes;
 }

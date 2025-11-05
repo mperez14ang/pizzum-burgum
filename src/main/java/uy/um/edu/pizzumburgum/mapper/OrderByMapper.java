@@ -24,6 +24,7 @@ public class OrderByMapper {
                 .deliveryStreet(address.getStreet())
                 .deliveryPostalCode(address.getPostalCode())
                 .extraAmount(orderByRequest.getExtraAmount())
+                .notes(orderByRequest.getNotes())
                 .build();
     }
 
@@ -66,6 +67,7 @@ public class OrderByMapper {
                 .available(creationsAvailable)
                 .extraAmount(orderBy.getExtraAmount())
                 .totalPrice(totalPrice)
+                .notes(orderBy.getNotes())
                 .build();
     }
 }

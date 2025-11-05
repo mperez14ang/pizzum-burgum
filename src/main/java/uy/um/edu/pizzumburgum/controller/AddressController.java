@@ -38,14 +38,21 @@ public class AddressController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<AddressResponse> updateAddress(@PathVariable Long id, @RequestBody AddressRequest addressRequest){
-        return new ResponseEntity<>(addressService.updateAddress(id, addressRequest), HttpStatus.OK);
+    public ResponseEntity<AddressResponse> updateAddress(HttpServletRequest request, @PathVariable Long id, @RequestBody AddressRequest addressRequest){
+        String clientEmail = authService.getUserEmail(request);
+        return new ResponseEntity<>(addressService.updateAddress(id, addressRequest, clientEmail), HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Map<String, Object>> deleteAddress(HttpServletRequest request, @PathVariable Long id){
         String clientEmail = authService.getUserEmail(request);
         return new ResponseEntity<>(addressService.deleteAddress(clientEmail, id), HttpStatus.OK);
+    }
+
+    @PatchMapping("{id}/active")
+    public ResponseEntity<AddressResponse> setAddressAsActive(HttpServletRequest request, @PathVariable Long id){
+        String clientEmail = authService.getUserEmail(request);
+        return new ResponseEntity<>(addressService.setAsActive(id, clientEmail),  HttpStatus.OK);
     }
 
 }

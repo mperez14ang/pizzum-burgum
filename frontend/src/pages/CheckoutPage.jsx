@@ -8,6 +8,8 @@ import {AddressComponent} from "../components/AddressComponent.jsx";
 import {CardComponent} from "../components/CardComponent.jsx";
 import {cartInteraction, cartSubtotal, updateQuantity} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
+import {useCard} from "../contexts/CardContext.jsx";
+import {useAddresses} from "../contexts/UseAddresses.jsx";
 
 export const CheckoutPage = ({ onNavigate, onBack }) => {
     const { user, isAuthenticated } = useAuth();
@@ -59,16 +61,11 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
             // Aqui iria el procesamiento del pedido
             const currency = "uyu";
             const extraAmount = calculateDelivery();
-            const response = await cartService.checkout(currency, extraAmount)
+            const notes = formData.orderNotes
+            const response = await cartService.checkout(currency, extraAmount, notes)
 
             if (response.paymentStatus !== "succeeded"){
-                try{
-                    toast.error(response.error)
-                }catch (e){
-                    toast.error("No se pudo procesar el pago")
-                }
-
-                console.log(response.error)
+                toast.error(response.error)
                 return
             }
             setCartItems([])
@@ -79,7 +76,7 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
             onNavigate('home');
         } catch (error) {
             console.error('Error processing order:', error);
-            toast.error('Error al procesar el pedido. Intenta nuevamente.');
+            toast.error('Error al procesar el pago');
         } finally {
             setSubmitting(false);
         }

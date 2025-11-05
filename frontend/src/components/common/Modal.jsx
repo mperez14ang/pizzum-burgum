@@ -20,6 +20,18 @@ export const Modal = ({
         };
     }, [isOpen]);
 
+    // Cerrar con tecla ESC
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                onClose();
+            }
+        };
+
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+    }, [isOpen, onClose]);
+
     if (!isOpen) return null;
 
     const sizes = {

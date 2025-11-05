@@ -39,6 +39,8 @@ public class OrderBy {
     @Min(0)
     private BigDecimal extraAmount;
 
+    private String notes;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default
     private Set<OrderHasCreations> creations = new HashSet<>();

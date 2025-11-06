@@ -50,7 +50,7 @@ export const CardModal = ({ isOpen, onClose, onSuccess }) => {
 
         card.on('change', (event) => {
             if (event.error) {
-                toast.error(event.error.message, { duration: 2000 });
+                toast.error(event.error.message);
             }
         });
 

@@ -19,7 +19,7 @@ const getAuthHeaders = () => {
     };
 };
 
-const fetchFromAPI = async (endpoint, options = {}) => {
+export const fetchFromAPI = async (endpoint, options = {}) => {
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
             ...options,
@@ -343,6 +343,29 @@ export const clientService = {
     setCardAsActive(cardId){
         return fetchFromAPI(`/card/v1/${cardId}/active`, {
             method: 'PATCH'
+        })
+    }
+}
+
+
+export const userService = {
+    getUserInfo: async (user) => {
+        if (user.role === "CLIENT"){
+            return fetchFromAPI(`/client/v1/${user.email}`, {
+                method: 'GET'
+            })
+        }
+        else if (user.role === "ADMIN"){
+            return fetchFromAPI(`/admin/v1/${user.email}`, {
+                method: 'GET'
+            })
+        }
+
+    },
+
+    randomizeUserAvatar: async (userEmail) => {
+        return fetchFromAPI(`/v1/user/${userEmail}/avatar`, {
+            method: 'POST'
         })
     }
 }

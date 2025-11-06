@@ -63,13 +63,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole(ADMIN)
 
                         // ============ CLIENT + ADMIN ============
+                        // User
+                        .requestMatchers("/api/v1/user/**").hasAnyRole(CLIENT, ADMIN)
+
                         // Client
                         .requestMatchers("/api/favorites/**").hasRole(CLIENT)
                         .requestMatchers("/api/payments/**").hasRole(CLIENT)
 
                         // Admin
                         .requestMatchers("/api/client/**").hasAnyRole(CLIENT, ADMIN)
-                        .requestMatchers("/api/users/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers("/api/order/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers("/api/cart/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers("/api/card/**").hasAnyRole(CLIENT, ADMIN)

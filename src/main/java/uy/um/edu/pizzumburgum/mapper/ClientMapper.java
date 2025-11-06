@@ -4,7 +4,9 @@ import uy.um.edu.pizzumburgum.dto.request.ClientCreateRequest;
 import uy.um.edu.pizzumburgum.dto.response.AddressResponse;
 import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
 import uy.um.edu.pizzumburgum.entities.Client;
+import uy.um.edu.pizzumburgum.services.UserService;
 
+import java.time.LocalDate;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,6 +21,7 @@ public class ClientMapper {
                 .dni(clientCreateRequest.getDni())
                 .birthDate(clientCreateRequest.getBirthDate())
                 .password(clientCreateRequest.getPassword())
+                .createdDate(LocalDate.now())
                 .build();
     }
 
@@ -38,6 +41,10 @@ public class ClientMapper {
                 .birthDate(client.getBirthDate())
                 .addresses(addressDtos)
                 .userType(client.getUserType())
+                .profileUrl(UserService.getAvatarUrl(client))
+                .createdDate(client.getCreatedDate())
+                .profileUrl(UserService.getAvatarUrl(client))
+                .dni(client.getDni())
                 .build();
 
     }

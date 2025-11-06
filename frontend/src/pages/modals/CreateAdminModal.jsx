@@ -40,7 +40,7 @@ export const CreateAdminModal = ({isOpen, onSubmit, submitting, onClose, formDat
                     value={formData.dni}
                     onChange={(e) => setFormData({ ...formData, dni: e.target.value })}
                     error={formErrors.dni}
-                    placeholder="7 u 8 dígitos"
+                    placeholder="8 dígitos"
                 />
 
                 <Input

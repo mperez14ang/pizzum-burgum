@@ -8,6 +8,7 @@ import {useAuth} from "../contexts/AuthContext.jsx";
 import FavoriteDetailModal from "./modals/FavoriteDetailModal.jsx";
 import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
+import {Loading} from "../components/common/Loading.jsx";
 
 export const FavoritesPage = ({ onNavigate, onBack }) => {
     const { favorites, isLoading, removeFromFavorites } = useFavorites();
@@ -103,7 +104,7 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
         if (confirm('¿Eliminar este favorito?')) {
             const result = await removeFromFavorites(favoriteId);
             if (!result.success) {
-                toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'), { duration: 2000 });
+                toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'));
             }
         }
     };
@@ -131,10 +132,7 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
 
                 {isLoading ? (
                     <div className="py-12">
-                        <div className="text-center">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-                            <p className="text-gray-600">Cargando favoritos...</p>
-                        </div>
+                        <Loading size="lg" text="Cargando favoritos ..." />
                     </div>
                 ) : processed.length === 0 ? (
                     <div className="py-12">

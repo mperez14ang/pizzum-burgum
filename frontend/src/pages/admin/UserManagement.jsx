@@ -56,7 +56,7 @@ export const UserManagement = () => {
 
             setUsers(data);
         } catch (error) {
-            toast.error('Error al cargar usuarios', { duration: 2000 });
+            toast.error('Error al cargar usuarios');
             console.error(error);
         } finally {
             setLoading(false);
@@ -93,7 +93,7 @@ export const UserManagement = () => {
         }
 
         if (!formData.dni.trim() || !/^\d{7,8}$/.test(formData.dni)) {
-            errors.dni = 'La cédula debe tener 7 u 8 dígitos';
+            errors.dni = 'La cédula debe tener 8 dígitos';
         }
 
         if (!formData.birthDate) {
@@ -136,11 +136,11 @@ export const UserManagement = () => {
             };
 
             await adminService.createAdmin(payload);
-            toast.success('Administrador creado correctamente', { duration: 2000 });
+            toast.success('Administrador creado correctamente');
             setIsFormModalOpen(false);
             loadUsers();
         } catch (error) {
-            toast.error('Error al crear administrador. El email o DNI ya podrían estar registrados.', { duration: 2000 });
+            toast.error('Error al crear administrador. El email o DNI ya podrían estar registrados.');
             console.error(error);
         } finally {
             setSubmitting(false);

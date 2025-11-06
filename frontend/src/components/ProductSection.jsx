@@ -28,9 +28,7 @@ export const ProductSection = ({
             );
         } else {
             if (section.maxItems && currentItems.length >= section.maxItems) {
-                toast.error(`Puedes seleccionar hasta ${section.maxItems} ${section.title.toLowerCase()}`, {
-                    duration: 2000
-                });
+                toast.error(`Puedes seleccionar hasta ${section.maxItems} ${section.title.toLowerCase()}`, {});
                 return;
             }
             onUpdateSelection(section.stateKey, [...currentItems, item]);

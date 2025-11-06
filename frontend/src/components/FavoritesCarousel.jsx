@@ -6,6 +6,7 @@ import {FavoriteComponent} from "./FavoriteComponent.jsx";
 import FavoriteDetailModal from "../pages/modals/FavoriteDetailModal.jsx";
 import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
+import {Loading} from "./common/Loading.jsx";
 
 export const FavoritesCarousel = ({ onOpenLogin, onNavigateToFavorites, carouselLength = 5 }) => {
     const { favorites, loadFavorites, isLoading } = useFavorites();
@@ -146,8 +147,7 @@ export const FavoritesCarousel = ({ onOpenLogin, onNavigateToFavorites, carousel
         return (
             <div className="py-12">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Cargando favoritos...</p>
+                    <Loading size="lg" text="Cargando favoritos ..." />
                 </div>
             </div>
         );

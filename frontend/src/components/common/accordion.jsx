@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-export const Accordion = ({ title, children, isOpen = false }) => {
+export const Accordion = ({ title, children, isOpen = true }) => {
     const [open, setOpen] = useState(isOpen);
 
     // sincroniza si cambia el prop

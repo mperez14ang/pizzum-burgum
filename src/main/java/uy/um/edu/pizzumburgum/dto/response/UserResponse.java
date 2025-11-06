@@ -19,5 +19,11 @@ public class UserResponse {
 
     private LocalDate birthDate;
 
+    private LocalDate createdDate;
+
     private String userType;
+
+    private String profileUrl;
+
+    private String dni;
 }

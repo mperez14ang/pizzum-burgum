@@ -1,18 +1,15 @@
-import React, { useState } from 'react';
-import { ChevronLeft, KeyRound } from 'lucide-react';
-import { EditPasswordModal } from "./modals/EditPasswordModal.jsx";
-import { capitalize } from "../utils/StringUtils.jsx";
-import { AddressComponent } from "../components/AddressComponent.jsx";
-import { CardComponent } from "../components/CardComponent.jsx";
+import React, {useState} from 'react';
+import {ChevronLeft, KeyRound} from 'lucide-react';
+import {EditPasswordModal} from "./modals/EditPasswordModal.jsx";
+import {AddressComponent} from "../components/AddressComponent.jsx";
+import {CardComponent} from "../components/CardComponent.jsx";
+import {UserInfoComponent} from "../components/UserInfoComponent.jsx";
 
 export const ProfilePage = ({
                                 user = {},
                                 onBack,
                                 onNavigate
                             }) => {
-    const firstName = user?.firstName ?? '';
-    const lastName = user?.lastName ?? '';
-
     // Modals
     const [showPasswordModal, setShowPasswordModal] = useState(false);
 
@@ -21,40 +18,56 @@ export const ProfilePage = ({
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Top bar */}
-                <div className="flex items-center justify-between mb-6">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Barra superior */}
+                <div className="flex items-center justify-between mb-8">
                     <button
                         onClick={onBack}
-                        className="inline-flex items-center text-gray-600 hover:text-gray-900"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-white/50 rounded-xl transition-all"
                     >
                         <ChevronLeft size={20} />
-                        <span className="ml-1">Volver</span>
+                        <span className="font-medium">Volver</span>
                     </button>
-
-                    {/* Discrete password edit button */}
                     <button
                         onClick={handleChangePassword}
-                        className="inline-flex items-center text-sm text-gray-500 hover:text-gray-800"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-white/50 rounded-xl transition-all"
                         title="Editar contraseña"
                     >
-                        <KeyRound size={16} className="mr-1" />
-                        Editar contraseña
+                        <KeyRound size={18} />
+                        <span className="font-medium">Editar contraseña</span>
                     </button>
                 </div>
 
-                {/* User name section */}
-                <div className="text-center mb-10">
-                    <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900">
-                        Nombre: <span className="font-black">{capitalize(firstName) || '—'}</span> <span className="font-black">{capitalize(lastName) || '—'}</span>
-                    </h1>
-                </div>
+                {/* Sección de perfil */}
+                <section className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-5 flex items-center gap-3">
+                        <div className="w-1 h-7 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full" />
+                        Información de usuario
+                    </h2>
+                    <UserInfoComponent user={user}/>
+                </section>
 
-                <AddressComponent user={user} />
 
-                <CardComponent user={user} />
+                {/* Direcciones */}
+                <section className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-5 flex items-center gap-3">
+                        <div className="w-1 h-7 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full" />
+                        Direcciones
+                    </h2>
+                    <AddressComponent user={user} />
+                </section>
 
+                {/* Métodos de pago */}
+                <section className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-5 flex items-center gap-3">
+                        <div className="w-1 h-7 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full" />
+                        Métodos de Pago
+                    </h2>
+                    <CardComponent user={user} />
+                </section>
+
+                {/* Modal */}
                 <EditPasswordModal
                     isOpen={showPasswordModal}
                     onClose={() => setShowPasswordModal(false)}

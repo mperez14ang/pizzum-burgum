@@ -2,6 +2,7 @@ import {Plus} from 'lucide-react';
 import React, {useEffect, useState} from 'react';
 import {Modal} from "../../components/common/Modal.jsx";
 import toast from "react-hot-toast";
+import {Loading} from "../../components/common/Loading.jsx";
 
 export const AddAddressModal = (
     {isOpen, onSave, onClose, isEditingAddress, setIsEditingAddress, editingAddressId, addresses
@@ -82,7 +83,7 @@ export const AddAddressModal = (
         >
             {isLoading ? (
                 <div className="flex justify-center items-center py-8">
-                    <span className="text-gray-500 text-sm">Cargando dirección...</span>
+                    <Loading size="lg" text="Cargando dirección ..." />
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">

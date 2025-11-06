@@ -45,7 +45,7 @@ public abstract class User implements UserDetails{
     private LocalDate birthDate;
 
     @NotBlank(message = "La cédula es obligatoria")
-    @Pattern(regexp = "\\d{7,8}", message = "La cédula debe tener 7 u 8 dígitos")
+    @Pattern(regexp = "\\d{8}", message = "La cédula debe tener 8 dígitos")
     @Column(unique = true, nullable = false, length = 8)
     private String dni;
 
@@ -53,6 +53,12 @@ public abstract class User implements UserDetails{
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
     @Column(nullable = false)
     private String password;
+
+    @Column(name = "avatar_seed")
+    private String avatarSeed;
+
+    @Column(name = "created_date")
+    private LocalDate createdDate;
 
     @Transient
     public abstract String getUserType();

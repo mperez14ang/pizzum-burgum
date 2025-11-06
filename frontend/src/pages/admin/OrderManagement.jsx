@@ -64,7 +64,7 @@ export const OrderManagement = () => {
             setOrders(sortedData);
             setFilteredOrders(sortedData);
         } catch (error) {
-            toast.error('Error al cargar pedidos', { duration: 2000 });
+            toast.error('Error al cargar pedidos');
             console.error(error);
         } finally {
             setLoading(false);
@@ -93,18 +93,18 @@ export const OrderManagement = () => {
 
     const submitUpdateState = async () => {
         if (!newState || newState === selectedOrder.state) {
-            toast.error('Selecciona un estado diferente', { duration: 2000 });
+            toast.error('Selecciona un estado diferente');
             return;
         }
 
         try {
             setUpdating(true);
             await adminService.updateOrderState(selectedOrder.id, newState);
-            toast.success('Estado actualizado correctamente', { duration: 2000 });
+            toast.success('Estado actualizado correctamente');
             setIsUpdateModalOpen(false);
             loadOrders();
         } catch (error) {
-            toast.error('Error al actualizar estado', { duration: 2000 });
+            toast.error('Error al actualizar estado');
             console.error(error);
         } finally {
             setUpdating(false);

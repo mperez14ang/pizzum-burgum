@@ -70,7 +70,7 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
             }
             setCartItems([])
             setCartItemCount(0)
-            toast.success('Pago realizado con exito!', { duration: 3000 });
+            toast.success('Pago realizado con exito!');
 
             // TODO: Aqui la idea seria que llevase al usuario a una pagina donde pueda ver el estado de su pedido
             onNavigate('home');

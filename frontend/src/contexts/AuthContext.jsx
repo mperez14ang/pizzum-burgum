@@ -1,6 +1,7 @@
 import {createContext, useContext, useEffect, useState} from 'react';
 import toast from "react-hot-toast";
 import {jwtDecode} from "jwt-decode";
+import {fetchFromAPI} from "../services/api.js";
 
 const AuthContext = createContext();
 
@@ -81,107 +82,74 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password, logInAfter=true) => {
         setIsLoading(true)
-        try {
-            const response = await fetch('http://localhost:8080/api/auth/v1/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email,
-                    password
-                }),
-            });
+        const data = await fetchFromAPI('/auth/v1/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email,
+                password
+            })
+        })
 
-            const data = await response.json();
+        console.log(data)
 
-            if (!response.ok) {
-                return {
-                    success: false,
-                    error: data.message || data.error || 'Error al iniciar sesión'
-                };
-            }
-
-            return addUser(data, logInAfter);
-        } catch (error) {
-            console.error('Error en login:', error);
-            return { success: false, error: 'Error de conexión. Intente nuevamente.' };
-        } finally {
+        if (data.error){
+            toast.error(data.error)
             setIsLoading(false)
+            return
         }
+
+        setIsLoading(false)
+        return addUser(data, logInAfter)
     };
 
     const register = async (email, password, firstName, lastName, birthDate, dni, logInAfter=true) => {
         setIsLoading(true)
-        try {
-            const response = await fetch('http://localhost:8080/api/auth/v1/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    firstName,
-                    lastName,
-                    birthDate,
-                    dni,
-                    email,
-                    password,
-                    addresses: [],
-                    favorites: [],
-                }),
-            });
+        const data = await fetchFromAPI('/auth/v1/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                firstName,
+                lastName,
+                birthDate,
+                dni,
+                email,
+                password,
+                addresses: [],
+                favorites: [],
+            })
+        })
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                return {
-                    success: false,
-                    error: data.message || data.error || 'Error al registrar usuario'
-                };
-            }
-
-            return addUser(data, logInAfter);
-
-        } catch (error) {
-            console.error('Error en register:', error);
-            return { success: false, error: 'Error de conexión. Intente nuevamente.' };
-        }
-        finally {
+        if (data.error){
+            toast.error(data.error)
             setIsLoading(false)
+            return
         }
+
+        setIsLoading(false)
+        return addUser(data, logInAfter)
     };
 
     const changePassword = async (email, oldPassword, newPassword, passwordConfirmation) => {
-        try {
-            const response = await fetch('http://localhost:8080/api/auth/v1/password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email,
-                    oldPassword,
-                    password: newPassword,
-                    passwordConfirmation
-                }),
-            });
+        const data = await fetchFromAPI('/auth/v1/password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email,
+                oldPassword,
+                password: newPassword,
+                passwordConfirmation
+            })
+        })
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                return {
-                    success: false,
-                    error: data.message || data.error || 'Error al cambiar la contraseña'
-                };
-            }
-
-            return {
-                success: true
-            }
-
-        } catch (error) {
-            console.error('Error al actualizar la contraseña:', error);
-            return { success: false, error: 'Error de conexión. Intente nuevamente.' };
+        if (data.error){
+            toast.error(data.error)
         }
     };
 
@@ -210,8 +178,17 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user');
     };
 
+    const updateUser = (updates) => {
+        setUser(prev => {
+            const updatedUser = { ...prev, ...updates };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            return updatedUser;
+        });
+    };
+
     const value = {
         user,
+        updateUser,
         isAuthenticated,
         isLoading,
         tokenAuth,

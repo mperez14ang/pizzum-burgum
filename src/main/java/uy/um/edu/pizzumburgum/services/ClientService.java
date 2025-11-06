@@ -1,5 +1,6 @@
 package uy.um.edu.pizzumburgum.services;
 
+import com.fabdelgado.ciuy.Validator;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.param.CustomerCreateParams;
@@ -23,6 +24,7 @@ import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.repository.CreationRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.ClientServiceInt;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,19 +37,34 @@ public class ClientService implements ClientServiceInt {
 
     private final ClientRepository clientRepository;
 
-    private final CreationRepository creationRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
     public ClientResponse createClient(ClientCreateRequest clientCreateRequest) {
+        return this.createClient(clientCreateRequest, true);
+    }
+
+    @Transactional
+    @Override
+    public ClientResponse createClient(ClientCreateRequest clientCreateRequest, boolean validateDni) {
         // Verificar que el cliente no existe
         if (clientRepository.existsById(clientCreateRequest.getEmail())){
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Cliente con id " + clientCreateRequest.getEmail() + " ya existe"
             );
+        }
+
+        // Validar dni
+        if (validateDni) {
+            Validator validator = new Validator();
+            if (!validator.validateCi(clientCreateRequest.getDni())){
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "La cédula no es valida"
+                );
+            }
         }
 
         Client client = ClientMapper.toClient(clientCreateRequest);
@@ -90,7 +107,10 @@ public class ClientService implements ClientServiceInt {
         client.setPassword(passwordEncoder.encode(clientCreateRequest.getPassword()));
 
         client.setAddresses(addresses);
+
         client = clientRepository.save(client);
+
+        // Crear avatar
 
         return ClientMapper.toClientResponse(client);
     }

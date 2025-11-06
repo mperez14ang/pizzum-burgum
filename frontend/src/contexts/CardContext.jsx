@@ -52,7 +52,7 @@ export const CardProvider = ({ children }) => {
             const response = await clientService.addCards(user.email, paymentMethod.id);
             console.log(response)
             if (response) {
-                toast.success("La tarjeta se guardo con exito", { duration: 2000 })
+                toast.success("La tarjeta se guardo con exito")
                 setSuccess(true);
                 setCardholderName('');
                 setEmail('');
@@ -123,6 +123,7 @@ export const CardProvider = ({ children }) => {
                 cardElement,
                 setCardElement,
                 loading,
+                isLoadingCards,
                 error,
                 success,
                 cardholderName,

@@ -15,7 +15,7 @@ export const FavoriteComponent = ({favorite, handleInfo}) => {
         if (confirm('¿Eliminar este favorito?')) {
             const result = await removeFromFavorites(favoriteId);
             if (!result.success) {
-                toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'), { duration: 2000 });
+                toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'));
             }
         }
     };

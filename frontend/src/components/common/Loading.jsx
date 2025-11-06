@@ -1,4 +1,4 @@
-export const Loading = ({ size = 'md', text = '' }) => {
+export const Loading = ({ size = 'md', text = '', color = 'border-primary' }) => {
     const sizes = {
         sm: 'w-4 h-4 border-2',
         md: 'w-8 h-8 border-3',
@@ -7,7 +7,7 @@ export const Loading = ({ size = 'md', text = '' }) => {
 
     return (
         <div className="flex flex-col items-center justify-center gap-2">
-            <div className={`${sizes[size]} border-primary border-t-transparent rounded-full animate-spin`}></div>
+            <div className={`${sizes[size]} ${color} border-t-transparent rounded-full animate-spin`}></div>
             {text && <p className="text-gray-600 text-sm">{text}</p>}
         </div>
     );

@@ -80,7 +80,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
                 const value = selections[section.stateKey];
 
                 if (!value || (Array.isArray(value) && value.length === 0)) {
-                    toast.error(validation.message, { duration: 2000 });
+                    toast.error(validation.message);
                     return false;
                 }
             }

@@ -3,6 +3,9 @@ package uy.um.edu.pizzumburgum.mapper;
 import uy.um.edu.pizzumburgum.dto.request.AdminCreateRequest;
 import uy.um.edu.pizzumburgum.dto.response.AdminResponse;
 import uy.um.edu.pizzumburgum.entities.Admin;
+import uy.um.edu.pizzumburgum.services.UserService;
+
+import java.time.LocalDate;
 
 public class AdminMapper {
 
@@ -16,6 +19,7 @@ public class AdminMapper {
                 .password(dto.getPassword())
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
+                .createdDate(LocalDate.now())
                 .build();
     }
 
@@ -29,6 +33,9 @@ public class AdminMapper {
                 .createdById(admin.getEmail())
                 .birthDate(admin.getBirthDate())
                 .userType(admin.getUserType())
+                .profileUrl(UserService.getAvatarUrl(admin))
+                .createdDate(admin.getCreatedDate())
+                .dni(admin.getDni())
                 .build();
     }
 }

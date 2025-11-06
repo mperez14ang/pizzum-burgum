@@ -22,6 +22,7 @@ import uy.um.edu.pizzumburgum.repository.UserRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.AuthServiceInt;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -54,22 +55,36 @@ public class AuthService implements AuthServiceInt {
         ClientResponse clientResponse = clientService.createClient(request);
 
         String jwtToken = jwtService.generateToken(clientResponse);
-        return new AuthResponse(jwtToken, clientResponse.getEmail(), clientResponse.getFirstName(), clientResponse.getLastName(), clientResponse.getUserType() , "Usuario " + clientResponse.getEmail() + " registrado correctamente");
+        return AuthResponse.builder()
+                .token(jwtToken)
+                .email(clientResponse.getEmail())
+                .firstName(clientResponse.getFirstName())
+                .lastName(clientResponse.getLastName())
+                .role(clientResponse.getUserType())
+                .message("Usuario " + clientResponse.getEmail() + " registrado correctamente")
+                .build();
 
     }
 
     @Override
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findById(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email o contraseña incorrecta"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Email o contraseña incorrecta");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email o contraseña incorrecta");
         }
 
         String jwtToken = jwtService.generateToken(user);
 
-        return new AuthResponse(jwtToken, user.getEmail(), user.getFirstName(), user.getLastName(), user.getUserType(), "Usuario " + user.getEmail() + " logueado correctamente");
+        return AuthResponse.builder()
+                .token(jwtToken)
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .role(user.getUserType())
+                .message("Usuario " + user.getEmail() + " logueado correctamente")
+                .build();
     }
 
     @Override

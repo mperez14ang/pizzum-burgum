@@ -124,21 +124,18 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                 ]);
             }
 
-            if (!response.success) {
-                let errorLog = response.error;
-                if (errorLog == null) errorLog = "Error desconocido"
-                toast.error(errorLog, { duration: 2000 });
+            if (!response) {
                 setIsLoading(false);
                 return;
             }
 
             if (response && response.token && isRegister) {
-                toast.success('Registro de usuario exitoso', { duration: 2000 });
+                toast.success('Registro de usuario exitoso');
             }
             setIsLoading(false);
         } catch (err) {
             if (err.message === "timeout") {
-                toast.error("El servidor tardó demasiado en responder (timeout)", { duration: 2000 });
+                toast.error("El servidor tardó demasiado en responder (timeout)");
             }
             setIsLoading(false);
         }

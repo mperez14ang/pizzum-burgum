@@ -59,7 +59,7 @@ public class ClientInitializer implements CommandLineRunner {
                                     .build()
                     ))
                     .build();
-            clientService.createClient(client);
+            clientService.createClient(client, false);
             System.out.println("Cliente " + client.getEmail() + " created");
         }
 

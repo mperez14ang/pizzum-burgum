@@ -4,6 +4,7 @@ import {useCard} from "../contexts/CardContext.jsx";
 import CardModal from "../pages/modals/CardModal.jsx";
 import {clientService} from "../services/api.js";
 import toast from "react-hot-toast";
+import {Loading} from "./common/Loading.jsx";
 
 export const CardComponent = ({
                                   user,
@@ -13,7 +14,7 @@ export const CardComponent = ({
                               }) => {
     const {
         cards,
-        loading,
+        isLoadingCards,
         getCards,
         createCard,
         deleteCard
@@ -118,6 +119,11 @@ export const CardComponent = ({
         }
     }
 
+    if (isLoadingCards) {
+        return (
+            <Loading size="lg" text="Cargando tarjetas ..." color='border-blue-600' />
+        );
+    }
 
     return (
         <>

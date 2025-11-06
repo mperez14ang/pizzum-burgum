@@ -13,6 +13,8 @@ public interface ClientServiceInt {
 
     ClientResponse createClient(ClientCreateRequest clientCreateRequest);
 
+    ClientResponse createClient(ClientCreateRequest clientCreateRequest, boolean validateDni);
+
     ClientResponse getClientByEmail(String email);
 
     List<ClientResponse> getClients();

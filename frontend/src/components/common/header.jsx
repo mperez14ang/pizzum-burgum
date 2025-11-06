@@ -23,7 +23,7 @@ export const Header = forwardRef(({onNavigate, hideCartButton = false}, ref) => 
     const handleLogout = () => {
         setIsDropdownOpen(false);
         logout();
-        toast.success('Sesión cerrada', { duration: 2000 });
+        toast.success('Sesión cerrada');
         // After logging out, navigate to Home page
         if (onNavigate) {
             onNavigate('home');

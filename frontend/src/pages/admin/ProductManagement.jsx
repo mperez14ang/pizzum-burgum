@@ -70,7 +70,7 @@ export const ProductManagement = () => {
 
             setProducts(data);
         } catch (error) {
-            toast.error('Error al cargar productos', { duration: 2000 });
+            toast.error('Error al cargar productos');
             console.error(error);
         } finally {
             setLoading(false);
@@ -142,11 +142,11 @@ export const ProductManagement = () => {
         }
         try {
             await adminService.deleteProduct(product.id);
-            toast.success('Producto eliminado', { duration: 2000 });
+            toast.success('Producto eliminado');
             // Recargar sin pasar filtros para mantener los actuales
             await loadProducts();
         } catch (error) {
-            toast.error('Error al eliminar producto', { duration: 2000 });
+            toast.error('Error al eliminar producto');
             console.error(error);
         }
     };
@@ -158,7 +158,7 @@ export const ProductManagement = () => {
             // Recargar sin pasar filtros para mantener los actuales
             await loadProducts();
         } catch (error) {
-            toast.error('Error al cambiar disponibilidad', { duration: 2000 });
+            toast.error('Error al cambiar disponibilidad');
             console.error(error);
         }
     };
@@ -204,17 +204,17 @@ export const ProductManagement = () => {
 
             if (editingProduct) {
                 await adminService.updateProduct(editingProduct.id, payload);
-                toast.success('Producto actualizado', { duration: 2000 });
+                toast.success('Producto actualizado');
             } else {
                 await adminService.createProduct(payload);
-                toast.success('Producto creado', { duration: 2000 });
+                toast.success('Producto creado');
             }
 
             setIsFormModalOpen(false);
             // Recargar sin pasar filtros para mantener los actuales
             await loadProducts();
         } catch (error) {
-            toast.error(editingProduct ? 'Error al actualizar producto' : 'Error al crear producto', { duration: 2000 });
+            toast.error(editingProduct ? 'Error al actualizar producto' : 'Error al crear producto');
             console.error('Error completo:', error);
         } finally {
             setSubmitting(false);

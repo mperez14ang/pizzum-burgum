@@ -1,5 +1,7 @@
 package uy.um.edu.pizzumburgum.services;
 
+import com.fabdelgado.ciuy.Validator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,14 +27,32 @@ public class AdminService implements AdminServiceInt {
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     @Override
     public AdminResponse createAdmin(AdminCreateRequest adminCreateRequest) {
+        return this.createAdmin(adminCreateRequest, true);
+    }
+
+    @Transactional
+    @Override
+    public AdminResponse createAdmin(AdminCreateRequest adminCreateRequest, boolean validateDni) {
         // Verificar si el email ya existe
         if (adminRepository.existsById(adminCreateRequest.getEmail())) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "Ya existe un administrador con el email: " + adminCreateRequest.getEmail()
             );
+        }
+
+        // Validar dni
+        if (validateDni) {
+            Validator validator = new Validator();
+            if (!validator.validateCi(adminCreateRequest.getDni())){
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "La cédula no es valida"
+                );
+            }
         }
 
         // Hashear la contraseña

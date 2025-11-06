@@ -10,6 +10,8 @@ import java.util.List;
 public interface AdminServiceInt {
     AdminResponse createAdmin(AdminCreateRequest adminCreateRequest);
 
+    AdminResponse createAdmin(AdminCreateRequest adminCreateRequest, boolean validateDni);
+
     AdminResponse getAdminByEmail(String email);
 
     List<AdminResponse> getAdmins();

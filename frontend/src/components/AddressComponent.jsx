@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import {AddAddressModal} from "../pages/modals/AddAddressModal.jsx";
 import {getBackendErrorMessage} from "../utils/parsers.jsx";
 import {clientService} from "../services/api.js";
+import {Loading} from "./common/Loading.jsx";
 
 export const AddressComponent = ({
                                      user,
@@ -125,6 +126,12 @@ export const AddressComponent = ({
             toast.error(message)
         }
     };
+
+    if (isLoadingAddresses) {
+        return (
+            <Loading size="lg" text="Cargando direcciones ..." color='border-blue-600' />
+        );
+    }
 
     return (
         <>

@@ -58,6 +58,9 @@ public class OrderBy {
     private Client client;
 
     public void setAddress(Address address) {
+        if (address == null){
+            return;
+        }
         this.deliveryStreet = address.getStreet();
         this.deliveryCity = address.getCity();
         this.deliveryPostalCode = address.getPostalCode();

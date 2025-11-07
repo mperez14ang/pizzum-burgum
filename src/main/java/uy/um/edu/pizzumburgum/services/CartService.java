@@ -68,18 +68,7 @@ public class CartService {
                 ));
 
         // 2. Buscar o crear carrito activo (UNPAID) - SIN DIRECCIÓN
-        OrderBy cart = orderByRepository
-                .findByClientEmailAndState(clientEmail, OrderState.UNPAID)
-                .orElseGet(() -> {
-                    log.info("No existe carrito activo, creando uno nuevo");
-
-                    OrderBy newCart = OrderBy.builder()
-                            .client(client)
-                            .state(OrderState.UNPAID)
-                            .creations(new HashSet<>())
-                            .build();
-                    return orderByRepository.save(newCart);
-                });
+        OrderBy cart = this.getActiveCart(clientEmail);
 
         // 3. Validar productos (ingredientes)
         Set<Product> products = new HashSet<>();
@@ -385,10 +374,29 @@ public class CartService {
 
         OrderBy cart = orderByRepository
                 .findByClientEmailAndState(clientEmail, OrderState.UNPAID)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "No existe un carrito activo para el cliente " + clientEmail
-                ));
+                .orElse(null);
+
+        if (cart == null){
+            Client client = clientRepository.findById(clientEmail)
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.NOT_FOUND,
+                            "Cliente con email " + clientEmail + " no encontrado"
+                    ));
+
+            cart = orderByRepository
+                    .findByClientEmailAndState(clientEmail, OrderState.UNPAID)
+                    .orElseGet(() -> {
+                        log.info("No existe carrito activo, creando uno nuevo");
+
+                        OrderBy newCart = OrderBy.builder()
+                                .client(client)
+                                .state(OrderState.UNPAID)
+                                .creations(new HashSet<>())
+                                .build();
+                        return orderByRepository.save(newCart);
+                    });
+        }
+
         // Validar que esté en estado UNPAID
         if (cart.getState() != OrderState.UNPAID) {
             throw new ResponseStatusException(

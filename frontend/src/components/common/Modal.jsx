@@ -1,12 +1,15 @@
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
+import {Loading} from "./Loading.jsx";
 
 export const Modal = ({
                           isOpen,
                           onClose,
                           title,
                           children,
-                          size = 'md'
+                          size = 'md',
+                          loading = false,
+                          loadingText = "cargando..."
                       }) => {
     useEffect(() => {
         if (isOpen) {
@@ -73,11 +76,21 @@ export const Modal = ({
                 )
 
             }
-
-                {/* Body */}
                 <div className="flex-1 overflow-y-auto px-6 py-6">
-                    {children}
+                {loading ? (
+                    <>
+                        <Loading size="lg" text={loadingText}/>
+                    </>
+                ) : (
+                    <>
+                        {/* Body */}
+
+                            {children}
+
+                    </>
+                )}
                 </div>
+
             </div>
         </div>
     );

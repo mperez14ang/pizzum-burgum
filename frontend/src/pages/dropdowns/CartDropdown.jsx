@@ -11,7 +11,7 @@ import {
 } from "../../utils/CartInteraction.jsx";
 import {useCart} from "../../contexts/CartContext.jsx";
 
-const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckout }) => {
+const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckout, onGoToExtras }) => {
     const { cartItems, setCartItems, itemCount, setCartItemCount } = useCart();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -171,6 +171,15 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
                                     onClick={onCheckout}>
                                         Finalizar Compra
                                         <ArrowRight className="w-5 h-5" />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            onClose();
+                                            onGoToExtras();
+                                        }}
+                                        className="w-full bg-orange-400 text-white py-2 rounded-lg hover:bg-gray-100 transition-colors border border-gray-300 text-sm"
+                                    >
+                                        Extras
                                     </button>
                                     <button
                                         onClick={onClose}

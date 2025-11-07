@@ -1,4 +1,4 @@
-export const Loading = ({ size = 'md', text = '', color = 'border-primary' }) => {
+export const Loading = ({ size = 'lg', text = '', color = 'border-primary' }) => {
     const sizes = {
         sm: 'w-4 h-4 border-2',
         md: 'w-8 h-8 border-3',

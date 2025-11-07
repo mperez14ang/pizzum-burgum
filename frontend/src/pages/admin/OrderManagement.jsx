@@ -60,7 +60,9 @@ export const OrderManagement = () => {
             setLoading(true);
             const data = await adminService.getAllOrders();
             // Sort by id descending (most recent first)
-            const sortedData = data.sort((a, b) => b.id - a.id);
+            const sortedData = data.sort
+            ((a, b) => b.id - a.id);
+            console.log(data)
             setOrders(sortedData);
             setFilteredOrders(sortedData);
         } catch (error) {
@@ -196,7 +198,7 @@ export const OrderManagement = () => {
             <OrderDetailModal
                 isOpen={isDetailModalOpen}
                 onClose={() => setIsDetailModalOpen(false)}
-                selectedOrderId={selectedOrder.id}
+                selectedOrderId={selectedOrder?.id}
                 ORDER_STATE_LABELS={ORDER_STATE_LABELS}
                 ORDER_STATE_COLORS={ORDER_STATE_COLORS}></OrderDetailModal>
 

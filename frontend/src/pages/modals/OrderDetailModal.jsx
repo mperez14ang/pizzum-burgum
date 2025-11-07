@@ -10,12 +10,17 @@ export const OrderDetailModal = ({isOpen, onClose, selectedOrderId, ORDER_STATE_
     useEffect(() => {
         const loadSelectedOrder = async () => {
             setLoading(true)
+            console.log(selectedOrderId)
             const response = await adminService.getOrder(selectedOrderId)
             setSelectedOrder(response)
             setLoading(false)
         }
-        loadSelectedOrder()
-    }, []);
+        if (isOpen){
+            setSelectedOrder(null)
+            loadSelectedOrder()
+        }
+
+    }, [isOpen]);
 
     return (
         <Modal
@@ -23,6 +28,7 @@ export const OrderDetailModal = ({isOpen, onClose, selectedOrderId, ORDER_STATE_
             onClose={onClose}
             title={`Detalle del Pedido #${selectedOrderId}`}
             size="lg"
+            loading={loading}
         >
             {selectedOrder && (
                 <div className="space-y-6">

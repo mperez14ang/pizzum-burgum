@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../components/common/Modal.jsx';
+import { adminService } from '../../services/api.js';
 
 // Order status modal showing a progress bar for the order lifecycle
 // States (in Spanish UI order):
@@ -10,10 +11,48 @@ export const OrderStatusModal = ({
   isOpen,
   onClose,
   order,
-  title = 'Estado del pedido'
+  title = 'Estado del pedido',
+  onOrderUpdated
 }) => {
   // Labels for UI
   const LABELS = ['Pago', 'En espera', 'En cola', 'En preparación', 'En camino', 'Entregado'];
+
+  const [localOrder, setLocalOrder] = useState(order);
+
+  // Polling each 5 seconds while open to refresh order state
+  useEffect(() => {
+    let intervalId;
+    let cancelled = false;
+
+    const fetchLatest = async () => {
+      try {
+        if (!order?.id) return;
+        const latest = await adminService.getOrder(order.id);
+        if (cancelled) return;
+        if (latest && latest.state && latest.state !== (localOrder?.state || order?.state)) {
+          setLocalOrder(latest);
+          if (typeof onOrderUpdated === 'function') {
+            onOrderUpdated(latest);
+          }
+        }
+      } catch (e) {
+        // Silent fail; modal is read-only
+        // console.error(e);
+      }
+    };
+
+    if (isOpen && order?.id) {
+      setLocalOrder(order);
+      // initial fetch to avoid waiting 5s
+      fetchLatest();
+      intervalId = setInterval(fetchLatest, 5000);
+    }
+
+    return () => {
+      cancelled = true;
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isOpen, order?.id, localOrder?.state]);
 
   // Map backend state to progress index (k)
   // -1 means nothing filled (UNPAID)
@@ -34,13 +73,14 @@ export const OrderStatusModal = ({
 
   // Decide current index from order
   const currentIndex = useMemo(() => {
-    if (!order) return -1;
-    const val = stateToIndex(order?.state);
+    const src = localOrder || order;
+    if (!src) return -1;
+    const val = stateToIndex(src?.state);
     if (val === 'CANCELLED') return 'CANCELLED';
     // If it's any state other than UNPAID, we assume payment done at least
     if (val >= 0) return val; // already mapped including paid progression
     return -1;
-  }, [order]);
+  }, [localOrder, order]);
 
   // Special spacing rule: distance between Pago (0) and En espera (1) is HALF the rest
   // Compute tick positions in % along the bar length
@@ -63,7 +103,7 @@ export const OrderStatusModal = ({
       {!order ? (
         <div className="text-gray-600">No se encontró información del pedido.</div>
       ) : (
-        <div>
+        <div className="px-2 sm:px-4">{/* extra horizontal padding */}
           {/* Header with order basic info if available */}
           {(order?.id || order?.code) && (
             <div className="mb-4 text-sm text-gray-600">Pedido #{order?.code ?? order?.id}</div>
@@ -103,7 +143,7 @@ export const OrderStatusModal = ({
                   {LABELS.map((label, idx) => (
                     <div
                       key={label}
-                      className="absolute -translate-x-1/2 text-xs text-gray-700 whitespace-nowrap"
+                      className="absolute -translate-x-1/2 text-xs text-gray-700 whitespace-nowrap px-1 text-center"
                       style={{ left: `${tickPositions[idx]}%` }}
                     >
                       {label}
@@ -117,9 +157,14 @@ export const OrderStatusModal = ({
       )}
 
       {/* Footer */}
-      <div className="mt-8 flex justify-end">
+      <div className="mt-8 flex justify-end px-2 sm:px-4">{/* match extra padding */}
         <button
-          onClick={onClose}
+          onClick={() => {
+            if (typeof onOrderUpdated === 'function' && (localOrder || order)) {
+              onOrderUpdated(localOrder || order);
+            }
+            onClose();
+          }}
           className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
         >
           Cerrar

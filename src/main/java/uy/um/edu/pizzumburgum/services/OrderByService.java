@@ -90,11 +90,6 @@ public class OrderByService implements OrderByInt {
         orderBy.setAddress(address);
         orderBy.setClient(client);
 
-        // Set creation date if not already set (avoid relying on auditing for minimal change)
-        if (orderBy.getDateCreated() == null) {
-            orderBy.setDateCreated(java.time.LocalDate.now());
-        }
-
         orderByRepository.save(orderBy);
         return OrderByMapper.toOrderByDto(orderBy);
     }

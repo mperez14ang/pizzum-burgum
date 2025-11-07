@@ -4,13 +4,17 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "order_by")
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -27,19 +31,23 @@ public class OrderBy {
     @Column(name = "state",  nullable = false)
     private OrderState state;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String deliveryStreet;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String deliveryCity;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String deliveryPostalCode;
 
     @Min(0)
     private BigDecimal extraAmount;
 
     private String notes;
+
+    @CreatedDate
+    @Column(name = "date_created", nullable = false, updatable = false)
+    private LocalDate dateCreated;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default

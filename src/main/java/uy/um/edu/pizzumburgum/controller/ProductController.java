@@ -126,9 +126,9 @@ public class ProductController {
 
         return ResponseEntity.ok(extras);
     }
-    @PutMapping
+    @PutMapping("{id}")
     public ResponseEntity<ProductDto> updateProduct(
-            @RequestParam Long id,
+            @PathVariable Long id,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) BigDecimal price,
             @RequestParam(required = false) ProductType productType,

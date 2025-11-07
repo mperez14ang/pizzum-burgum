@@ -65,7 +65,7 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 max-h-[600px] flex flex-col">
+                <div className="fixed inset-x-4 top-16 sm:absolute sm:right-0 sm:left-auto sm:top-auto mt-2 w-auto sm:w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 max-h-[600px] sm:max-h-[600px] flex flex-col">
                     <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                         <h2 className="text-lg font-semibold text-gray-800">
                             Carrito {isAuthenticated && `(${itemCount})`}

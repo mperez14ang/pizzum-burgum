@@ -267,7 +267,7 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
 
                                 {/* Botón continuar sin extras */}
                                 <button
-                                    onClick={() => onNavigate('cart')}
+                                    onClick={() => onNavigate('checkout')}
                                     className="w-full mt-3 bg-gray-100 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors"
                                 >
                                     Continuar sin extras

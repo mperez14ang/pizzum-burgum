@@ -241,7 +241,8 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
                                 favoriteName,
                                 selections,
                                 setCartItemCount,
-                                itemCount
+                                itemCount,
+                                setShowCartModal
                             });
                         }}
                         isSavingFavorite={isSavingFavorite}

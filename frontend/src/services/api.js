@@ -217,6 +217,16 @@ export const cartService = {
                 quantity
             })
         });
+
+    },
+    addExtraToCart: async (extraData) => {
+        try {
+            const response = await apiClient.post('/cart/add-extra', extraData);
+            return response.data;
+        } catch (error) {
+            console.error('Error adding extra to cart:', error);
+            throw error;
+        }
     },
 
     addCreationToCart: async (creationId, quantity) => {

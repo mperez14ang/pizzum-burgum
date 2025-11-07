@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react';
-import { adminService } from '../../services/api';
-import { Card, CardHeader, CardBody } from '../../components/common/Card';
-import { Button } from '../../components/common/Button';
-import { Input } from '../../components/common/Input';
-import { Select } from '../../components/common/Select';
-import { Badge } from '../../components/common/Badge';
-import { Modal } from '../../components/common/Modal';
-import { Loading } from '../../components/common/Loading';
-import { Plus, Edit, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
-import toast, { Toaster } from 'react-hot-toast';
+import {useEffect, useState} from 'react';
+import {adminService} from '../../services/api';
+import {Card, CardBody} from '../../components/common/Card';
+import {Button} from '../../components/common/Button';
+import {Select} from '../../components/common/Select';
+import {Badge} from '../../components/common/Badge';
+import {Loading} from '../../components/common/Loading';
+import {Edit, Plus, ToggleLeft, ToggleRight, Trash2} from 'lucide-react';
+import toast from 'react-hot-toast';
 import {CreateProductModal} from "../modals/CreateProductModal.jsx";
 
 const CATEGORY_LABELS = {
@@ -122,6 +120,7 @@ export const ProductManagement = () => {
 
     const handleEdit = (product) => {
         setEditingProduct(product);
+        console.log("editing")
         setFormData({
             name: product.name,
             price: product.price,

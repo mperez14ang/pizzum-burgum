@@ -308,27 +308,27 @@ export const clientService = {
 
     updateAddress(addressId, street, city, postalCode){
         return fetchFromAPI(`/address/${addressId}`, {
-            method: 'PUT',
-            body: JSON.stringify({
-                street,
-                city,
-                postalCode
-            })
+                method: 'PUT',
+                body: JSON.stringify({
+                    street,
+                    city,
+                    postalCode
+                })
             }
         );
     },
 
     deleteAddress(addressId){
         return fetchFromAPI(`/address/${addressId}`, {
-            method: 'DELETE'
-        }
+                method: 'DELETE'
+            }
         );
     },
 
     setAddressAsActive(addressId){
         return fetchFromAPI(`/address/${addressId}/active`, {
-            method: 'PATCH'
-        }
+                method: 'PATCH'
+            }
         );
     },
 

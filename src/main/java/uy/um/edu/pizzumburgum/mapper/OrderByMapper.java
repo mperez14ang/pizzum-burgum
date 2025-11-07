@@ -68,6 +68,7 @@ public class OrderByMapper {
                 .extraAmount(orderBy.getExtraAmount())
                 .totalPrice(totalPrice)
                 .notes(orderBy.getNotes())
+                .dateCreated(orderBy.getDateCreated())
                 .build();
     }
 }

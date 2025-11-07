@@ -50,6 +50,10 @@ export const Header = forwardRef(({onNavigate, hideCartButton = false}, ref) => 
         setIsCartOpen(false)
         onNavigate('checkout')
     }
+    const handleGoToExtras = () => {
+        setIsCartOpen(false);
+        onNavigate('extras');
+    }
 
     return (
         <>
@@ -67,6 +71,7 @@ export const Header = forwardRef(({onNavigate, hideCartButton = false}, ref) => 
                                               onToggle={onToggleCart}
                                               onClose={() => setIsCartOpen(false)}
                                               handleClickOutside={handleClickOutside}
+                                              onGoToExtras={handleGoToExtras}
                                               onCheckout={handleCheckout}
                                 />
                             )}

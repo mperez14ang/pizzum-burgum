@@ -165,7 +165,11 @@ export const adminService = {
 
     // Orders
     getAllOrders: async () => {
-        return fetchFromAPI('/order/v1');
+        return fetchFromAPI('/order/v1/list');
+    },
+
+    getOrder: async (orderId) => {
+        return fetchFromAPI(`/order/v1/${orderId}`)
     },
 
     getOrdersByState: async (state) => {

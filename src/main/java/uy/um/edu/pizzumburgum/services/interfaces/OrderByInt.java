@@ -2,6 +2,7 @@ package uy.um.edu.pizzumburgum.services.interfaces;
 
 import org.springframework.http.ResponseEntity;
 import uy.um.edu.pizzumburgum.dto.request.OrderByRequest;
+import uy.um.edu.pizzumburgum.dto.response.OrderByDataResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.entities.OrderState;
 
@@ -20,4 +21,6 @@ public interface OrderByInt {
     OrderByResponse updateOrder(Long id, OrderByRequest orderByDto);
 
     ResponseEntity<Map<String, Object>> deleteOrder(Long id);
+
+    List<OrderByDataResponse> getOrdersSimpleData();
 }

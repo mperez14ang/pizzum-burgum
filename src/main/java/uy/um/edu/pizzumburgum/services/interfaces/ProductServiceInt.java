@@ -23,8 +23,6 @@ public interface ProductServiceInt {
 
     ResponseEntity<Map<String, Object>> deleteProduct(Long id) throws ResponseStatusException;
 
-    Object updateProduct(Long id, String name, BigDecimal price, ProductType productType, ProductCategory productCategory, Boolean available);
-
     @Transactional
     ProductDto updateProduct(Long id, ProductDto dto) throws ResponseStatusException;
 }

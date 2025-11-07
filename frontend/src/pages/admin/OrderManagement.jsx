@@ -196,7 +196,7 @@ export const OrderManagement = () => {
             <OrderDetailModal
                 isOpen={isDetailModalOpen}
                 onClose={() => setIsDetailModalOpen(false)}
-                selectedOrder={selectedOrder}
+                selectedOrderId={selectedOrder.id}
                 ORDER_STATE_LABELS={ORDER_STATE_LABELS}
                 ORDER_STATE_COLORS={ORDER_STATE_COLORS}></OrderDetailModal>
 

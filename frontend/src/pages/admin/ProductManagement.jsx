@@ -121,13 +121,7 @@ export const ProductManagement = () => {
     const handleEdit = (product) => {
         setEditingProduct(product);
         console.log("editing")
-        setFormData({
-            name: product.name,
-            price: product.price,
-            productCategory: product.productCategory,
-            productType: product.productType,
-            available: product.available !== false
-        });
+        setFormData(product);
         setFormErrors({});
         if (product.productCategory) {
             loadTypesByCategory(product.productCategory);
@@ -202,6 +196,7 @@ export const ProductManagement = () => {
             console.log('Enviando producto:', payload);
 
             if (editingProduct) {
+                console.log(payload)
                 await adminService.updateProduct(editingProduct.id, payload);
                 toast.success('Producto actualizado');
             } else {

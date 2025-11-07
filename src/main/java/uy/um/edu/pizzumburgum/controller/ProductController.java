@@ -126,22 +126,13 @@ public class ProductController {
 
         return ResponseEntity.ok(extras);
     }
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(
             @PathVariable Long id,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) BigDecimal price,
-            @RequestParam(required = false) ProductType productType,
-            @RequestParam(required = false) ProductCategory productCategory,
-            @RequestParam(required = false) Boolean available) {
+            @RequestBody ProductDto productDto) {
         return ResponseEntity.ok(productService.updateProduct(
-                id, name, price, productType, productCategory, available
+                id, productDto
         ));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto) {
-        return ResponseEntity.ok(productService.updateProduct(id, productDto));
     }
 
     @DeleteMapping("/{id}")

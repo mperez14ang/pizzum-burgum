@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.OrderByRequest;
+import uy.um.edu.pizzumburgum.dto.response.OrderByDataResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.entities.*;
 import uy.um.edu.pizzumburgum.mapper.OrderByMapper;
@@ -208,6 +209,20 @@ public class OrderByService implements OrderByInt {
         body.put("message", "Orden " + orderBy.getId() + " fue eliminado");
 
         return ResponseEntity.ok(body);
+    }
+
+    @Override
+    public List<OrderByDataResponse> getOrdersSimpleData() {
+        List<OrderBy> orderByList = orderByRepository.findAll();
+        return orderByList.stream()
+                .map(
+                        orderBy -> OrderByDataResponse.builder()
+                                .id(orderBy.getId())
+                                .clientEmail(orderBy.getClient().getEmail())
+                                .state(orderBy.getState())
+                                .address(orderBy.getDeliveryStreet() + ", " + orderBy.getDeliveryCity())
+                                .build()
+                ).collect(Collectors.toList());
     }
 
     public OrderByResponse updateOrderState(Long id, OrderState state) {

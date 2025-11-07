@@ -3,6 +3,7 @@ package uy.um.edu.pizzumburgum.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uy.um.edu.pizzumburgum.dto.request.OrderByRequest;
+import uy.um.edu.pizzumburgum.dto.response.OrderByDataResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.entities.OrderState;
 import uy.um.edu.pizzumburgum.services.OrderByService;
@@ -70,5 +71,10 @@ public class OrderByController {
                         .map(Enum::name)
                         .toList()
         );
+    }
+
+    @GetMapping("/list")
+    private ResponseEntity<List<OrderByDataResponse>> getOrderByList(){
+        return ResponseEntity.ok(orderByService.getOrdersSimpleData());
     }
 }

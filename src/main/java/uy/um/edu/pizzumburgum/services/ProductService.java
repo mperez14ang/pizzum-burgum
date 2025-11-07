@@ -107,12 +107,17 @@ public class ProductService implements ProductServiceInt {
     }
 
     @Override
-    public ProductDto updateProduct(Long id, String name, BigDecimal price,
-                                ProductType productType, ProductCategory productCategory, Boolean available) {
-        System.out.println("Updating Product " + id + " " + name);
+    public ProductDto updateProduct(Long id, ProductDto productDto) throws ResponseStatusException {
+        System.out.println("Updating Product " + id + " " + productDto.getName());
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Producto con id : " + id + " no encontrado"));
+
+        String name = productDto.getName();
+        ProductType productType = productDto.getProductType();
+        ProductCategory productCategory = productDto.getProductCategory();
+        Boolean available = productDto.getAvailable();
+        BigDecimal price = productDto.getPrice();
 
         this.checkCompatibility(productType, productCategory);
 
@@ -124,12 +129,6 @@ public class ProductService implements ProductServiceInt {
 
         product = productRepository.save(product);
         return ProductMapper.toProductDto(product);
-    }
-
-    @Transactional
-    @Override
-    public ProductDto updateProduct(Long id, ProductDto dto) throws ResponseStatusException {
-        return this.updateProduct(dto.getId(), dto.getName(), dto.getPrice(), dto.getProductType(), dto.getProductCategory(), dto.getAvailable());
     }
 
     private void checkCompatibility(ProductType productType, ProductCategory productCategory) throws ResponseStatusException {

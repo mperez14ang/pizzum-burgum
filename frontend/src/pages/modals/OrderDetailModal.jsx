@@ -1,12 +1,27 @@
 import {Badge} from "../../components/common/Badge.jsx";
 import {Modal} from "../../components/common/Modal.jsx";
+import {useEffect, useState} from "react";
+import {adminService} from "../../services/api.js";
 
-export const OrderDetailModal = ({isOpen, onClose, selectedOrder, ORDER_STATE_COLORS, ORDER_STATE_LABELS}) => {
+export const OrderDetailModal = ({isOpen, onClose, selectedOrderId, ORDER_STATE_COLORS, ORDER_STATE_LABELS}) => {
+    const [selectedOrder, setSelectedOrder] = useState(null)
+    const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        const loadSelectedOrder = async () => {
+            setLoading(true)
+            const response = await adminService.getOrder(selectedOrderId)
+            setSelectedOrder(response)
+            setLoading(false)
+        }
+        loadSelectedOrder()
+    }, []);
+
     return (
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title={`Detalle del Pedido #${selectedOrder?.id}`}
+            title={`Detalle del Pedido #${selectedOrderId}`}
             size="lg"
         >
             {selectedOrder && (

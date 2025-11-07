@@ -7,7 +7,6 @@ import uy.um.edu.pizzumburgum.entities.*;
 import uy.um.edu.pizzumburgum.repository.AddressRepository;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,7 +25,6 @@ public class OrderByMapper {
                 .deliveryPostalCode(address.getPostalCode())
                 .extraAmount(orderByRequest.getExtraAmount())
                 .notes(orderByRequest.getNotes())
-                .dateCreated(LocalDate.now())
                 .build();
     }
 
@@ -70,7 +68,6 @@ public class OrderByMapper {
                 .extraAmount(orderBy.getExtraAmount())
                 .totalPrice(totalPrice)
                 .notes(orderBy.getNotes())
-                .dateCreated(orderBy.getDateCreated())
                 .build();
     }
 }

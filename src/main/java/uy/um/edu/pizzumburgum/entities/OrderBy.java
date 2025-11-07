@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -41,10 +40,6 @@ public class OrderBy {
     private BigDecimal extraAmount;
 
     private String notes;
-
-    @CreatedDate
-    @Column(name = "date_created", nullable = false)
-    private java.time.LocalDate dateCreated;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     @Builder.Default

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import uy.um.edu.pizzumburgum.entities.OrderState;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -34,8 +33,6 @@ public class OrderByResponse {
     private String clientEmail;
 
     private String notes;
-
-    private LocalDate dateCreated;
 
     private String clientName;
 

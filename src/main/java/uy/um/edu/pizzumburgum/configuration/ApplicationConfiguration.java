@@ -2,6 +2,7 @@ package uy.um.edu.pizzumburgum.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import uy.um.edu.pizzumburgum.repository.UserRepository;
 
 @Configuration
+@EnableJpaAuditing
 public class ApplicationConfiguration {
     private final UserRepository userRepository;
 

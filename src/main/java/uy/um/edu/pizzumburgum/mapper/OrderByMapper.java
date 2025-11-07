@@ -20,6 +20,7 @@ public class OrderByMapper {
 
         return OrderBy.builder()
                 .state(orderByRequest.getState())
+                .createdAt(java.time.LocalDateTime.now())
                 .deliveryCity(address.getCity())
                 .deliveryStreet(address.getStreet())
                 .deliveryPostalCode(address.getPostalCode())

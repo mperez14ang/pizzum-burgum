@@ -62,6 +62,10 @@ public class SecurityConfig {
                         // ============ ADMIN ONLY ============
                         .requestMatchers("/api/admin/**").hasRole(ADMIN)
 
+                        // ============ PUBLIC (DGI & BPS) ============
+                        .requestMatchers("/api/dgi/**").permitAll()
+                        .requestMatchers("/api/bps/**").permitAll()
+
                         // ============ CLIENT + ADMIN ============
                         // User
                         .requestMatchers("/api/v1/user/**").hasAnyRole(CLIENT, ADMIN)

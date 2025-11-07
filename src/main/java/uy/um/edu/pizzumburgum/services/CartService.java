@@ -76,6 +76,7 @@ public class CartService {
                     OrderBy newCart = OrderBy.builder()
                             .client(client)
                             .state(OrderState.UNPAID)
+                            .createdAt(LocalDateTime.now())
                             .creations(new HashSet<>())
                             .build();
                     return orderByRepository.save(newCart);

@@ -216,12 +216,21 @@ public class OrderByService implements OrderByInt {
         List<OrderBy> orderByList = orderByRepository.findAll();
         return orderByList.stream()
                 .map(
-                        orderBy -> OrderByDataResponse.builder()
-                                .id(orderBy.getId())
-                                .clientEmail(orderBy.getClient().getEmail())
-                                .state(orderBy.getState())
-                                .address(orderBy.getDeliveryStreet() + ", " + orderBy.getDeliveryCity())
-                                .build()
+                        orderBy -> {
+                            String address;
+                            if (orderBy.getDeliveryStreet() != null && orderBy.getDeliveryCity() != null) {
+                                address = orderBy.getDeliveryStreet() + ", " + orderBy.getDeliveryCity();
+                            } else {
+                                address = "Dirección pendiente";
+                            }
+
+                            return OrderByDataResponse.builder()
+                                    .id(orderBy.getId())
+                                    .clientEmail(orderBy.getClient().getEmail())
+                                    .state(orderBy.getState())
+                                    .address(address)
+                                    .build();
+                        }
                 ).collect(Collectors.toList());
     }
 

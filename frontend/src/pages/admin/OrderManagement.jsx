@@ -59,6 +59,16 @@ export const OrderManagement = () => {
         try {
             setLoading(true);
             const data = await adminService.getAllOrders();
+
+            // Validar que data sea un array
+            if (!Array.isArray(data)) {
+                console.error('La respuesta no es un array:', data);
+                toast.error('Error en el formato de datos');
+                setOrders([]);
+                setFilteredOrders([]);
+                return;
+            }
+
             // Sort by id descending (most recent first)
             const sortedData = data.sort((a, b) => b.id - a.id);
             setOrders(sortedData);
@@ -66,6 +76,8 @@ export const OrderManagement = () => {
         } catch (error) {
             toast.error('Error al cargar pedidos');
             console.error(error);
+            setOrders([]);
+            setFilteredOrders([]);
         } finally {
             setLoading(false);
         }
@@ -74,9 +86,18 @@ export const OrderManagement = () => {
     const loadOrderStates = async () => {
         try {
             const states = await adminService.getOrderStates();
+
+            // Validar que states sea un array
+            if (!Array.isArray(states)) {
+                console.error('Los estados no son un array:', states);
+                setOrderStates([]);
+                return;
+            }
+
             setOrderStates(states);
         } catch (error) {
             console.error('Error loading order states:', error);
+            setOrderStates([]);
         }
     };
 
@@ -165,7 +186,7 @@ export const OrderManagement = () => {
                                         </div>
                                         <div className="text-sm text-gray-600 space-y-1">
                                             <p>Cliente: {order.clientEmail}</p>
-                                            <p>Dirección: {order.deliveryStreet}, {order.deliveryCity}</p>
+                                            <p>Dirección: {order.address}</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
@@ -193,24 +214,28 @@ export const OrderManagement = () => {
             )}
 
             {/* Detail Modal */}
-            <OrderDetailModal
-                isOpen={isDetailModalOpen}
-                onClose={() => setIsDetailModalOpen(false)}
-                selectedOrderId={selectedOrder.id}
-                ORDER_STATE_LABELS={ORDER_STATE_LABELS}
-                ORDER_STATE_COLORS={ORDER_STATE_COLORS}></OrderDetailModal>
+            {selectedOrder && (
+                <OrderDetailModal
+                    isOpen={isDetailModalOpen}
+                    onClose={() => setIsDetailModalOpen(false)}
+                    selectedOrderId={selectedOrder.id}
+                    ORDER_STATE_LABELS={ORDER_STATE_LABELS}
+                    ORDER_STATE_COLORS={ORDER_STATE_COLORS}></OrderDetailModal>
+            )}
 
             {/* Update State Modal */}
-            <UpdateOrderStateModal
-                isOpen={isUpdateModalOpen}
-                onClose={() => setIsUpdateModalOpen(false)}
-                selectedOrder={selectedOrder}
-                newState={newState}
-                setNewState={setNewState}
-                orderStates={orderStates}
-                updating={updating}
-                onSubmit={submitUpdateState}
-                ORDER_STATE_LABELS={ORDER_STATE_LABELS}></UpdateOrderStateModal>
+            {selectedOrder && (
+                <UpdateOrderStateModal
+                    isOpen={isUpdateModalOpen}
+                    onClose={() => setIsUpdateModalOpen(false)}
+                    selectedOrder={selectedOrder}
+                    newState={newState}
+                    setNewState={setNewState}
+                    orderStates={orderStates}
+                    updating={updating}
+                    onSubmit={submitUpdateState}
+                    ORDER_STATE_LABELS={ORDER_STATE_LABELS}></UpdateOrderStateModal>
+            )}
         </div>
     );
 };

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,13 +28,16 @@ public class OrderBy {
     @Column(name = "state",  nullable = false)
     private OrderState state;
 
-    @Column(nullable = false)
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column
     private String deliveryStreet;
 
-    @Column(nullable = false)
+    @Column
     private String deliveryCity;
 
-    @Column(nullable = false)
+    @Column
     private String deliveryPostalCode;
 
     @Min(0)

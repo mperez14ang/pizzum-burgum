@@ -31,13 +31,13 @@ public class OrderBy {
     @Column(name = "state",  nullable = false)
     private OrderState state;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String deliveryStreet;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String deliveryCity;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String deliveryPostalCode;
 
     @Min(0)

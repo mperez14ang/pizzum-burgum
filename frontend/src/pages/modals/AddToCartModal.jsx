@@ -1,7 +1,7 @@
 import { ShoppingBag, Plus, ArrowRight } from 'lucide-react';
 import { Modal } from '../../components/common/Modal.jsx';
 
-export const AddToCartModal = ({ isOpen, onClose, onContinueShopping, onGoToExtras, productType }) => {
+export const AddToCartModal = ({ isOpen, onClose, onContinueShopping, onGoToExtras, type }) => {
     return (
         <Modal
             isOpen={isOpen}
@@ -14,7 +14,7 @@ export const AddToCartModal = ({ isOpen, onClose, onContinueShopping, onGoToExtr
                     <ShoppingBag className="text-green-500" size={32} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    Tu {productType === 'pizza' ? 'pizza' : 'hamburguesa'} se agregó al carrito
+                    Tu {type === 'pizza' ? 'pizza' : 'hamburguesa'} se agregó al carrito
                 </h3>
                 <p className="text-gray-600 mb-6">
                     ¿Qué te gustaría hacer ahora?

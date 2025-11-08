@@ -121,10 +121,10 @@ function App() {
                     <CreatorProvider>
                         {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
                         {currentPage === 'creator-pizza' && (
-                            <CreatorPage productType={"pizza"} onBack={handleBack} onNavigate={handleNavigate}/>
+                            <CreatorPage type={"pizza"} onBack={handleBack} onNavigate={handleNavigate}/>
                         )}
                         {currentPage === 'creator-burger' && (
-                            <CreatorPage productType={"burger"} onBack={handleBack} onNavigate={handleNavigate}/>
+                            <CreatorPage type={"burger"} onBack={handleBack} onNavigate={handleNavigate}/>
                         )}
                         {currentPage === 'extras' && (
                             <ExtrasPage onBack={handleBack} onNavigate={handleNavigate}/>

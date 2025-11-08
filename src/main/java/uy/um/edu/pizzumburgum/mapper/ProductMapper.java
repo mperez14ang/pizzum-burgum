@@ -9,11 +9,12 @@ public class ProductMapper {
         return ProductDto.builder()
                 .id(product.getId())
                 .name(product.getName())
-                .productType(product.getType())
+                .type(product.getType())
                 .price(product.getPrice())
-                .productCategory(product.getCategory())
+                .category(product.getCategory())
                 .available(product.getAvailable())
                 .deleted(product.getDeleted())
+                .image(product.getImage())
                 .build();
     }
 
@@ -21,11 +22,12 @@ public class ProductMapper {
         return Product.builder()
                 .id(productDto.getId())
                 .name(productDto.getName())
-                .type(productDto.getProductType())
+                .type(productDto.getType())
                 .price(productDto.getPrice())
-                .category(productDto.getProductCategory())
+                .category(productDto.getCategory())
                 .available(productDto.getAvailable() != null ? productDto.getAvailable() : true)
                 .deleted(productDto.getDeleted() != null ? productDto.getDeleted() : false)
+                .image(productDto.getImage())
                 .build();
     }
 }

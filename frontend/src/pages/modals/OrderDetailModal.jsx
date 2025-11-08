@@ -91,7 +91,7 @@ export const OrderDetailModal = ({isOpen, onClose, selectedOrderId, ORDER_STATE_
                                                             className="flex justify-between text-gray-600"
                                                         >
                             <span>
-                              {p["product"]?.name} ({p["product"]?.productType})
+                              {p["product"]?.name} ({p["product"]?.type})
                             </span>
                                                             <span>x{p.quantity}</span>
                                                         </li>

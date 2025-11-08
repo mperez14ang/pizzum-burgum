@@ -54,43 +54,43 @@ public class ProductController {
         Map<String, List<ProductDto>> ingredients = new HashMap<>();
 
         ingredients.put("BREAD_OPTIONS", availableProducts.stream()
-                .filter(p -> p.getProductType().equals(ProductType.BREAD))
+                .filter(p -> p.getType().equals(ProductType.BREAD))
                 .toList());
 
         ingredients.put("MEAT_OPTIONS", availableProducts.stream()
-                .filter(p -> p.getProductType().equals(ProductType.MEAT))
+                .filter(p -> p.getType().equals(ProductType.MEAT))
                 .toList());
 
         ingredients.put("BURGER_CHEESE", availableProducts.stream()
-                .filter(p -> p.getProductType().equals(ProductType.BURGER_CHEESE))
+                .filter(p -> p.getType().equals(ProductType.BURGER_CHEESE))
                 .toList());
 
         ingredients.put("BURGER_TOPPINGS", availableProducts.stream()
-                .filter(p -> p.getProductType().equals(ProductType.BURGER_TOPPINGS))
+                .filter(p -> p.getType().equals(ProductType.BURGER_TOPPINGS))
                 .toList());
 
         ingredients.put("BURGER_SAUCES", availableProducts.stream()
-                .filter(p -> p.getProductType().equals(ProductType.SAUCE))
+                .filter(p -> p.getType().equals(ProductType.SAUCE))
                 .toList());
 
         ingredients.put("PIZZA_DOUGH", availableProducts.stream()
-                .filter(p -> p.getProductType().equals(ProductType.DOUGH))
+                .filter(p -> p.getType().equals(ProductType.DOUGH))
                 .toList());
 
         ingredients.put("PIZZA_SIZES", availableProducts.stream()
-                .filter(p -> p.getProductType().equals(ProductType.PIZZA_SIZE))
+                .filter(p -> p.getType().equals(ProductType.PIZZA_SIZE))
                 .toList());
 
         ingredients.put("PIZZA_SAUCE", availableProducts.stream()
-                .filter(p -> p.getProductType().equals(ProductType.SAUCE))
+                .filter(p -> p.getType().equals(ProductType.SAUCE))
                 .toList());
 
         ingredients.put("PIZZA_CHEESE", availableProducts.stream()
-                .filter(p -> p.getProductType().equals(ProductType.PIZZA_CHEESE))
+                .filter(p -> p.getType().equals(ProductType.PIZZA_CHEESE))
                 .toList());
 
         ingredients.put("PIZZA_TOPPINGS", availableProducts.stream()
-                .filter(p -> p.getProductType().equals(ProductType.PIZZA_TOPPINGS))
+                .filter(p -> p.getType().equals(ProductType.PIZZA_TOPPINGS))
                 .toList());
 
 
@@ -103,25 +103,25 @@ public class ProductController {
         // Filter only available products from EXTRA category
         List<ProductDto> availableExtras = allProducts.stream()
                 .filter(p -> p.getAvailable() != null && p.getAvailable())
-                .filter(p -> p.getProductCategory() != null && p.getProductCategory().equals(ProductCategory.EXTRA))
+                .filter(p -> p.getCategory() != null && p.getCategory().equals(ProductCategory.EXTRA))
                 .toList();
 
         Map<String, List<ProductDto>> extras = new HashMap<>();
 
         extras.put("BEBIDA", availableExtras.stream()
-                .filter(p -> p.getProductType().equals(ProductType.BEBIDA))
+                .filter(p -> p.getType().equals(ProductType.BEBIDA))
                 .toList());
 
         extras.put("POSTRE", availableExtras.stream()
-                .filter(p -> p.getProductType().equals(ProductType.POSTRE))
+                .filter(p -> p.getType().equals(ProductType.POSTRE))
                 .toList());
 
         extras.put("ACOMPANAMIENTO", availableExtras.stream()
-                .filter(p -> p.getProductType().equals(ProductType.ACOMPANAMIENTO))
+                .filter(p -> p.getType().equals(ProductType.ACOMPANAMIENTO))
                 .toList());
 
         extras.put("OTROS", availableExtras.stream()
-                .filter(p -> p.getProductType().equals(ProductType.OTROS))
+                .filter(p -> p.getType().equals(ProductType.OTROS))
                 .toList());
 
         return ResponseEntity.ok(extras);

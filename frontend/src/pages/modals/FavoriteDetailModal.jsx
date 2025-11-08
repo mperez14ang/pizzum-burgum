@@ -152,14 +152,14 @@ export const FavoriteDetailModal = ({ isOpen, onClose, favorite, onOrder }) => {
                                                             {product.name}
                                                         </div>
                                                         <div className="text-xs text-gray-500">
-                                                            {product.productCategory && (
+                                                            {product.category && (
                                                                 <span className="mr-2">
-                                                                    {product.productCategory}
+                                                                    {product.category}
                                                                 </span>
                                                             )}
-                                                            {product.productType && (
+                                                            {product.type && (
                                                                 <span className="text-gray-400">
-                                                                    • {product.productType}
+                                                                    • {product.type}
                                                                 </span>
                                                             )}
                                                         </div>

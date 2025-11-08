@@ -239,6 +239,15 @@ export const cartService = {
         })
     },
 
+    addExtrasToCart: async (products) => {
+        return fetchFromAPI('/cart/v1/add_extras_as_creation', {
+            method: 'POST',
+            body: JSON.stringify({
+                products
+            })
+        })
+    },
+
     //Obtiene el carrito activo del cliente
     getActiveCart: async () => {
         console.log("Get Active Cart")

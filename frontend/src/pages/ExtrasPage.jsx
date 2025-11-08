@@ -1,22 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ShoppingCart } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import {ArrowRight, ChevronLeft, ShoppingCart} from 'lucide-react';
 import { Header } from '../components/common/Header';
 import { Card, CardHeader, CardBody } from '../components/common/Card';
 import { ExtrasCard } from '../components/ExtrasCard';
 import { useAuth } from '../contexts/AuthContext';
 import { cartService, ingredientsService } from '../services/api';
 import toast from 'react-hot-toast';
-import { useCart } from "../contexts/CartContext.jsx";
-import { AddToCartModalLogin } from './modals/AddToCartModalLogin.jsx';
-import { LoginAndRegisterModal } from './modals/LoginAndRegisterModal.jsx';
-
-// Imágenes genéricas por categoría
-const CATEGORY_IMAGES = {
-    BEBIDA: 'https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=400',
-    POSTRE: 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400',
-    ACOMPANAMIENTO: 'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=400',
-    OTROS: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400'
-};
+import {handleAddExtrasToCart, handleAddToCart} from "../utils/CartInteraction.jsx";
+import {useCart} from "../contexts/CartContext.jsx";
+import {getImage} from "../utils/StringUtils.jsx";
 
 const CATEGORY_NAMES = {
     BEBIDA: 'Bebidas',
@@ -53,17 +45,11 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
 
                 const groupedExtras = await ingredientsService.getAllExtrasGrouped();
 
-                const addCategoryImage = (items, category) =>
-                    items.map(item => ({
-                        ...item,
-                        image: item.image || CATEGORY_IMAGES[category]
-                    }));
-
                 setExtras({
-                    BEBIDA: addCategoryImage(groupedExtras.BEBIDA || [], 'BEBIDA'),
-                    POSTRE: addCategoryImage(groupedExtras.POSTRE || [], 'POSTRE'),
-                    ACOMPANAMIENTO: addCategoryImage(groupedExtras.ACOMPANAMIENTO || [], 'ACOMPANAMIENTO'),
-                    OTROS: addCategoryImage(groupedExtras.OTROS || [], 'OTROS')
+                    BEBIDA: groupedExtras.BEBIDA,
+                    POSTRE: groupedExtras.POSTRE,
+                    ACOMPANAMIENTO: groupedExtras.ACOMPANAMIENTO ,
+                    OTROS: groupedExtras.OTROS
                 });
             } catch (err) {
                 setError('Error al cargar los extras. Por favor, intenta de nuevo.');
@@ -301,32 +287,14 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
 
                                         {/* Botón agregar al carrito */}
                                         <button
-                                            onClick={handleAddExtrasToCart}
-                                            disabled={isAddingToCart}
-                                            className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                            onClick={() => handleAddExtrasToCart(selectedItems)}
+                                            className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
                                         >
-                                            {isAddingToCart ? (
-                                                <>
-                                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                                    <span>Agregando...</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <ShoppingCart size={20} />
-                                                    Agregar al Carrito
-                                                </>
-                                            )}
+                                            Finalizar Compra
+                                            <ArrowRight className="w-5 h-5" />
                                         </button>
                                     </>
                                 )}
-
-                                {/* Botón continuar sin extras */}
-                                <button
-                                    onClick={() => onNavigate('checkout')}
-                                    className="w-full mt-3 bg-gray-100 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-                                >
-                                    Continuar sin extras
-                                </button>
                             </CardBody>
                         </Card>
                     </div>

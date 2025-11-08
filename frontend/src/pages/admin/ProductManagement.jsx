@@ -29,8 +29,8 @@ export const ProductManagement = () => {
     const [formData, setFormData] = useState({
         name: '',
         price: '',
-        productCategory: '',
-        productType: '',
+        category: '',
+        type: '',
         available: true
     });
     const [formErrors, setFormErrors] = useState({});
@@ -109,8 +109,8 @@ export const ProductManagement = () => {
         setFormData({
             name: '',
             price: '',
-            productCategory: '',
-            productType: '',
+            category: '',
+            type: '',
             available: true
         });
         setAvailableTypes([]);
@@ -123,8 +123,8 @@ export const ProductManagement = () => {
         console.log("editing")
         setFormData(product);
         setFormErrors({});
-        if (product.productCategory) {
-            loadTypesByCategory(product.productCategory);
+        if (product.category) {
+            loadTypesByCategory(product.category);
         }
         setIsFormModalOpen(true);
     };
@@ -167,12 +167,12 @@ export const ProductManagement = () => {
             errors.price = 'El precio debe ser mayor a 0';
         }
 
-        if (!formData.productCategory) {
-            errors.productCategory = 'La categoría es obligatoria';
+        if (!formData.category) {
+            errors.category = 'La categoría es obligatoria';
         }
 
-        if (!formData.productType) {
-            errors.productType = 'El tipo es obligatorio';
+        if (!formData.type) {
+            errors.type = 'El tipo es obligatorio';
         }
 
         setFormErrors(errors);
@@ -341,7 +341,7 @@ export const ProductManagement = () => {
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                                            <p className="text-sm text-gray-500">{product.productType?.replace(/_/g, ' ')}</p>
+                                            <p className="text-sm text-gray-500">{product.type?.replace(/_/g, ' ')}</p>
                                         </div>
                                         <Badge variant={product.available ? 'success' : 'danger'}>
                                             {product.available ? 'Disponible' : 'No disponible'}
@@ -351,7 +351,7 @@ export const ProductManagement = () => {
                                         <span className="text-lg font-bold text-primary">
                                             ${Number(product.price).toFixed(2)}
                                         </span>
-                                        <Badge>{CATEGORY_LABELS[product.productCategory] || product.productCategory}</Badge>
+                                        <Badge>{CATEGORY_LABELS[product.category] || product.category}</Badge>
                                     </div>
                                     <div className="flex gap-2 pt-2">
                                         {!product.deleted && (

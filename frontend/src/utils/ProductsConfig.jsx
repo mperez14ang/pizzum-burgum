@@ -1,9 +1,11 @@
 // Configuración centralizada de productos
+import {API_URL} from "./StringUtils.jsx";
+
 export const PRODUCT_CONFIG = {
     pizza: {
         type: 'PIZZA',
         displayName: 'Pizza',
-        image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80',
+        image: `${API_URL}/assets/pizza.jpg`,
         placeholder: 'Ej: Mi Pizza Suprema',
 
         sections: [
@@ -66,7 +68,7 @@ export const PRODUCT_CONFIG = {
     burger: {
         type: 'HAMBURGER',
         displayName: 'Hamburguesa',
-        image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80',
+        image: `${API_URL}/assets/burger.jpg`,
         placeholder: 'Ej: Mi Burger Especial',
 
         sections: [

@@ -16,7 +16,7 @@ import {SummaryPanel} from "../components/summary/SummaryPanel.jsx";
 import {createCreationData, handleAddToCart} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
 
-export const CreatorPage = ({ productType, onBack, onNavigate }) => {
+export const CreatorPage = ({ type, onBack, onNavigate }) => {
     const { creation, updateCreation, resetCreation } = useCreatorStore();
     const { addToFavorites } = useFavorites();
     const { isAuthenticated, user } = useAuth();
@@ -35,7 +35,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
     const [error, setError] = useState(null);
 
     // Obtener configuración del producto actual
-    const productConfig = PRODUCT_CONFIG[productType];
+    const productConfig = PRODUCT_CONFIG[type];
 
     // Cargar ingredientes
     useEffect(() => {
@@ -60,7 +60,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
         resetCreation();
         setSelections({});
         setFavoriteName('');
-    }, [productType, resetCreation]);
+    }, [type, resetCreation]);
 
     // Handler genérico para actualizar selecciones
     const updateSelection = (stateKey, value) => {
@@ -281,7 +281,7 @@ export const CreatorPage = ({ productType, onBack, onNavigate }) => {
                 onClose={() => setShowCartModal(false)}
                 onContinueShopping={handleContinueShopping}
                 onGoToExtras={handleGoToExtras}
-                productType={productType}
+                type={type}
             />
         </div>
     );

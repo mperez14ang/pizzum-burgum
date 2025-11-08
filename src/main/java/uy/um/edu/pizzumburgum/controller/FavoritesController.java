@@ -26,8 +26,9 @@ public class FavoritesController {
      * POST /api/favorites
      */
     @PostMapping
-    public ResponseEntity<FavoritesResponse> createFavorite(@RequestBody FavoritesRequest favoritesDto) {
-        FavoritesResponse created = favoritesService.createFavorites(favoritesDto);
+    public ResponseEntity<FavoritesResponse> createFavorite(@RequestBody FavoritesRequest favoritesDto, HttpServletRequest httpServletRequest) {
+        String clientEmail = authService.getUserEmail(httpServletRequest);
+        FavoritesResponse created = favoritesService.createFavorites(favoritesDto, clientEmail);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -75,7 +76,8 @@ public class FavoritesController {
      * DELETE /api/favorites/{id}
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteFavorite(@PathVariable Long id) {
-        return favoritesService.deleteFavorite(id);
+    public ResponseEntity<String> deleteFavorite(@PathVariable Long id, HttpServletRequest request) {
+        String userEmail = authService.getUserEmail(request);
+        return favoritesService.deleteFavorite(id, userEmail);
     }
 }

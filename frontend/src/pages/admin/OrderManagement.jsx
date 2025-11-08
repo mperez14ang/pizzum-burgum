@@ -26,8 +26,7 @@ const ORDER_STATE_LABELS = {
     MAKING: 'Preparando',
     DELIVERING: 'En camino',
     DELIVERED: 'Entregado',
-    CANCELLED: 'Cancelado',
-    ON_HOLD: 'En espera'
+    CANCELLED: 'Cancelado'
 };
 
 export const OrderManagement = () => {
@@ -76,7 +75,7 @@ export const OrderManagement = () => {
     const loadOrderStates = async () => {
         try {
             const states = await adminService.getOrderStates();
-            setOrderStates(states);
+            setOrderStates(states.filter(state => state !== 'PROCESSING_PAYMENT'));
         } catch (error) {
             console.error('Error loading order states:', error);
         }
@@ -104,7 +103,15 @@ export const OrderManagement = () => {
             await adminService.updateOrderState(selectedOrder.id, newState);
             toast.success('Estado actualizado correctamente');
             setIsUpdateModalOpen(false);
-            loadOrders();
+
+            // Actualizar solo la orden modificada en el estado
+            setOrders(prevOrders =>
+                prevOrders.map(order =>
+                    order.id === selectedOrder.id
+                        ? { ...order, state: newState }
+                        : order
+                )
+            );
         } catch (error) {
             toast.error('Error al actualizar estado');
             console.error(error);

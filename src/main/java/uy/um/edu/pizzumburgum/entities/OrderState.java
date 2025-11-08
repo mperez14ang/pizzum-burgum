@@ -7,6 +7,5 @@ public enum OrderState {
     MAKING,
     DELIVERING,
     DELIVERED,
-    CANCELLED,
-    ON_HOLD
+    CANCELLED
 }

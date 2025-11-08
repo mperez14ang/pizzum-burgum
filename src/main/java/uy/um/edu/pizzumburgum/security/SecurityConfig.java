@@ -47,11 +47,14 @@ public class SecurityConfig {
                         // Authentication
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // Public endpoints
-                        .requestMatchers("/api/public/**").permitAll()
-
+                        // Assets (images)
                         .requestMatchers("/assets/**").permitAll()
 
+                        // DGI and BPS
+                        .requestMatchers("/api/dgi/**").permitAll()
+                        .requestMatchers("/api/bps/**").permitAll()
+
+                        // ============ ONLY LOGGED USERS ============
                         // Products - READ ONLY public, WRITE requires ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole(ADMIN)
@@ -59,27 +62,37 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole(ADMIN)
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole(ADMIN)
 
-                        // ============ ADMIN ONLY ============
-                        .requestMatchers("/api/admin/**").hasRole(ADMIN)
+                        // Orders
+                        .requestMatchers(HttpMethod.GET, "/api/order/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers(HttpMethod.POST, "/api/order/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers(HttpMethod.PUT, "/api/order/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.PATCH, "/api/order/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.DELETE, "/api/order/**").hasRole(ADMIN)
 
-                        // ============ PUBLIC (DGI & BPS) ============
-                        .requestMatchers("/api/dgi/**").permitAll()
-                        .requestMatchers("/api/bps/**").permitAll()
-
-                        // ============ CLIENT + ADMIN ============
-                        // User
-                        .requestMatchers("/api/v1/user/**").hasAnyRole(CLIENT, ADMIN)
+                        // Creations
+                        .requestMatchers(HttpMethod.GET, "/api/creation/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers(HttpMethod.POST, "/api/creation/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers(HttpMethod.PUT, "/api/creation/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.PATCH, "/api/creation/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.DELETE, "/api/creation/**").hasRole(ADMIN)
 
                         // Client
-                        .requestMatchers("/api/favorites/**").hasRole(CLIENT)
-                        .requestMatchers("/api/payments/**").hasRole(CLIENT)
+                        .requestMatchers(HttpMethod.GET, "/api/client/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers(HttpMethod.POST, "/api/client/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers(HttpMethod.PUT, "/api/client/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.PATCH, "/api/client/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.DELETE, "/api/client/**").hasRole(ADMIN)
 
-                        // Admin
-                        .requestMatchers("/api/client/**").hasAnyRole(CLIENT, ADMIN)
-                        .requestMatchers("/api/order/**").hasAnyRole(CLIENT, ADMIN)
+                        // Payments
+                        .requestMatchers(HttpMethod.POST, "/api/payments/**").hasAnyRole(ADMIN)
+                        .requestMatchers(HttpMethod.GET, "/api/payments/**").hasRole(ADMIN)
+
+                        .requestMatchers("/api/favorites/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers("/api/cart/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers("/api/card/**").hasAnyRole(CLIENT, ADMIN)
-                        .requestMatchers("/api/creation/**").hasAnyRole(CLIENT, ADMIN)
+                        .requestMatchers("/api/v1/user/**").hasAnyRole(CLIENT, ADMIN)
+
+                        .requestMatchers("/api/admin/**").hasRole(ADMIN)
 
                         .anyRequest().authenticated()
                 )

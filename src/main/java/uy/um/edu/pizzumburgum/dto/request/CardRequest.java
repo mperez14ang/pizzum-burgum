@@ -10,8 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CardRequest {
-
-    private String clientEmail;
-
     private String paymentMethodId;
 }

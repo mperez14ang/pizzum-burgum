@@ -25,8 +25,9 @@ public class CardController {
     }
 
     @PostMapping
-    public ResponseEntity<CardResponse> createCard(@RequestBody CardRequest cardRequest) {
-        return new ResponseEntity<>(cardService.createCard(cardRequest), HttpStatus.OK);
+    public ResponseEntity<CardResponse> createCard(@RequestBody CardRequest cardRequest, HttpServletRequest httpServletRequest) {
+        String clientEmail = authService.getUserEmail(httpServletRequest);
+        return new ResponseEntity<>(cardService.createCard(cardRequest, clientEmail), HttpStatus.OK);
     }
 
     @GetMapping("my")
@@ -41,8 +42,9 @@ public class CardController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<CardResponse> updateCard(@PathVariable Long id, @RequestBody CardRequest cardRequest) {
-        return new ResponseEntity<>(cardService.updateCard(id, cardRequest), HttpStatus.OK);
+    public ResponseEntity<CardResponse> updateCard(@PathVariable Long id, @RequestBody CardRequest cardRequest, HttpServletRequest httpServletRequest) {
+        String clientEmail = authService.getUserEmail(httpServletRequest);
+        return new ResponseEntity<>(cardService.updateCard(id, cardRequest, clientEmail), HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")

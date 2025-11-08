@@ -147,9 +147,16 @@ export const ProductManagement = () => {
     const handleToggleAvailability = async (product) => {
         try {
             await adminService.toggleProductAvailability(product.id, !product.available);
+
+            // Actualizar el estado local del producto
+            setProducts(prevProducts =>
+                prevProducts.map(p =>
+                    p.id === product.id
+                        ? { ...p, available: !p.available }
+                        : p
+                )
+            );
             toast.success(product.available ? 'Producto marcado como no disponible' : 'Producto marcado como disponible', { duration: 2000 });
-            // Recargar sin pasar filtros para mantener los actuales
-            await loadProducts();
         } catch (error) {
             toast.error('Error al cambiar disponibilidad');
             console.error(error);

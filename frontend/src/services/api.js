@@ -146,8 +146,9 @@ export const adminService = {
     },
 
     toggleProductAvailability: async (id, available) => {
-        return fetchFromAPI(`/products?id=${id}&available=${available}`, {
-            method: 'PUT'
+        return fetchFromAPI(`/products/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ available: available })
         });
     },
 

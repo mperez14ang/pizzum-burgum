@@ -52,7 +52,7 @@ public class CardService implements CardServiceInt {
 
     @Override
     @Transactional
-    public CardResponse createCard(CardRequest cardRequest) {
+    public CardResponse createCard(CardRequest cardRequest, String clientEmail) {
         // Verificar si la tarjeta ya existe
         Card existingCard = cardRepository.findByStripeId(cardRequest.getPaymentMethodId());
         if (existingCard != null) {
@@ -61,9 +61,9 @@ public class CardService implements CardServiceInt {
         }
 
         // Buscar el cliente
-        Client client = clientRepository.findById(cardRequest.getClientEmail())
+        Client client = clientRepository.findById(clientEmail)
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "No se encontró un cliente con email: " + cardRequest.getClientEmail()
+                        HttpStatus.NOT_FOUND, "No se encontró un cliente con email: " + clientEmail
                 ));
 
         PaymentMethod paymentMethod = this.adjustPaymentMethod(cardRequest.getPaymentMethodId(), client);
@@ -117,18 +117,18 @@ public class CardService implements CardServiceInt {
 
     @Transactional
     @Override
-    public CardResponse updateCard(Long id, CardRequest cardRequest) {
+    public CardResponse updateCard(Long id, CardRequest cardRequest, String clientEmail) {
         logger.info(cardRequest.toString());
         logger.info(id.toString());
-        Client client = clientRepository.findById(cardRequest.getClientEmail())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un cliente con email: " + cardRequest.getClientEmail()));
+        Client client = clientRepository.findById(clientEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontró un cliente con email: " + clientEmail));
 
         Set<Card> cards = client.getCards();
 
         Card card = cards.stream()
                 .filter(card1 -> card1.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro una tarjeta con el id " + id + " perteneciente a " + cardRequest.getClientEmail()));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se encontro una tarjeta con el id " + id + " perteneciente a " + clientEmail));
 
 
         PaymentMethod paymentMethod = this.adjustPaymentMethod(cardRequest.getPaymentMethodId(), client);

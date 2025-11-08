@@ -4,6 +4,7 @@ import { fetchFromAPI } from '../services/api.js';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { OrderStatusModal } from './modals/OrderStatusModal.jsx';
 import { OrderDetailModal } from './modals/OrderDetailModal.jsx';
+import {ORDER_STATE_LABELS, ORDER_STATE_COLORS} from "../utils/StringUtils.jsx";
 
 export const OrderHistoryPage = ({ onNavigate, onBack }) => {
     const { user } = useAuth();
@@ -17,33 +18,12 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
 
     // Modals state
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-    const [selectedOrderForStatus, setSelectedOrderForStatus] = useState(null);
+    const [selectedOrder, setSelectedOrder] = useState(null);
 
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-    const [selectedOrderIdForDetail, setSelectedOrderIdForDetail] = useState(null);
 
     const dateInputRef = useRef(null);
     const detailsRef = useRef(null);
-
-    const ORDER_STATE_COLORS = {
-        UNPAID: 'warning',
-        IN_QUEUE: 'info',
-        MAKING: 'primary',
-        DELIVERING: 'info',
-        DELIVERED: 'success',
-        CANCELLED: 'danger',
-        ON_HOLD: 'warning'
-    };
-
-    const ORDER_STATE_LABELS = {
-        UNPAID: 'Sin pagar',
-        IN_QUEUE: 'En cola',
-        MAKING: 'Preparando',
-        DELIVERING: 'En camino',
-        DELIVERED: 'Entregado',
-        CANCELLED: 'Cancelado',
-        ON_HOLD: 'En espera'
-    };
 
     const handleSelectFilter = (option) => {
         // Cerrar el dropdown si está abierto
@@ -168,7 +148,7 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
                     <div className="text-right">
                         <button
                             type="button"
-                            onClick={() => { setSelectedOrderForStatus(order); setIsStatusModalOpen(true); }}
+                            onClick={() => { setSelectedOrder(order); setIsStatusModalOpen(true); }}
                             className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 transition"
                             title="Ver estado"
                         >
@@ -186,7 +166,7 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
 
                 <div className="mt-4 flex justify-end">
                     <button
-                        onClick={() => { setSelectedOrderIdForDetail(order.id); setIsDetailModalOpen(true); }}
+                        onClick={() => { setSelectedOrder(order); setIsDetailModalOpen(true); }}
                         className="text-sm font-medium text-orange-600 hover:text-orange-700"
                     >
                         Ver detalle
@@ -280,22 +260,26 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
                 <OrderStatusModal
                     isOpen={isStatusModalOpen}
                     onClose={() => { setIsStatusModalOpen(false); }}
-                    order={selectedOrderForStatus}
+                    order={selectedOrder}
                     title={`Estado del pedido`}
                     onOrderUpdated={(updated) => {
                         if (!updated) return;
                         // Update list and selected order state
                         setOrders(prev => prev.map(o => o.id === updated.id ? { ...o, ...updated } : o));
-                        setSelectedOrderForStatus(prev => (prev && prev.id === updated.id) ? { ...prev, ...updated } : prev);
+                        setSelectedOrder(prev => (prev && prev.id === updated.id) ? { ...prev, ...updated } : prev);
                     }}
                 />
 
                 <OrderDetailModal
                     isOpen={isDetailModalOpen}
-                    onClose={() => { setIsDetailModalOpen(false); setSelectedOrderIdForDetail(null); }}
-                    selectedOrderId={selectedOrderIdForDetail}
-                    ORDER_STATE_COLORS={ORDER_STATE_COLORS}
-                    ORDER_STATE_LABELS={ORDER_STATE_LABELS}
+                    onClose={() => { setIsDetailModalOpen(false); setSelectedOrder(null); }}
+                    order={selectedOrder}
+                    onOrderUpdated={(updated) => {
+                        if (!updated) return;
+                        // Update list and selected order state
+                        setOrders(prev => prev.map(o => o.id === updated.id ? { ...o, ...updated } : o));
+                        setSelectedOrder(prev => (prev && prev.id === updated.id) ? { ...prev, ...updated } : prev);
+                    }}
                 />
             </main>
         </div>

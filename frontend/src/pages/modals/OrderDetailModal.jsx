@@ -1,35 +1,80 @@
 import {Badge} from "../../components/common/Badge.jsx";
 import {Modal} from "../../components/common/Modal.jsx";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState, useCallback} from "react";
 import {adminService} from "../../services/api.js";
+import OrderStatusModal from "./OrderStatusModal.jsx";
+import {ORDER_STATE_COLORS, ORDER_STATE_LABELS} from "../../utils/StringUtils.jsx";
 
-export const OrderDetailModal = ({isOpen, onClose, selectedOrderId, ORDER_STATE_COLORS, ORDER_STATE_LABELS}) => {
-    const [selectedOrder, setSelectedOrder] = useState(null)
-    const [loading, setLoading] = useState(false)
+export const OrderDetailModal = ({
+                                     isOpen,
+                                     onClose,
+                                     order,
+                                     onOrderUpdated
+                                 }) => {
+    const [selectedOrder, setSelectedOrder] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    // Memoize the load function to prevent unnecessary recreations
+    const loadSelectedOrder = useCallback(async () => {
+        console.log(order)
+        if (!order?.id) return;
+
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await adminService.getOrder(order.id);
+            setSelectedOrder(response);
+        } catch (err) {
+            console.error('Error loading order:', err);
+            setError('No se pudo cargar el pedido. Por favor, intenta nuevamente.');
+        } finally {
+            setLoading(false);
+        }
+    }, [order?.id]);
 
     useEffect(() => {
-        const loadSelectedOrder = async () => {
-            setLoading(true)
-            console.log(selectedOrderId)
-            const response = await adminService.getOrder(selectedOrderId)
-            setSelectedOrder(response)
-            setLoading(false)
+        if (isOpen) {
+            setSelectedOrder(null);
+            setError(null);
+            loadSelectedOrder();
         }
-        if (isOpen){
-            setSelectedOrder(null)
-            loadSelectedOrder()
-        }
+    }, [isOpen, order?.id, loadSelectedOrder]);
 
-    }, [isOpen]);
+    // Handle order updates
+    const handleOrderUpdated = useCallback((updatedOrder) => {
+        setSelectedOrder(updatedOrder);
+        onOrderUpdated?.(updatedOrder);
+    }, [onOrderUpdated]);
+
+    // Calculate total price
+    const calculateTotal = () => {
+        if (!selectedOrder?.creations) return 0;
+        return selectedOrder.creations.reduce((total, c) => {
+            return total + (c.creation?.price || 0) * c.quantity;
+        }, 0);
+    };
 
     return (
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title={`Detalle del Pedido #${selectedOrderId}`}
+            title={selectedOrder ? `Detalle del Pedido #${selectedOrder.id}` : 'Detalle del Pedido'}
             size="lg"
             loading={loading}
         >
+            {error && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 text-sm">{error}</p>
+                    <button
+                        onClick={loadSelectedOrder}
+                        className="mt-2 text-red-600 hover:text-red-700 text-sm font-medium"
+                    >
+                        Reintentar
+                    </button>
+                </div>
+            )}
+
             {selectedOrder && (
                 <div className="space-y-6">
                     {/* Estado */}
@@ -38,50 +83,66 @@ export const OrderDetailModal = ({isOpen, onClose, selectedOrderId, ORDER_STATE_
                         <Badge variant={ORDER_STATE_COLORS[selectedOrder.state]}>
                             {ORDER_STATE_LABELS[selectedOrder.state] || selectedOrder.state}
                         </Badge>
+                        <OrderStatusModal
+                            isOpen={isOpen}
+                            onClose={onClose}
+                            order={selectedOrder}
+                            title="Estado del pedido"
+                            onOrderUpdated={handleOrderUpdated}
+                            drawAsComponent={true}
+                        />
                     </div>
 
-                    {/* Cliente */}
+                    {/* Información del Cliente */}
                     <div>
                         <h4 className="font-semibold text-gray-900 mb-2">Cliente</h4>
-                        <p className="text-gray-600">{selectedOrder.clientEmail}</p>
+                        <p className="text-gray-600">{selectedOrder.clientEmail || 'N/A'}</p>
                     </div>
 
-                    {/* Dirección */}
+                    {/* Dirección de Entrega */}
                     <div>
                         <h4 className="font-semibold text-gray-900 mb-2">Dirección de entrega</h4>
-                        <p className="text-gray-600">
-                            {selectedOrder.deliveryStreet}, {selectedOrder.deliveryCity}{" "}
-                            (CP: {selectedOrder.deliveryPostalCode})
-                        </p>
+                        {selectedOrder.deliveryStreet ? (
+                            <p className="text-gray-600">
+                                {selectedOrder.deliveryStreet}
+                                {selectedOrder.deliveryCity && `, ${selectedOrder.deliveryCity}`}
+                                {selectedOrder.deliveryPostalCode && ` (CP: ${selectedOrder.deliveryPostalCode})`}
+                            </p>
+                        ) : (
+                            <p className="text-gray-600">N/A</p>
+                        )}
                     </div>
 
                     {/* Creaciones */}
                     <div>
                         <h4 className="font-semibold text-gray-900 mb-2">Creaciones</h4>
-                        {selectedOrder.creations && selectedOrder.creations.length > 0 ? (
+                        {selectedOrder.creations?.length > 0 ? (
                             <div className="space-y-3">
                                 {selectedOrder.creations.map((c) => (
                                     <div
                                         key={c.id}
-                                        className="border rounded-xl p-4 bg-gray-50 shadow-sm"
+                                        className="border rounded-xl p-4 bg-gray-50 shadow-sm hover:shadow-md transition-shadow"
                                     >
-                                        {/* Nombre + cantidad */}
-                                        <div className="flex justify-between items-center mb-1">
+                                        {/* Nombre + Cantidad */}
+                                        <div className="flex justify-between items-center mb-2">
                                             <h5 className="font-semibold text-gray-900">
-                                                {c.creation?.name}
+                                                {c.creation?.name || 'Sin nombre'}
                                             </h5>
                                             <Badge variant="outline">x{c.quantity}</Badge>
                                         </div>
 
-                                        {/* Tipo y precio */}
-                                        <p className="text-sm text-gray-600">
-                                            Tipo: {c.creation?.type} — Precio: ${c.creation?.price}
-                                        </p>
+                                        {/* Tipo y Precio */}
+                                        <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
+                                            <span>Tipo: {c.creation?.type || 'N/A'}</span>
+                                            <span className="font-medium">
+                                                Precio: ${c.creation?.price || 0} × {c.quantity} = ${(c.creation?.price || 0) * c.quantity}
+                                            </span>
+                                        </div>
 
                                         {/* Productos */}
                                         {c.creation?.products?.length > 0 && (
                                             <div className="mt-3 pl-3 border-l-2 border-gray-300">
-                                                <p className="font-medium text-gray-700 mb-1 text-sm">
+                                                <p className="font-medium text-gray-700 mb-2 text-sm">
                                                     Productos:
                                                 </p>
                                                 <ul className="space-y-1 text-sm">
@@ -90,10 +151,11 @@ export const OrderDetailModal = ({isOpen, onClose, selectedOrderId, ORDER_STATE_
                                                             key={p.id}
                                                             className="flex justify-between text-gray-600"
                                                         >
-                            <span>
-                              {p["product"]?.name} ({p["product"]?.type})
-                            </span>
-                                                            <span>x{p.quantity}</span>
+                                                            <span>
+                                                                {p.product?.name || 'Sin nombre'}
+                                                                {p.product?.type && ` (${p.product.type})`}
+                                                            </span>
+                                                            <span className="font-medium">x{p.quantity}</span>
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -103,12 +165,23 @@ export const OrderDetailModal = ({isOpen, onClose, selectedOrderId, ORDER_STATE_
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-gray-600">N/A</p>
+                            <p className="text-gray-600">No hay creaciones en este pedido</p>
                         )}
                     </div>
+
+                    {/* Total */}
+                    {selectedOrder.creations?.length > 0 && (
+                        <div className="pt-4 border-t border-gray-200">
+                            <div className="flex justify-between items-center">
+                                <h4 className="font-semibold text-gray-900 text-lg">Total</h4>
+                                <p className="font-bold text-gray-900 text-xl">
+                                    ${calculateTotal().toFixed(2)}
+                                </p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </Modal>
     );
-
-}
+};

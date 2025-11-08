@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {adminService} from '../../services/api';
 import {Card, CardBody} from '../../components/common/Card';
 import {Button} from '../../components/common/Button';
@@ -9,25 +9,7 @@ import {Eye} from 'lucide-react';
 import toast, {Toaster} from 'react-hot-toast';
 import {OrderDetailModal} from "../modals/OrderDetailModal.jsx";
 import {UpdateOrderStateModal} from "../modals/UpdateOrderStateModal.jsx";
-
-const ORDER_STATE_COLORS = {
-    UNPAID: 'warning',
-    IN_QUEUE: 'info',
-    MAKING: 'primary',
-    DELIVERING: 'info',
-    DELIVERED: 'success',
-    CANCELLED: 'danger',
-    ON_HOLD: 'warning'
-};
-
-const ORDER_STATE_LABELS = {
-    UNPAID: 'Sin pagar',
-    IN_QUEUE: 'En cola',
-    MAKING: 'Preparando',
-    DELIVERING: 'En camino',
-    DELIVERED: 'Entregado',
-    CANCELLED: 'Cancelado'
-};
+import {ORDER_STATE_COLORS, ORDER_STATE_LABELS} from "../../utils/StringUtils.jsx";
 
 export const OrderManagement = () => {
     const [orders, setOrders] = useState([]);
@@ -204,10 +186,15 @@ export const OrderManagement = () => {
             {/* Detail Modal */}
             <OrderDetailModal
                 isOpen={isDetailModalOpen}
-                onClose={() => setIsDetailModalOpen(false)}
-                selectedOrderId={selectedOrder?.id}
-                ORDER_STATE_LABELS={ORDER_STATE_LABELS}
-                ORDER_STATE_COLORS={ORDER_STATE_COLORS}></OrderDetailModal>
+                onClose={() => { setIsDetailModalOpen(false); setSelectedOrder(null); }}
+                order={selectedOrder}
+                onOrderUpdated={(updated) => {
+                    if (!updated) return;
+                    // Update list and selected order state
+                    setOrders(prev => prev.map(o => o.id === updated.id ? { ...o, ...updated } : o));
+                    setSelectedOrder(prev => (prev && prev.id === updated.id) ? { ...prev, ...updated } : prev);
+                }}
+            />
 
             {/* Update State Modal */}
             <UpdateOrderStateModal

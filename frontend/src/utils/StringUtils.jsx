@@ -33,6 +33,24 @@ export const getExtraImage = (category) => {
     return CATEGORY_IMAGES[category] || CATEGORY_IMAGES.OTHER;
 };
 
+export const ORDER_STATE_COLORS = {
+    UNPAID: 'warning',
+    IN_QUEUE: 'info',
+    MAKING: 'primary',
+    DELIVERING: 'info',
+    DELIVERED: 'success',
+    CANCELLED: 'danger'
+};
+
+export const ORDER_STATE_LABELS = {
+    UNPAID: 'Sin pagar',
+    IN_QUEUE: 'En cola',
+    MAKING: 'Preparando',
+    DELIVERING: 'En camino',
+    DELIVERED: 'Entregado',
+    CANCELLED: 'Cancelado'
+};
+
 export function capitalize(str) {
     if (typeof str !== 'string' || str.length === 0) {
         return str;

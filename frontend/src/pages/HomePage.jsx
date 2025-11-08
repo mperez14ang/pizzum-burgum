@@ -7,6 +7,7 @@ import {useAuth} from "../contexts/AuthContext.jsx";
 import {LoginAndRegisterModal} from "./modals/LoginAndRegisterModal.jsx";
 import OrderStatusModal from "./modals/OrderStatusModal.jsx";
 import {adminService} from "../services/api.js";
+import {OrderDetailModal} from "./modals/OrderDetailModal.jsx";
 
 export const HomePage = ({ onNavigate, orderPayedId=null }) => {
     const { logout } = useAuth();
@@ -15,14 +16,14 @@ export const HomePage = ({ onNavigate, orderPayedId=null }) => {
 
     // Order Status Modal
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-    const [selectedOrderForStatus, setSelectedOrderForStatus] = useState(null);
+    const [selectedOrder, setSelectedOrder] = useState(null);
 
     useEffect(() => {
         const getOrder = async () => {
             const response = await adminService.getOrder(orderPayedId)
             if (response){
                 setIsStatusModalOpen(true)
-                setSelectedOrderForStatus(response)
+                setSelectedOrder(response)
             }
         }
         if (orderPayedId){
@@ -86,13 +87,12 @@ export const HomePage = ({ onNavigate, orderPayedId=null }) => {
                 <LoginAndRegisterModal isOpen={isShowLoginModal}
                                        onClose={() => {setIsShowLoginModal(false)}}/>
 
-                <OrderStatusModal
+                <OrderDetailModal
                     isOpen={isStatusModalOpen}
                     onClose={() => {
                         setIsStatusModalOpen(false);
                     }}
-                    order={selectedOrderForStatus}
-                    title={`Estado del pedido`}
+                    order={selectedOrder}
                 />
             </main>
         </div>

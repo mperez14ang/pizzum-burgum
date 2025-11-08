@@ -11,11 +11,12 @@ export const OrderStatusModal = ({
   isOpen,
   onClose,
   order,
+  onOrderUpdated,
   title = 'Estado del pedido',
-  onOrderUpdated
+  drawAsComponent=false
 }) => {
   // Labels for UI
-  const LABELS = ['Pago', 'En espera', 'En cola', 'En preparación', 'En camino', 'Entregado'];
+  const LABELS = ['Pago', 'En cola', 'En preparación', 'En camino', 'Entregado'];
 
   const [localOrder, setLocalOrder] = useState(order);
 
@@ -62,32 +63,37 @@ export const OrderStatusModal = ({
     const s = String(state).toUpperCase();
     if (s === 'CANCELLED') return 'CANCELLED';
     if (s === 'UNPAID') return -1;
-    if (s === 'ON_HOLD') return 1;
-    if (s === 'IN_QUEUE') return 2;
-    if (s === 'MAKING') return 3;
-    if (s === 'DELIVERING') return 4;
-    if (s === 'DELIVERED') return 5;
+    if (s === 'IN_QUEUE') return 1;
+    if (s === 'MAKING') return 2;
+    if (s === 'DELIVERING') return 3;
+    if (s === 'DELIVERED') return 4;
     // If an unknown paid state arrives, assume at least paid
     return 0;
   };
 
-  // Decide current index from order
-  const currentIndex = useMemo(() => {
-    const src = localOrder || order;
-    if (!src) return -1;
-    const val = stateToIndex(src?.state);
-    if (val === 'CANCELLED') return 'CANCELLED';
-    // If it's any state other than UNPAID, we assume payment done at least
-    if (val >= 0) return val; // already mapped including paid progression
-    return -1;
-  }, [localOrder, order]);
+    // Decide current index from order
+    const currentIndex = useMemo(() => {
+        const src = localOrder || order;
+        if (!src) return -1;
+        const val = stateToIndex(src?.state);
+        if (val === 'CANCELLED') return 'CANCELLED';
+        // If it's any state other than UNPAID, we assume payment done at least
+        if (val >= 0) return val; // already mapped including paid progression
+        return -1;
+    }, [localOrder, order]);
 
-  // Special spacing rule: distance between Pago (0) and En espera (1) is HALF the rest
-  // Compute tick positions in % along the bar length
-  const tickPositions = useMemo(() => {
-    const d = 100 / 4.5; // normal gap size
-    return [0, d / 2, d / 2 + d, d / 2 + 2 * d, d / 2 + 3 * d, 100];
-  }, []);
+    // Special spacing rule: distance between Pago (0) and En cola (1) is HALF the rest
+    // Compute tick positions in % along the bar length for 5 labels
+    const tickPositions = useMemo(() => {
+        const d = 100 / 3.5; // normal gap size (3 full gaps + 1 half gap = 3.5)
+        return [
+            0,              // Pago (0)
+            d / 2,          // En cola (1) - half distance
+            d / 2 + d,      // En preparación (2)
+            d / 2 + 2 * d,  // En camino (3)
+            d / 2 + 3 * d   // Entregado (4)
+        ];
+    }, []);
 
   // Compute fill percentage
   const fillPercent = useMemo(() => {
@@ -99,7 +105,7 @@ export const OrderStatusModal = ({
   const cancelled = currentIndex === 'CANCELLED';
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg" drawAsComponent={drawAsComponent}>
       {!order ? (
         <div className="text-gray-600">No se encontró información del pedido.</div>
       ) : (
@@ -158,17 +164,6 @@ export const OrderStatusModal = ({
 
       {/* Footer */}
       <div className="mt-8 flex justify-end px-2 sm:px-4">{/* match extra padding */}
-        <button
-          onClick={() => {
-            if (typeof onOrderUpdated === 'function' && (localOrder || order)) {
-              onOrderUpdated(localOrder || order);
-            }
-            onClose();
-          }}
-          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
-        >
-          Cerrar
-        </button>
       </div>
     </Modal>
   );

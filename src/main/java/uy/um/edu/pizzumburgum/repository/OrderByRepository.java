@@ -16,11 +16,11 @@ public interface OrderByRepository extends JpaRepository<OrderBy,Long> {
         Optional<OrderBy> findByClientEmailAndState(String clientEmail, OrderState state);
 
         // Buscar ordenes por rango de fechas
-        @Query("SELECT o FROM OrderBy o WHERE o.createdAt >= :startDate AND o.createdAt < :endDate")
+        @Query("SELECT o FROM OrderBy o WHERE o.dateCreated >= :startDate AND o.dateCreated < :endDate")
         List<OrderBy> findByCreatedAtBetween(@Param("startDate") LocalDateTime startDate,
                                               @Param("endDate") LocalDateTime endDate);
 
         // Buscar ordenes de un día específico
-        @Query("SELECT o FROM OrderBy o WHERE DATE(o.createdAt) = DATE(:date)")
+        @Query("SELECT o FROM OrderBy o WHERE DATE(o.dateCreated) = DATE(:date)")
         List<OrderBy> findByCreatedAtDate(@Param("date") LocalDateTime date);
 }

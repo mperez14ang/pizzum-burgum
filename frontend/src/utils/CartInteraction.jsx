@@ -13,9 +13,9 @@ export const cartInteraction = async ({setLoading, setError, setCartItems}) => {
             // Transformar los items del backend al formato del componente
             const transformedItems = response.items.map(item => {
                 // Normalizar la ruta de la imagen
-                let imageUrl = item.image;
-                if (imageUrl && !imageUrl.startsWith('/')) {
-                    imageUrl = '/' + imageUrl;
+                let image = item.image;
+                if (image && !image.startsWith('/')) {
+                    image = '/' + image;
                 }
 
                 return {
@@ -24,8 +24,9 @@ export const cartInteraction = async ({setLoading, setError, setCartItems}) => {
                     price: item.unitPrice,
                     quantity: item.quantity,
                     subtotal: item.subtotal,
-                    image: imageUrl,
-                    type: item.creationType
+                    image: image,
+                    type: item.type,
+                    extraType: item.extraType
                 };
             });
 
@@ -152,7 +153,8 @@ export const handleAddFavoriteToCart = async (favorite, isAuthenticated, itemCou
 
 // Agregar al carrito
 export const handleAddToCart = async (
-    {isAuthenticated, productConfig, favoriteName, selections, setCartItemCount, itemCount, setShowCartModal = null, validateSelections = null,
+    {isAuthenticated, productConfig, favoriteName, selections, setCartItemCount, itemCount,
+        setShowCartModal = null, validateSelections = null,
                                       }) => {
     if (!isAuthenticated) {
         toast.error("Debes iniciar sesión para agregar al carrito");
@@ -190,3 +192,17 @@ export const handleAddToCart = async (
         toast.error("Ocurrió un error al agregar al carrito");
     }
 };
+
+export const handleAddExtrasToCart = async (items) => {
+    const products = items.map(item => ({
+        productId: item.id,
+        quantity: item.quantity
+    }));
+
+    console.log(products)
+    const result = await cartService.addExtrasToCart(products);
+
+    if (result){
+        toast.success("Extras agregados correctamente!")
+    }
+}

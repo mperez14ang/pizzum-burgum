@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uy.um.edu.pizzumburgum.entities.CreationType;
+import uy.um.edu.pizzumburgum.entities.ProductType;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -20,9 +21,13 @@ public class CreationResponse {
 
     private CreationType type;
 
+    private ProductType extraType; // Esto es solo para extras
+
     private BigDecimal price;
 
     private Set<CreationHasProductsResponse> products;
 
     private Boolean available;
+
+    private String image;
 }

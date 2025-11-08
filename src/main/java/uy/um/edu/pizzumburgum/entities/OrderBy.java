@@ -27,13 +27,13 @@ public class OrderBy {
     @Column(name = "state",  nullable = false)
     private OrderState state;
 
-    @Column(nullable = false)
+    @Column
     private String deliveryStreet;
 
-    @Column(nullable = false)
+    @Column
     private String deliveryCity;
 
-    @Column(nullable = false)
+    @Column
     private String deliveryPostalCode;
 
     @Min(0)

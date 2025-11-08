@@ -3,13 +3,11 @@ package uy.um.edu.pizzumburgum.mapper;
 import uy.um.edu.pizzumburgum.dto.response.CartItemResponse;
 import uy.um.edu.pizzumburgum.dto.response.CartResponse;
 import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
-import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
-import uy.um.edu.pizzumburgum.entities.CreationType;
-import uy.um.edu.pizzumburgum.entities.OrderBy;
-import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
+import uy.um.edu.pizzumburgum.entities.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,11 +51,13 @@ public class CartMapper {
                 .collect(Collectors.toSet());
 
         String image = null;
-        if (orderHasCreations.getCreation().getType() == CreationType.PIZZA){
-            image = "assets/pizza.jpg";
-        }
-        else if (orderHasCreations.getCreation().getType() == CreationType.HAMBURGER){
-            image = "assets/burger.jpg";
+        ProductType extraType = null;
+        if (orderHasCreations.getCreation().getType() == CreationType.EXTRA){
+            image = orderHasCreations.getCreation().getProducts().stream()
+                    .map(chp -> chp.getProduct().getImage())
+                    .findFirst()
+                    .orElse("");
+            extraType = Objects.requireNonNull(orderHasCreations.getCreation().getProducts().stream().findFirst().orElse(null)).getProduct().getType();
         }
 
         BigDecimal unitPrice = CreationMapper.toCreationDto(orderHasCreations.getCreation()).getPrice();
@@ -67,12 +67,13 @@ public class CartMapper {
                 .itemId(orderHasCreations.getId())
                 .creationId(orderHasCreations.getCreation().getId())
                 .creationName(orderHasCreations.getCreation().getName())
-                .creationType(orderHasCreations.getCreation().getType().name())
+                .type(orderHasCreations.getCreation().getType())
                 .ingredients(ingredients)
                 .unitPrice(unitPrice)
                 .quantity(orderHasCreations.getQuantity())
                 .subtotal(subtotal)
                 .image(image)
+                .extraType(extraType)
                 .build();
     }
 }

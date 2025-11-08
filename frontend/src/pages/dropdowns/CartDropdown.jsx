@@ -10,6 +10,7 @@ import {
     updateQuantity
 } from "../../utils/CartInteraction.jsx";
 import {useCart} from "../../contexts/CartContext.jsx";
+import {getImage} from "../../utils/StringUtils.jsx";
 
 const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckout, onGoToExtras }) => {
     const { cartItems, setCartItems, itemCount, setCartItemCount } = useCart();
@@ -53,6 +54,7 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
     }, [cartItems]);
 
     const subtotal = cartSubtotal(cartItems);
+
     return (
         <div className="relative inline-block" ref={dropdownRef}>
             <button onClick={onToggle} className="p-2 hover:bg-gray-100 rounded-full relative">
@@ -119,7 +121,7 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
                                 {cartItems.map(item => (
                                     <div key={item.id} className="flex gap-4 pb-4 border-b border-gray-100 last:border-0">
                                         <img
-                                            src={item.image ? `http://localhost:8080${item.image}` : '/placeholder.png'}
+                                            src={getImage(item,item.type, item.extraType)}
                                             alt={item.name}
                                             className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                                         />

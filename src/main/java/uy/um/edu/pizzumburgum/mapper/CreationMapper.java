@@ -3,12 +3,10 @@ package uy.um.edu.pizzumburgum.mapper;
 import uy.um.edu.pizzumburgum.dto.response.CreationHasProductsResponse;
 import uy.um.edu.pizzumburgum.dto.request.CreationRequest;
 import uy.um.edu.pizzumburgum.dto.response.CreationResponse;
-import uy.um.edu.pizzumburgum.entities.Creation;
-import uy.um.edu.pizzumburgum.entities.CreationHasProducts;
-import uy.um.edu.pizzumburgum.entities.OrderHasCreations;
-import uy.um.edu.pizzumburgum.entities.Product;
+import uy.um.edu.pizzumburgum.entities.*;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -21,6 +19,14 @@ public class CreationMapper {
                 .stream()
                 .map(CreationHasProductMapper::toCreationHasProductsDto)
                 .collect(Collectors.toSet());
+
+        // Si es EXTRA
+        ProductType extraType = null;
+        if (creation.getType().equals(CreationType.EXTRA)){
+            extraType = Objects.requireNonNull(
+                    creation.getProducts().stream().findFirst().orElse(null)
+            ).getProduct().getType();
+        }
 
         boolean productsAvailable = creation.getProducts().stream()
                 .map(CreationHasProducts::getProduct)
@@ -44,6 +50,7 @@ public class CreationMapper {
                 .type(creation.getType())
                 .products(creationsHasProductsDtos)
                 .available(productsAvailable)
+                .extraType(extraType)
                 .build();
     }
 

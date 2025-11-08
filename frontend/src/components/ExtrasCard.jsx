@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus, Minus } from 'lucide-react';
 import { Card, CardBody, CardFooter } from './common/Card';
+import {getImage} from "../utils/StringUtils.jsx";
 
 export const ExtrasCard = ({ extra, onQuantityChange, maxQuantity = 10 }) => {
     const [quantity, setQuantity] = useState(0);
@@ -27,7 +28,7 @@ export const ExtrasCard = ({ extra, onQuantityChange, maxQuantity = 10 }) => {
                 {/* Imagen */}
                 <div className="w-full h-40 bg-gray-200 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                     <img
-                        src={extra.image || '/placeholder-extra.jpg'}
+                        src={getImage(extra,extra.category, extra.type)}
                         alt={extra.name}
                         className="w-full h-full object-cover"
                     />

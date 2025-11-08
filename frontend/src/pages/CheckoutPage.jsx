@@ -3,13 +3,11 @@ import {ChevronLeft, CreditCard, MapPin, Minus, Plus, User} from 'lucide-react';
 import toast from 'react-hot-toast';
 import {cartService} from "../services/api.js";
 import {useAuth} from "../contexts/AuthContext.jsx";
-import {capitalize} from "../utils/StringUtils.jsx";
+import {capitalize, getImage} from "../utils/StringUtils.jsx";
 import {AddressComponent} from "../components/AddressComponent.jsx";
 import {CardComponent} from "../components/CardComponent.jsx";
 import {cartInteraction, cartSubtotal, updateQuantity} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
-import {useCard} from "../contexts/CardContext.jsx";
-import {useAddresses} from "../contexts/UseAddresses.jsx";
 
 export const CheckoutPage = ({ onNavigate, onBack }) => {
     const { user, isAuthenticated } = useAuth();
@@ -184,7 +182,7 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
                                     <div key={item.id} className="flex gap-3 pb-4 border-b">
                                         <div className="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0">
                                             <img
-                                                src={item.image ? `http://localhost:8080${item.image}` : '/placeholder.png'}
+                                                src={getImage(item,item.type, item.extraType)}
                                                 alt={item.name}
                                                 className="w-full h-full object-cover rounded-lg"
                                             />

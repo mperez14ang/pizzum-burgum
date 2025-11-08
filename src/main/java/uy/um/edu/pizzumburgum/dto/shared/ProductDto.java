@@ -19,12 +19,14 @@ public class ProductDto {
 
     private BigDecimal price;
 
-    private ProductType productType;
+    private ProductType type;
 
-    private ProductCategory productCategory;
+    private ProductCategory category;
 
     private Boolean available;
 
     private Boolean deleted;
+
+    private String image;
 
 }

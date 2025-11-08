@@ -2,6 +2,7 @@ import { Select } from "../../components/common/Select.jsx";
 import { Button } from "../../components/common/Button.jsx";
 import { Modal } from "../../components/common/Modal.jsx";
 import { Input } from "../../components/common/Input.jsx";
+import {CATEGORY_IMAGES} from "../../utils/StringUtils.jsx";
 
 export const CreateProductModal = ({
                                        isOpen,
@@ -15,14 +16,15 @@ export const CreateProductModal = ({
                                        formData,
                                        setFormData,
                                        formErrors,
-                                       onCategoryChange
+                                       onCategoryChange,
                                    }) => {
     const handleCategoryChange = (e) => {
         const newCategory = e.target.value;
         setFormData({
             ...formData,
-            productCategory: newCategory,
-            productType: ''
+            category: newCategory,
+            type: "",
+            image: "",
         });
 
         if (onCategoryChange) {
@@ -30,37 +32,41 @@ export const CreateProductModal = ({
         }
     };
 
+    const isExtraCategory =
+        CATEGORY_LABELS[formData.category]?.toLowerCase() === "extra" ||
+        formData.category?.toLowerCase() === "extra";
+
     return (
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title={editingProduct ? 'Editar Producto' : 'Crear Producto'}
+            title={editingProduct ? "Editar Producto" : "Crear Producto"}
         >
             <form onSubmit={onSubmit} className="space-y-4">
                 <Select
                     label="Categoría *"
-                    value={formData.productCategory}
+                    value={formData.category}
                     onChange={handleCategoryChange}
-                    options={categories.map(cat => ({
+                    options={categories.map((cat) => ({
                         value: cat,
-                        label: CATEGORY_LABELS[cat] || cat
+                        label: CATEGORY_LABELS[cat] || cat,
                     }))}
-                    error={formErrors.productCategory}
+                    error={formErrors.category}
                 />
 
                 <Select
                     label="Tipo *"
-                    value={formData.productType}
+                    value={formData.type}
                     onChange={(e) =>
-                        setFormData({ ...formData, productType: e.target.value })
+                        setFormData({ ...formData, type: e.target.value })
                     }
-                    options={availableTypes.map(type => ({
+                    options={availableTypes.map((type) => ({
                         value: type,
-                        label: type.replace(/_/g, ' ')
+                        label: type.replace(/_/g, " "),
                     }))}
-                    error={formErrors.productType}
+                    error={formErrors.type}
                     placeholder={
-                        formData.productCategory
+                        formData.category
                             ? "Seleccionar tipo..."
                             : "Primero selecciona una categoría"
                     }
@@ -86,6 +92,37 @@ export const CreateProductModal = ({
                     }
                     error={formErrors.price}
                 />
+
+                {isExtraCategory && (
+                    <div className="space-y-2">
+                        <Input
+                            label="URL de Imagen"
+                            type="url"
+                            value={formData.image || ""}
+                            onChange={(e) =>
+                                setFormData({ ...formData, image: e.target.value })
+                            }
+                            placeholder="https://ejemplo.com/imagen.jpg"
+                            error={formErrors.image}
+                        />
+
+                        {/* Vista previa de la imagen */}
+                        <div className="flex justify-center">
+                            <img
+                                key={formData.type} // 👈 fuerza el re-render cuando cambia el tipo
+                                src={formData.image || CATEGORY_IMAGES[formData.type]}
+                                alt="Vista previa"
+                                className="w-32 h-32 object-cover rounded-xl border border-gray-200 shadow-sm"
+                                onError={(e) => {
+                                    e.target.src = CATEGORY_IMAGES[formData.type];
+                                }}
+                            />
+                        </div>
+
+
+
+                    </div>
+                )}
 
                 <div className="flex items-center gap-2">
                     <input
@@ -113,10 +150,10 @@ export const CreateProductModal = ({
                     </Button>
                     <Button type="submit" disabled={submitting}>
                         {submitting
-                            ? 'Guardando...'
+                            ? "Guardando..."
                             : editingProduct
-                                ? 'Actualizar'
-                                : 'Crear'}
+                                ? "Actualizar"
+                                : "Crear"}
                     </Button>
                 </div>
             </form>

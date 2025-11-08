@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uy.um.edu.pizzumburgum.dto.shared.ProductDto;
+import uy.um.edu.pizzumburgum.entities.CreationType;
+import uy.um.edu.pizzumburgum.entities.ProductCategory;
+import uy.um.edu.pizzumburgum.entities.ProductType;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -17,7 +20,8 @@ public class CartItemResponse {
     private Long itemId; // ID del OrderHasCreations
     private Long creationId;
     private String creationName; // "Pizza Personalizada"
-    private String creationType; // PIZZA / BURGER
+    private CreationType type; // PIZZA / BURGER / EXTRA
+    private ProductType extraType; // Si es EXTRA aplica
     private Set<ProductDto> ingredients;
     private BigDecimal unitPrice;
     private Integer quantity;

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import uy.um.edu.pizzumburgum.dto.request.*;
 import uy.um.edu.pizzumburgum.dto.response.CartCheckoutResponse;
 import uy.um.edu.pizzumburgum.dto.response.CartResponse;
-import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.services.AuthService;
 import uy.um.edu.pizzumburgum.services.CartService;
 
@@ -109,6 +108,20 @@ public class CartController {
         String clientEmail = authService.getUserEmail(httpRequest);
         log.info("POST /api/cart/v1/checkout");
         CartCheckoutResponse response = cartService.checkout(clientEmail, request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Convierte una lista de productos en una lista
+     * de creaciones individuales. Un producto por cada creacion
+     **/
+    @PostMapping("/add_extras_as_creation")
+    public ResponseEntity<CartResponse> addExtrasAsCreationsToCart(
+            HttpServletRequest httpRequest,
+            @Valid @RequestBody AddProductsAsCreationsRequest request
+    ){
+        String clientEmail = authService.getUserEmail(httpRequest);
+        CartResponse response = cartService.addExtrasAsCreationsToCart(clientEmail, request);
         return ResponseEntity.ok(response);
     }
 }

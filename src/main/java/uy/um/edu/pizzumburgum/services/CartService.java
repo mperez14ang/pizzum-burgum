@@ -1,9 +1,11 @@
 package uy.um.edu.pizzumburgum.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.hibernate.query.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.*;
 import uy.um.edu.pizzumburgum.dto.response.CartCheckoutResponse;
 import uy.um.edu.pizzumburgum.dto.response.CartResponse;
+import uy.um.edu.pizzumburgum.dto.response.CreationResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.entities.*;
 import uy.um.edu.pizzumburgum.mapper.*;
@@ -18,9 +21,7 @@ import uy.um.edu.pizzumburgum.repository.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,24 +56,17 @@ public class CartService {
     private PaymentService paymentService;
 
     //Agrega una creación personalizada al carrito: si no existe carrito activo, lo crea (SIN DIRECCIÓN todavía)
-
     @Transactional
     public CartResponse addToCart(AddToCartRequest request, String clientEmail) {
         log.info("Agregando item al carrito para cliente: {}", clientEmail);
 
-        // 1. Validar cliente
-        Client client = clientRepository.findById(clientEmail)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Cliente con email " + clientEmail + " no encontrado"
-                ));
-
-        // 2. Buscar o crear carrito activo (UNPAID) - SIN DIRECCIÓN
+        // Buscar o crear carrito activo
         OrderBy cart = this.getActiveCart(clientEmail);
 
-        // 3. Validar productos (ingredientes)
+        // Validar productos
         Set<Product> products = new HashSet<>();
         Set<CreationHasProducts> creationHasProducts = new HashSet<>();
+
         for (CreationHasProductsRequest creationHasProductsRequest : request.getProducts()) {
             Long productId = creationHasProductsRequest.getProductId();
             Product product = productRepository.findById(productId)
@@ -82,19 +76,55 @@ public class CartService {
                     ));
             products.add(product);
 
-            // CreationHasProducts
             creationHasProducts.add(CreationHasProducts.builder()
-                            .quantity(creationHasProductsRequest.getQuantity())
-                            .product(product)
+                    .quantity(creationHasProductsRequest.getQuantity())
+                    .product(product)
                     .build());
         }
 
-        // 5. Crear nombre default según tipo
-        String creationName = request.getType() == CreationType.PIZZA
-                ? "Pizza Personalizada"
-                : "Hamburguesa Personalizada";
+        // Crear nombre según tipo
+        String creationName = switch (request.getType()) {
+            case PIZZA -> "Pizza Personalizada";
+            case HAMBURGER -> "Hamburguesa Personalizada";
+            case EXTRA -> creationHasProducts.stream()
+                    .findFirst()
+                    .map(chp -> chp.getProduct().getName())
+                    .orElse("Producto Extra");
+        };
 
-        // 6. Crear Creation
+        // Buscar si ya existe una creacion con los mismos productos
+        Map<Long, Integer> requestedProductsMap = request.getProducts().stream()
+                .collect(Collectors.toMap(
+                        CreationHasProductsRequest::getProductId,
+                        CreationHasProductsRequest::getQuantity
+                ));
+
+        Optional<OrderHasCreations> existingCreationOpt = cart.getCreations().stream()
+                .filter(orderHasCreations ->
+                        orderHasCreations.getCreation().getType() == request.getType())
+                .filter(orderHasCreations -> {
+                    Map<Long, Integer> existingProductsMap = orderHasCreations.getCreation().getProducts().stream()
+                            .collect(Collectors.toMap(
+                                    chp -> chp.getProduct().getId(),
+                                    CreationHasProducts::getQuantity
+                            ));
+                    return existingProductsMap.equals(requestedProductsMap);
+                })
+                .findFirst();
+
+
+        if (existingCreationOpt.isPresent()) {
+            OrderHasCreations existing = existingCreationOpt.get();
+            int oldQty = existing.getQuantity();
+            int newQty = oldQty + request.getQuantity();
+            existing.setQuantity(newQty);
+            orderHasCreationsRepository.save(existing);
+
+            return CartMapper.toCartResponse(cart);
+        }
+
+
+        // Crear Creation nueva
         Creation creation = Creation.builder()
                 .name(creationName)
                 .type(request.getType())
@@ -104,20 +134,19 @@ public class CartService {
                 .build();
 
         creation = creationRepository.save(creation);
-        log.info("✅ Creation creada con ID: {} ", creation.getId());
 
-        // 7. Vincular productos a la creation (CreationHasProducts)
-        for (CreationHasProducts creationHasProducts1 : creationHasProducts) {
+        // Vincular productos
+        for (CreationHasProducts chpItem : creationHasProducts) {
             CreationHasProducts chp = CreationHasProducts.builder()
                     .creation(creation)
-                    .product(creationHasProducts1.getProduct())
-                    .quantity(creationHasProducts1.getQuantity())
+                    .product(chpItem.getProduct())
+                    .quantity(chpItem.getQuantity())
                     .build();
             creationHasProductsRepository.save(chp);
             creation.getProducts().add(chp);
         }
 
-        // 8. Crear OrderHasCreations (item del carrito)
+        // Crear OrderHasCreations
         OrderHasCreations cartItem = OrderHasCreations.builder()
                 .order(cart)
                 .creation(creation)
@@ -129,7 +158,6 @@ public class CartService {
 
         log.info("Item agregado al carrito exitosamente");
 
-        // 9. Retornar respuesta
         return CartMapper.toCartResponse(cart);
     }
 
@@ -367,6 +395,38 @@ public class CartService {
                 .address(AddressMapper.toAddressResponse(deliveryAddress))
                 .notes(orderResponse.getNotes())
                 .build();
+    }
+
+    @Transactional
+    public CartResponse addExtrasAsCreationsToCart(String clientEmail, AddProductsAsCreationsRequest creationDto) {
+        CartResponse cartResponse = null;
+
+        for (CreationHasProductsRequest creationHasProductsRequest : creationDto.getProducts()) {
+            Long productId = creationHasProductsRequest.getProductId();
+
+            // Verificar que sea un EXTRA
+            Product product = productRepository.findById(productId).orElse(null);
+
+            if (product == null || !product.getCategory().equals(ProductCategory.EXTRA)){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El producto no es de la categoria EXTRA o no existe");
+            }
+
+            int quantity = creationHasProductsRequest.getQuantity();
+
+            AddToCartRequest addToCartRequest = AddToCartRequest.builder()
+                    .products(Collections.singleton(
+                            CreationHasProductsRequest.builder()
+                                    .productId(productId)
+                                    .quantity(1)
+                                    .build()
+                    ))
+                    .quantity(quantity)
+                    .type(CreationType.EXTRA)
+                    .build();
+
+            cartResponse = this.addToCart(addToCartRequest, clientEmail);
+        }
+        return cartResponse;
     }
 
     private OrderBy getActiveCart(String clientEmail){

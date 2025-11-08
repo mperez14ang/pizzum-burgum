@@ -48,6 +48,9 @@ public class Product {
     @Builder.Default
     private Boolean deleted = false;
 
+    @Column(length = 500, name = "image")
+    private String image;
+
     @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @ToString.Exclude
     private Set<CreationHasProducts> creations = new HashSet<>();

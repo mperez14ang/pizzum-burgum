@@ -33,7 +33,7 @@ public class ProductService implements ProductServiceInt {
     @Override
     public ProductDto createProduct(ProductDto productDto) {
         // Validar que el tipo sea compatible con la categoría
-        this.checkCompatibility(productDto.getProductType(), productDto.getProductCategory());
+        this.checkCompatibility(productDto.getType(), productDto.getCategory());
 
         System.out.println("=== CREANDO PRODUCTO ===");
         System.out.println("DTO recibido: " + productDto);
@@ -114,31 +114,33 @@ public class ProductService implements ProductServiceInt {
                         "Producto con id : " + id + " no encontrado"));
 
         String name = productDto.getName();
-        ProductType productType = productDto.getProductType();
-        ProductCategory productCategory = productDto.getProductCategory();
+        ProductType type = productDto.getType();
+        ProductCategory category = productDto.getCategory();
         Boolean available = productDto.getAvailable();
         BigDecimal price = productDto.getPrice();
+        String urlImage = productDto.getImage();
 
-        this.checkCompatibility(productType, productCategory);
+        this.checkCompatibility(type, category);
 
         if (name != null) product.setName(name);
         if (price != null) product.setPrice(price);
-        if (productType != null) product.setType(productType);
-        if (productCategory != null) product.setCategory(productCategory);
+        if (type != null) product.setType(type);
+        if (category != null) product.setCategory(category);
         if (available != null && product.getDeleted() == false) product.setAvailable(available);
+        if (urlImage != null) product.setImage(urlImage);
 
         product = productRepository.save(product);
         return ProductMapper.toProductDto(product);
     }
 
-    private void checkCompatibility(ProductType productType, ProductCategory productCategory) throws ResponseStatusException {
+    private void checkCompatibility(ProductType type, ProductCategory category) throws ResponseStatusException {
         // Validar que el tipo sea compatible con la categoría
-        if (productType != null &&
-                productCategory != null &&
-                productType.getCategory() != productCategory) {
+        if (type != null &&
+                category != null &&
+                type.getCategory() != category) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "El tipo '" + productType + "' no es compatible con la categoría '" + productCategory + "'"
+                    "El tipo '" + type + "' no es compatible con la categoría '" + category + "'"
             );
         }
     }

@@ -8,13 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uy.um.edu.pizzumburgum.dto.request.FavoritesRequest;
 import uy.um.edu.pizzumburgum.dto.response.FavoritesResponse;
-import uy.um.edu.pizzumburgum.entities.Client;
-import uy.um.edu.pizzumburgum.entities.Creation;
-import uy.um.edu.pizzumburgum.entities.Favorites;
+import uy.um.edu.pizzumburgum.entities.*;
 import uy.um.edu.pizzumburgum.mapper.FavoritesMapper;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.repository.CreationRepository;
 import uy.um.edu.pizzumburgum.repository.FavoritesRepository;
+import uy.um.edu.pizzumburgum.repository.UserRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.FavoritesServiceInt;
 
 import java.util.HashSet;
@@ -27,18 +26,19 @@ public class FavoritesService implements FavoritesServiceInt {
     private static final Logger log = LoggerFactory.getLogger(FavoritesService.class);
 
     private final ClientRepository clientRepository;
+    private final UserRepository userRepository;
     private final FavoritesRepository favoritesRepository;
     private final CreationRepository creationRepository;
 
     @Transactional
     @Override
-    public FavoritesResponse createFavorites(FavoritesRequest favoritesDto) {
-        log.info("Creando favorito para cliente: {}", favoritesDto.getClientEmail());
+    public FavoritesResponse createFavorites(FavoritesRequest favoritesDto, String clientEmail) {
+        log.info("Creando favorito para cliente: {}", clientEmail);
 
         Favorites favorites = FavoritesMapper.toFavorites(favoritesDto);
 
         // Buscar cliente
-        Client client = clientRepository.findById(favoritesDto.getClientEmail())
+        Client client = clientRepository.findById(clientEmail)
                 .orElseThrow(() -> new RuntimeException("No se encontró el cliente de favoritos"));
 
         // Pasar de creationDto a creation
@@ -125,10 +125,23 @@ public class FavoritesService implements FavoritesServiceInt {
 
     @Transactional
     @Override
-    public ResponseEntity<String> deleteFavorite(Long id) {
+    public ResponseEntity<String> deleteFavorite(Long id, String userEmail) {
         if (!favoritesRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
+        // Verificar si el usuario es dueño del favorito
+        User user = userRepository.findById(userEmail)
+                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        if (!user.getUserType().equals(UserType.ADMIN)) {
+            Client client = clientRepository.findById(userEmail)
+                    .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+            Favorites favorites = favoritesRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Favorito no encontrado con id: " + id));
+            if (!favorites.getClient().equals(client)) {
+                throw new RuntimeException("Favorito con id: " + id + " no pertenece al cliente " + userEmail);
+            }
+        }
+
         favoritesRepository.deleteById(id);
         return ResponseEntity.ok("Favorito eliminado exitosamente");
     }

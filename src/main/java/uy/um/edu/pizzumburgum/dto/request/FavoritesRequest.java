@@ -13,7 +13,5 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FavoritesRequest {
-    private String clientEmail;
-
     private Set<Long> creationsIds;
 }

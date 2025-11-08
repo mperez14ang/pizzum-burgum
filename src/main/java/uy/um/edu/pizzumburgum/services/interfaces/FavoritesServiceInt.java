@@ -10,7 +10,7 @@ import java.util.List;
 public interface FavoritesServiceInt {
 
     @Transactional
-    FavoritesResponse createFavorites(FavoritesRequest favoritesDto);
+    FavoritesResponse createFavorites(FavoritesRequest favoritesDto, String clientEmail);
 
     FavoritesResponse getFavoritesById(Long id);
 
@@ -24,5 +24,5 @@ public interface FavoritesServiceInt {
     FavoritesResponse updateFavorites(Long id, FavoritesRequest favoritesDto);
 
     @Transactional
-    ResponseEntity<String> deleteFavorite(Long id);
+    ResponseEntity<String> deleteFavorite(Long id, String userEmail);
 }

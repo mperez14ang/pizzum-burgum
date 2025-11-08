@@ -2,11 +2,10 @@ package uy.um.edu.pizzumburgum.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,8 +27,8 @@ public class OrderBy {
     @Column(name = "state",  nullable = false)
     private OrderState state;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Column(name = "date_created")
+    private LocalDate dateCreated;
 
     @Column
     private String deliveryStreet;

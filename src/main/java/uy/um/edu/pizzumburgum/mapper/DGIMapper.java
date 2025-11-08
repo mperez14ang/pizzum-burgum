@@ -42,7 +42,7 @@ public class DGIMapper {
         return DGIOrderResponse.builder()
                 .id(orderBy.getId())
                 .state(orderBy.getState())
-                .createdAt(orderBy.getDateCreated())
+                .dateCreated(orderBy.getDateCreated())
                 .deliveryStreet(orderBy.getDeliveryStreet())
                 .deliveryCity(orderBy.getDeliveryCity())
                 .deliveryPostalCode(orderBy.getDeliveryPostalCode())

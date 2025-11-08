@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import uy.um.edu.pizzumburgum.entities.OrderState;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -17,7 +17,7 @@ import java.util.Set;
 public class DGIOrderResponse {
     private Long id;
     private OrderState state;
-    private LocalDateTime createdAt;
+    private LocalDate dateCreated;
     private String deliveryStreet;
     private String deliveryCity;
     private String deliveryPostalCode;

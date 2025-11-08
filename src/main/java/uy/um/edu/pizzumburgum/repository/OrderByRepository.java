@@ -6,7 +6,7 @@ import org.springframework.data.repository.query.Param;
 import uy.um.edu.pizzumburgum.entities.OrderBy;
 import uy.um.edu.pizzumburgum.entities.OrderState;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,11 +16,11 @@ public interface OrderByRepository extends JpaRepository<OrderBy,Long> {
         Optional<OrderBy> findByClientEmailAndState(String clientEmail, OrderState state);
 
         // Buscar ordenes por rango de fechas
-        @Query("SELECT o FROM OrderBy o WHERE o.dateCreated >= :startDate AND o.dateCreated < :endDate")
-        List<OrderBy> findByCreatedAtBetween(@Param("startDate") LocalDateTime startDate,
-                                              @Param("endDate") LocalDateTime endDate);
+        @Query("SELECT o FROM OrderBy o WHERE o.dateCreated >= :startDate AND o.dateCreated <= :endDate")
+        List<OrderBy> findByCreatedAtBetween(@Param("startDate") LocalDate startDate,
+                                              @Param("endDate") LocalDate endDate);
 
         // Buscar ordenes de un día específico
-        @Query("SELECT o FROM OrderBy o WHERE DATE(o.dateCreated) = DATE(:date)")
-        List<OrderBy> findByCreatedAtDate(@Param("date") LocalDateTime date);
+        @Query("SELECT o FROM OrderBy o WHERE o.dateCreated = :date")
+        List<OrderBy> findByCreatedAtDate(@Param("date") LocalDate date);
 }

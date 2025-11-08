@@ -9,8 +9,6 @@ import uy.um.edu.pizzumburgum.repository.OrderByRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.DGIServiceInt;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,11 +20,7 @@ public class DGIService implements DGIServiceInt {
 
     @Override
     public List<DGIOrderResponse> getOrdersByDate(LocalDate date) {
-        // Convertir LocalDate a LocalDateTime para el inicio y fin del día
-        LocalDateTime startOfDay = date.atStartOfDay();
-        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
-
-        List<OrderBy> orders = orderByRepository.findByCreatedAtBetween(startOfDay, endOfDay);
+        List<OrderBy> orders = orderByRepository.findByCreatedAtDate(date);
 
         return orders.stream()
                 .map(DGIMapper::toDGIOrderResponse)
@@ -35,11 +29,7 @@ public class DGIService implements DGIServiceInt {
 
     @Override
     public List<DGIOrderResponse> getOrdersByDateRange(LocalDate startDate, LocalDate endDate) {
-        // Convertir LocalDate a LocalDateTime
-        LocalDateTime startDateTime = startDate.atStartOfDay();
-        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
-
-        List<OrderBy> orders = orderByRepository.findByCreatedAtBetween(startDateTime, endDateTime);
+        List<OrderBy> orders = orderByRepository.findByCreatedAtBetween(startDate, endDate);
 
         return orders.stream()
                 .map(DGIMapper::toDGIOrderResponse)

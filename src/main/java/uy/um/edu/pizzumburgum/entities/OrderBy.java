@@ -29,7 +29,7 @@ public class OrderBy {
     @Column(name = "state",  nullable = false)
     private OrderState state;
 
-    @Column(name = "date_created")
+    @Column(name = "date_created", nullable = true)
     private LocalDate dateCreated;
 
     @Column(nullable = true)

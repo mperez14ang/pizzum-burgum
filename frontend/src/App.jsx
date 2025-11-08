@@ -22,6 +22,7 @@ function App() {
     const [prevPageType, setPrevPageType] = useState('home');
     const { user, isAuthenticated, isLoading, checkUser } = useAuth();
     const [hideCart, setHideCart] = useState(false)
+    const [orderPayedId, setOrderPayedId] = useState(null)
 
     useEffect(() => {
         window.history.replaceState({ page: 'home' }, '', window.location.href);
@@ -50,11 +51,12 @@ function App() {
     }, [currentPage]);
 
     useEffect(() => {
-        setHideCart(currentPage === 'checkout');
+        setHideCart(currentPage === 'checkout' || currentPage === 'extras');
     }, [currentPage]);
 
-    const handleNavigate = async (type, validate=true) => {
+    const handleNavigate = async (type, payedOrderId=null, validate=true) => {
         let newPage = 'home';
+        setOrderPayedId(null)
 
         if (type === 'pizza' || type === 'burger'){
             newPage = `creator-${type}`
@@ -64,6 +66,7 @@ function App() {
         }
         else if (type === 'home'){
             newPage = 'home'
+            setOrderPayedId(payedOrderId)
         }
         else if (type === 'favorites'){
             newPage = 'favorites'
@@ -96,6 +99,7 @@ function App() {
     };
 
     const handleBack = () => {
+        setOrderPayedId(null)
         window.history.back();
     };
 
@@ -119,7 +123,7 @@ function App() {
                 <Header ref={headerRef} onNavigate={handleNavigate} hideCartButton={hideCart}/>
                 <FavoritesProvider>
                     <CreatorProvider>
-                        {currentPage === 'home' && <HomePage onNavigate={handleNavigate} />}
+                        {currentPage === 'home' && <HomePage onNavigate={handleNavigate} orderPayedId={orderPayedId} />}
                         {currentPage === 'creator-pizza' && (
                             <CreatorPage type={"pizza"} onBack={handleBack} onNavigate={handleNavigate}/>
                         )}

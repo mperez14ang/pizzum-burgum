@@ -170,18 +170,9 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
 
                                 <div className="space-y-2">
                                     <button className="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition-colors font-semibold flex items-center justify-center gap-2"
-                                    onClick={onCheckout}>
+                                    onClick={onGoToExtras}>
                                         Finalizar Compra
                                         <ArrowRight className="w-5 h-5" />
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            onClose();
-                                            onGoToExtras();
-                                        }}
-                                        className="w-full bg-orange-400 text-white py-2 rounded-lg hover:bg-gray-100 transition-colors border border-gray-300 text-sm"
-                                    >
-                                        Extras
                                     </button>
                                     <button
                                         onClick={onClose}

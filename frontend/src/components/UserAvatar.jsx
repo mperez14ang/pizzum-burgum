@@ -3,7 +3,7 @@ import {userService} from "../services/api.js";
 import {Dices} from "lucide-react";
 
 const UserAvatar = ({ userInfo, size = 120, className = "", randomizeButton = false }) => {
-    const [avatarUrl, setAvatarUrl] = useState("");
+    const [avatarUrl, setAvatarUrl] = useState(null);
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
@@ -12,8 +12,6 @@ const UserAvatar = ({ userInfo, size = 120, className = "", randomizeButton = fa
                 setAvatarUrl("https://api.dicebear.com/9.x/fun-emoji/svg?seed=anonymous");
                 return
             }
-
-            console.log(userInfo)
 
             if (userInfo.profileUrl) {
                 setAvatarUrl(userInfo.profileUrl);

@@ -108,20 +108,20 @@ public class ProductController {
 
         Map<String, List<ProductDto>> extras = new HashMap<>();
 
-        extras.put("BEBIDA", availableExtras.stream()
-                .filter(p -> p.getType().equals(ProductType.BEBIDA))
+        extras.put("BEVERAGE", availableExtras.stream()
+                .filter(p -> p.getType().equals(ProductType.BEVERAGE))
                 .toList());
 
-        extras.put("POSTRE", availableExtras.stream()
-                .filter(p -> p.getType().equals(ProductType.POSTRE))
+        extras.put("DESSERT", availableExtras.stream()
+                .filter(p -> p.getType().equals(ProductType.DESSERT))
                 .toList());
 
-        extras.put("ACOMPANAMIENTO", availableExtras.stream()
-                .filter(p -> p.getType().equals(ProductType.ACOMPANAMIENTO))
+        extras.put("SIDE", availableExtras.stream()
+                .filter(p -> p.getType().equals(ProductType.SIDE))
                 .toList());
 
-        extras.put("OTROS", availableExtras.stream()
-                .filter(p -> p.getType().equals(ProductType.OTROS))
+        extras.put("OTHER", availableExtras.stream()
+                .filter(p -> p.getType().equals(ProductType.OTHER))
                 .toList());
 
         return ResponseEntity.ok(extras);

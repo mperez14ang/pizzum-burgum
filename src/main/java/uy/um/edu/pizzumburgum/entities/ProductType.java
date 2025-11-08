@@ -19,10 +19,10 @@ public enum ProductType {
     SAUCE(ProductCategory.PIZZA),
 
     // Extra types (bebidas, postres, acompañamientos)
-    BEBIDA(ProductCategory.EXTRA),
-    POSTRE(ProductCategory.EXTRA),
-    ACOMPANAMIENTO(ProductCategory.EXTRA),
-    OTROS(ProductCategory.EXTRA);
+    BEVERAGE(ProductCategory.EXTRA),
+    DESSERT(ProductCategory.EXTRA),
+    SIDE(ProductCategory.EXTRA),
+    OTHER(ProductCategory.EXTRA);
 
     private final ProductCategory category;
 

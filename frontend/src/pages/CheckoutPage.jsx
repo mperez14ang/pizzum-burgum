@@ -70,8 +70,8 @@ export const CheckoutPage = ({ onNavigate, onBack }) => {
             setCartItemCount(0)
             toast.success('Pago realizado con exito!');
 
-            // TODO: Aqui la idea seria que llevase al usuario a una pagina donde pueda ver el estado de su pedido
-            onNavigate('home');
+            const payedOrderId = response.orderBy.id;
+            onNavigate('home', payedOrderId);
         } catch (error) {
             console.error('Error processing order:', error);
             toast.error('Error al procesar el pago');

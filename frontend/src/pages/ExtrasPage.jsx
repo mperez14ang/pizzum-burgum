@@ -1,20 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {ArrowRight, ChevronLeft, ShoppingCart} from 'lucide-react';
-import { Header } from '../components/common/Header';
-import { Card, CardHeader, CardBody } from '../components/common/Card';
-import { ExtrasCard } from '../components/ExtrasCard';
-import { useAuth } from '../contexts/AuthContext';
-import { cartService, ingredientsService } from '../services/api';
-import toast from 'react-hot-toast';
-import {handleAddExtrasToCart, handleAddToCart} from "../utils/CartInteraction.jsx";
+import {Card, CardBody, CardHeader} from '../components/common/Card';
+import {ExtrasCard} from '../components/ExtrasCard';
+import {useAuth} from '../contexts/AuthContext';
+import {ingredientsService} from '../services/api';
+import {handleAddExtrasToCart} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
-import {getImage} from "../utils/StringUtils.jsx";
+import {AddToCartModalLogin} from "./modals/AddToCartModalLogin.jsx";
+import {LoginAndRegisterModal} from "./modals/LoginAndRegisterModal.jsx";
 
 const CATEGORY_NAMES = {
-    BEBIDA: 'Bebidas',
-    POSTRE: 'Postres',
-    ACOMPANAMIENTO: 'Acompañamientos',
-    OTROS: 'Otros'
+    BEVERAGE: 'Bebidas',
+    DESSERT: 'Postres',
+    SIDE: 'Acompañamientos',
+    OTHER: 'Otros'
 };
 
 const MAX_QUANTITY_PER_EXTRA = 10;
@@ -24,10 +23,10 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
     const { itemCount, setCartItemCount } = useCart();
 
     const [extras, setExtras] = useState({
-        BEBIDA: [],
-        POSTRE: [],
-        ACOMPANAMIENTO: [],
-        OTROS: []
+        BEVERAGE: [],
+        DESSERT: [],
+        SIDE: [],
+        OTHER: []
     });
     const [selectedExtras, setSelectedExtras] = useState({});
     const [loading, setLoading] = useState(true);
@@ -46,10 +45,10 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
                 const groupedExtras = await ingredientsService.getAllExtrasGrouped();
 
                 setExtras({
-                    BEBIDA: groupedExtras.BEBIDA,
-                    POSTRE: groupedExtras.POSTRE,
-                    ACOMPANAMIENTO: groupedExtras.ACOMPANAMIENTO ,
-                    OTROS: groupedExtras.OTROS
+                    BEVERAGE: groupedExtras.BEVERAGE,
+                    DESSERT: groupedExtras.DESSERT,
+                    SIDE: groupedExtras.SIDE ,
+                    OTHER: groupedExtras.OTHER
                 });
             } catch (err) {
                 setError('Error al cargar los extras. Por favor, intenta de nuevo.');
@@ -101,62 +100,6 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
             }
         });
         return items;
-    };
-
-    // ✅ Agregar extras al carrito
-    const handleAddExtrasToCart = async () => {
-        // Verificar autenticación
-        if (!isAuthenticated) {
-            setShowCartLoginPrompt(true);
-            return;
-        }
-
-        // Verificar que haya extras seleccionados
-        const selectedItems = getSelectedItems();
-        if (selectedItems.length === 0) {
-            toast.error('Por favor selecciona al menos un extra');
-            return;
-        }
-
-        setIsAddingToCart(true);
-
-        try {
-            // Agregar cada extra al carrito
-            let addedCount = 0;
-
-            for (const item of selectedItems) {
-                const extraData = {
-                    extraId: item.id,
-                    quantity: item.quantity
-                };
-
-                const result = await cartService.addExtraToCart(extraData);
-
-                if (result) {
-                    addedCount += item.quantity;
-                }
-            }
-
-            if (addedCount > 0) {
-                // Actualizar el contador del carrito
-                setCartItemCount(itemCount + addedCount);
-
-                toast.success(`${addedCount} extra(s) agregado(s) al carrito!`, { duration: 2000 });
-
-                // Limpiar selecciones
-                setSelectedExtras({});
-
-                // Navegar al checkout
-                onNavigate('checkout');
-            } else {
-                toast.error('No se pudieron agregar los extras al carrito');
-            }
-        } catch (error) {
-            console.error('Error adding extras to cart:', error);
-            toast.error('Error al agregar extras al carrito');
-        } finally {
-            setIsAddingToCart(false);
-        }
     };
 
     if (loading) {
@@ -253,7 +196,18 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
                                     <div className="text-center py-8 text-gray-500">
                                         <ShoppingCart size={48} className="mx-auto mb-2 opacity-30" />
                                         <p>No hay extras seleccionados</p>
+
+                                        <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                                            <button
+                                                onClick={() => onNavigate('checkout')}
+                                                className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+                                            >
+                                                Continuar al checkout sin extras
+                                                <ArrowRight className="w-5 h-5" />
+                                            </button>
+                                        </div>
                                     </div>
+
                                 ) : (
                                     <>
                                         {/* Items seleccionados */}
@@ -287,10 +241,10 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
 
                                         {/* Botón agregar al carrito */}
                                         <button
-                                            onClick={() => handleAddExtrasToCart(selectedItems)}
+                                            onClick={() => handleAddExtrasToCart(selectedItems, () => onNavigate('checkout'))}
                                             className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
                                         >
-                                            Finalizar Compra
+                                            Agregar y continuar al checkout
                                             <ArrowRight className="w-5 h-5" />
                                         </button>
                                     </>

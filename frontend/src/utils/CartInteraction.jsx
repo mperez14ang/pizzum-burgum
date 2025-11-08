@@ -193,16 +193,15 @@ export const handleAddToCart = async (
     }
 };
 
-export const handleAddExtrasToCart = async (items) => {
+export const handleAddExtrasToCart = async (items, onAdd) => {
     const products = items.map(item => ({
         productId: item.id,
         quantity: item.quantity
     }));
 
-    console.log(products)
     const result = await cartService.addExtrasToCart(products);
 
     if (result){
-        toast.success("Extras agregados correctamente!")
+        onAdd()
     }
 }

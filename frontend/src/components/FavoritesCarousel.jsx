@@ -7,6 +7,7 @@ import FavoriteDetailModal from "../pages/modals/FavoriteDetailModal.jsx";
 import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
 import {Loading} from "./common/Loading.jsx";
+import {API_URL} from "../utils/StringUtils.jsx";
 
 export const FavoritesCarousel = ({ onOpenLogin, onNavigateToFavorites, carouselLength = 5 }) => {
     const { favorites, loadFavorites, isLoading } = useFavorites();
@@ -59,8 +60,8 @@ export const FavoritesCarousel = ({ onOpenLogin, onNavigateToFavorites, carousel
                     type: firstCreation.type,
                     price: totalPrice,
                     image: firstCreation.type === 'PIZZA'
-                        ? 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop'
-                        : 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop',
+                        ? `${API_URL}/assets/pizza.jpg`
+                        : `${API_URL}/assets/burger.jpg`,
                     description: `${firstCreation.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'} personalizada`,
                     creationCount: fav.creations.length,
                     available: fav.available,

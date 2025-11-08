@@ -1,17 +1,13 @@
 export const API_URL = "http://localhost:8080";
 
 export const CATEGORY_IMAGES = {
-    BEBIDA: 'https://images.unsplash.com/photo-1437418747212-8d9709afab22?w=400',
-    POSTRE: 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=400',
-    ACOMPANAMIENTO: 'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=400',
-    OTROS: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400'
+    BEVERAGE: `${API_URL}/assets/beverage.jpeg`,
+    DESSERT: `${API_URL}/assets/dessert.jpeg`,
+    SIDE: `${API_URL}/assets/side.jpeg`,
+    OTHER: `${API_URL}/assets/other.jpeg`
 };
 
 export const getImage = (item, type, category) => {
-    console.log(item);
-    console.log(category)
-    console.log(type)
-
     if (type === 'EXTRA') {
         if (item.image && item.image !== '') {
             if (item.image.startsWith('/')) {
@@ -34,7 +30,7 @@ export const getImage = (item, type, category) => {
 };
 
 export const getExtraImage = (category) => {
-    return CATEGORY_IMAGES[category] || CATEGORY_IMAGES.OTROS;
+    return CATEGORY_IMAGES[category] || CATEGORY_IMAGES.OTHER;
 };
 
 export function capitalize(str) {

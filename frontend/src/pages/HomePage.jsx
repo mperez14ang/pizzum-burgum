@@ -1,15 +1,34 @@
-import {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Header} from '../components/common/Header';
 import {FavoritesCarousel} from '../components/FavoritesCarousel';
 import burgerImg from '../assets/burger.jpg';
 import pizzaImg from '../assets/pizza.jpg';
 import {useAuth} from "../contexts/AuthContext.jsx";
 import {LoginAndRegisterModal} from "./modals/LoginAndRegisterModal.jsx";
+import OrderStatusModal from "./modals/OrderStatusModal.jsx";
+import {adminService} from "../services/api.js";
 
-export const HomePage = ({ onNavigate }) => {
+export const HomePage = ({ onNavigate, orderPayedId=null }) => {
     const { logout } = useAuth();
 
     const [isShowLoginModal, setIsShowLoginModal] = useState(false);
+
+    // Order Status Modal
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+    const [selectedOrderForStatus, setSelectedOrderForStatus] = useState(null);
+
+    useEffect(() => {
+        const getOrder = async () => {
+            const response = await adminService.getOrder(orderPayedId)
+            if (response){
+                setIsStatusModalOpen(true)
+                setSelectedOrderForStatus(response)
+            }
+        }
+        if (orderPayedId){
+            getOrder()
+        }
+    }, [orderPayedId]);
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -66,6 +85,15 @@ export const HomePage = ({ onNavigate }) => {
                 {/* Modal de login prompt */}
                 <LoginAndRegisterModal isOpen={isShowLoginModal}
                                        onClose={() => {setIsShowLoginModal(false)}}/>
+
+                <OrderStatusModal
+                    isOpen={isStatusModalOpen}
+                    onClose={() => {
+                        setIsStatusModalOpen(false);
+                    }}
+                    order={selectedOrderForStatus}
+                    title={`Estado del pedido`}
+                />
             </main>
         </div>
     );

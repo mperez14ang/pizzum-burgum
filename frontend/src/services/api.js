@@ -217,6 +217,16 @@ export const cartService = {
                 quantity
             })
         });
+
+    },
+    addExtraToCart: async (extraData) => {
+        try {
+            const response = await apiClient.post('/cart/add-extra', extraData);
+            return response.data;
+        } catch (error) {
+            console.error('Error adding extra to cart:', error);
+            throw error;
+        }
     },
 
     addCreationToCart: async (creationId, quantity) => {
@@ -307,27 +317,27 @@ export const clientService = {
 
     updateAddress(addressId, street, city, postalCode){
         return fetchFromAPI(`/address/${addressId}`, {
-            method: 'PUT',
-            body: JSON.stringify({
-                street,
-                city,
-                postalCode
-            })
+                method: 'PUT',
+                body: JSON.stringify({
+                    street,
+                    city,
+                    postalCode
+                })
             }
         );
     },
 
     deleteAddress(addressId){
         return fetchFromAPI(`/address/${addressId}`, {
-            method: 'DELETE'
-        }
+                method: 'DELETE'
+            }
         );
     },
 
     setAddressAsActive(addressId){
         return fetchFromAPI(`/address/${addressId}/active`, {
-            method: 'PATCH'
-        }
+                method: 'PATCH'
+            }
         );
     },
 

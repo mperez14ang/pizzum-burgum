@@ -2,10 +2,12 @@ package uy.um.edu.pizzumburgum.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,13 +29,16 @@ public class OrderBy {
     @Column(name = "state",  nullable = false)
     private OrderState state;
 
-    @Column
+    @Column(name = "date_created", nullable = true)
+    private LocalDate dateCreated;
+
+    @Column(nullable = true)
     private String deliveryStreet;
 
-    @Column
+    @Column(nullable = true)
     private String deliveryCity;
 
-    @Column
+    @Column(nullable = true)
     private String deliveryPostalCode;
 
     @Min(0)

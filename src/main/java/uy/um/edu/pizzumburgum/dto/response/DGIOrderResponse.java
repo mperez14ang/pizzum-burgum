@@ -14,30 +14,18 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderByResponse {
+public class DGIOrderResponse {
     private Long id;
-
     private OrderState state;
-
-    private String deliveryStreet;
-
-    private String deliveryCity;
-
-    private String deliveryPostalCode;
-
-    private Set<OrderHasCreationsResponse> creations;
-
-    private BigDecimal extraAmount;
-
-    private BigDecimal totalPrice;
-
-    private String clientEmail;
-
-    private String notes;
-
     private LocalDate dateCreated;
-
+    private String deliveryStreet;
+    private String deliveryCity;
+    private String deliveryPostalCode;
+    private Set<OrderHasCreationsResponse> creations;
+    private BigDecimal extraAmount;
+    private BigDecimal totalPrice;
+    private String clientEmail;
     private String clientName;
-
-    private Boolean available;
+    private String clientDni;
+    private String notes;
 }

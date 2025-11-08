@@ -4,7 +4,7 @@ import { Header } from '../components/common/Header';
 import { Card, CardHeader, CardBody } from '../components/common/Card';
 import { ExtrasCard } from '../components/ExtrasCard';
 import { useAuth } from '../contexts/AuthContext';
-import { ingredientsService } from '../services/api';
+import { cartService, ingredientsService } from '../services/api';
 import toast from 'react-hot-toast';
 import {handleAddExtrasToCart, handleAddToCart} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
@@ -17,11 +17,11 @@ const CATEGORY_NAMES = {
     OTROS: 'Otros'
 };
 
-const MAX_QUANTITY_PER_EXTRA = 10; // Variable configurable
+const MAX_QUANTITY_PER_EXTRA = 10;
 
 export const ExtrasPage = ({ onNavigate, onBack }) => {
     const { isAuthenticated, user } = useAuth();
-    const { itemCount, setCartItem } = useCart()
+    const { itemCount, setCartItemCount } = useCart();
 
     const [extras, setExtras] = useState({
         BEBIDA: [],
@@ -32,6 +32,9 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
     const [selectedExtras, setSelectedExtras] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showCartLoginPrompt, setShowCartLoginPrompt] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
 
     // Cargar extras desde el backend
     useEffect(() => {
@@ -40,7 +43,6 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
                 setLoading(true);
                 setError(null);
 
-                // Usar el nuevo endpoint que ya devuelve los extras agrupados
                 const groupedExtras = await ingredientsService.getAllExtrasGrouped();
 
                 setExtras({
@@ -77,7 +79,6 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
     const calculateTotal = () => {
         let total = 0;
         Object.entries(selectedExtras).forEach(([extraId, quantity]) => {
-            // Buscar el extra en todas las categorías
             const extra = Object.values(extras)
                 .flat()
                 .find(e => e.id === parseInt(extraId));
@@ -100,6 +101,62 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
             }
         });
         return items;
+    };
+
+    // ✅ Agregar extras al carrito
+    const handleAddExtrasToCart = async () => {
+        // Verificar autenticación
+        if (!isAuthenticated) {
+            setShowCartLoginPrompt(true);
+            return;
+        }
+
+        // Verificar que haya extras seleccionados
+        const selectedItems = getSelectedItems();
+        if (selectedItems.length === 0) {
+            toast.error('Por favor selecciona al menos un extra');
+            return;
+        }
+
+        setIsAddingToCart(true);
+
+        try {
+            // Agregar cada extra al carrito
+            let addedCount = 0;
+
+            for (const item of selectedItems) {
+                const extraData = {
+                    extraId: item.id,
+                    quantity: item.quantity
+                };
+
+                const result = await cartService.addExtraToCart(extraData);
+
+                if (result) {
+                    addedCount += item.quantity;
+                }
+            }
+
+            if (addedCount > 0) {
+                // Actualizar el contador del carrito
+                setCartItemCount(itemCount + addedCount);
+
+                toast.success(`${addedCount} extra(s) agregado(s) al carrito!`, { duration: 2000 });
+
+                // Limpiar selecciones
+                setSelectedExtras({});
+
+                // Navegar al checkout
+                onNavigate('checkout');
+            } else {
+                toast.error('No se pudieron agregar los extras al carrito');
+            }
+        } catch (error) {
+            console.error('Error adding extras to cart:', error);
+            toast.error('Error al agregar extras al carrito');
+        } finally {
+            setIsAddingToCart(false);
+        }
     };
 
     if (loading) {
@@ -139,7 +196,6 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-
             <div className="container mx-auto px-4 py-6">
                 <button
                     onClick={onBack}
@@ -160,7 +216,6 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
                             </CardHeader>
 
                             <CardBody>
-                                {/* Categorías de extras */}
                                 <div className="space-y-8">
                                     {Object.entries(extras).map(([category, items]) => (
                                         items.length > 0 && (
@@ -245,6 +300,21 @@ export const ExtrasPage = ({ onNavigate, onBack }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Modales de autenticación */}
+            <AddToCartModalLogin
+                isOpen={showCartLoginPrompt}
+                onOpenLogin={() => {
+                    setShowCartLoginPrompt(false);
+                    setIsAuthModalOpen(true);
+                }}
+                onClose={() => setShowCartLoginPrompt(false)}
+            />
+
+            <LoginAndRegisterModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+            />
         </div>
     );
 };

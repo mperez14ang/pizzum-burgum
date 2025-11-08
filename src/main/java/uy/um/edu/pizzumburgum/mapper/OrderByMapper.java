@@ -20,6 +20,7 @@ public class OrderByMapper {
 
         return OrderBy.builder()
                 .state(orderByRequest.getState())
+                .dateCreated(java.time.LocalDate.now())
                 .deliveryCity(address.getCity())
                 .deliveryStreet(address.getStreet())
                 .deliveryPostalCode(address.getPostalCode())
@@ -68,6 +69,7 @@ public class OrderByMapper {
                 .extraAmount(orderBy.getExtraAmount())
                 .totalPrice(totalPrice)
                 .notes(orderBy.getNotes())
+                .dateCreated(orderBy.getDateCreated())
                 .build();
     }
 }

@@ -206,14 +206,23 @@ export const ProductManagement = () => {
                 console.log(payload)
                 await adminService.updateProduct(editingProduct.id, payload);
                 toast.success('Producto actualizado');
+
+                setProducts(prevProducts =>
+                    prevProducts.map(p =>
+                        p.id === editingProduct.id  // Usa editingProduct.id
+                            ? { ...p, ...payload }  // Spread payload para fusionar propiedades
+                            : p
+                    )
+                );
+
             } else {
                 await adminService.createProduct(payload);
                 toast.success('Producto creado');
+                // Recargar sin pasar filtros para mantener los actuales
+                await loadProducts();
             }
 
             setIsFormModalOpen(false);
-            // Recargar sin pasar filtros para mantener los actuales
-            await loadProducts();
         } catch (error) {
             toast.error(editingProduct ? 'Error al actualizar producto' : 'Error al crear producto');
             console.error('Error completo:', error);

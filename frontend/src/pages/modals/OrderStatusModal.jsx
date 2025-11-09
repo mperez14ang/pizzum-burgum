@@ -1,172 +1,156 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../components/common/Modal.jsx';
-import { adminService } from '../../services/api.js';
-
-// Order status modal showing a progress bar for the order lifecycle
-// States (in Spanish UI order):
-// 0: Pago, 1: En espera, 2: En cola, 3: En preparación, 4: En camino, 5: Entregado, (Cancelado = special)
-// Backend enum examples (OrderState): UNPAID, ON_HOLD, IN_QUEUE, MAKING, DELIVERING, DELIVERED, CANCELLED
+import {useOrderWebSocket} from "../../contexts/UseOrderWebSocket.jsx";
 
 export const OrderStatusModal = ({
-  isOpen,
-  onClose,
-  order,
-  onOrderUpdated,
-  title = 'Estado del pedido',
-  drawAsComponent=false
-}) => {
-  // Labels for UI
-  const LABELS = ['Pago', 'En cola', 'En preparación', 'En camino', 'Entregado'];
+                                     isOpen,
+                                     onClose,
+                                     order,
+                                     onOrderUpdated,
+                                     title = 'Estado del pedido',
+                                     drawAsComponent = false
+                                 }) => {
+    const LABELS = ['Pago', 'En cola', 'En preparación', 'En camino', 'Entregado'];
+    const [localOrder, setLocalOrder] = useState(order);
 
-  const [localOrder, setLocalOrder] = useState(order);
+    // 🔥 Usar WebSocket en lugar de polling
+    const { isConnected, error } = useOrderWebSocket(
+        order?.id,
+        (update) => {
+            // Actualizar orden cuando llega una actualización
+            if (update.orderId === order?.id) {
+                const updatedOrder = { ...localOrder, state: update.state };
+                setLocalOrder(updatedOrder);
 
-  // Polling each 5 seconds while open to refresh order state
-  useEffect(() => {
-    let intervalId;
-    let cancelled = false;
+                if (typeof onOrderUpdated === 'function') {
+                    onOrderUpdated(updatedOrder);
+                }
+            }
+        },
+        isOpen // Solo conectar cuando el modal está abierto
+    );
 
-    const fetchLatest = async () => {
-      try {
-        if (!order?.id) return;
-        const latest = await adminService.getOrder(order.id);
-        if (cancelled) return;
-        if (latest && latest.state && latest.state !== (localOrder?.state || order?.state)) {
-          setLocalOrder(latest);
-          if (typeof onOrderUpdated === 'function') {
-            onOrderUpdated(latest);
-          }
+    // Sincronizar con la orden externa
+    useEffect(() => {
+        if (order) {
+            setLocalOrder(order);
         }
-      } catch (e) {
-        // Silent fail; modal is read-only
-        // console.error(e);
-      }
+    }, [order]);
+
+    const stateToIndex = (state) => {
+        if (!state) return -1;
+        const s = String(state).toUpperCase();
+        if (s === 'CANCELLED') return 'CANCELLED';
+        if (s === 'UNPAID') return -1;
+        if (s === 'IN_QUEUE') return 1;
+        if (s === 'MAKING') return 2;
+        if (s === 'DELIVERING') return 3;
+        if (s === 'DELIVERED') return 4;
+        return 0;
     };
 
-    if (isOpen && order?.id) {
-      setLocalOrder(order);
-      // initial fetch to avoid waiting 5s
-      fetchLatest();
-      intervalId = setInterval(fetchLatest, 5000);
-    }
-
-    return () => {
-      cancelled = true;
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [isOpen, order?.id, localOrder?.state]);
-
-  // Map backend state to progress index (k)
-  // -1 means nothing filled (UNPAID)
-  // 0..5 are the corresponding indices above
-  const stateToIndex = (state) => {
-    if (!state) return -1;
-    const s = String(state).toUpperCase();
-    if (s === 'CANCELLED') return 'CANCELLED';
-    if (s === 'UNPAID') return -1;
-    if (s === 'IN_QUEUE') return 1;
-    if (s === 'MAKING') return 2;
-    if (s === 'DELIVERING') return 3;
-    if (s === 'DELIVERED') return 4;
-    // If an unknown paid state arrives, assume at least paid
-    return 0;
-  };
-
-    // Decide current index from order
     const currentIndex = useMemo(() => {
         const src = localOrder || order;
         if (!src) return -1;
         const val = stateToIndex(src?.state);
         if (val === 'CANCELLED') return 'CANCELLED';
-        // If it's any state other than UNPAID, we assume payment done at least
-        if (val >= 0) return val; // already mapped including paid progression
+        if (val >= 0) return val;
         return -1;
     }, [localOrder, order]);
 
-    // Special spacing rule: distance between Pago (0) and En cola (1) is HALF the rest
-    // Compute tick positions in % along the bar length for 5 labels
     const tickPositions = useMemo(() => {
-        const d = 100 / 3.5; // normal gap size (3 full gaps + 1 half gap = 3.5)
+        const d = 100 / 3.5;
         return [
-            0,              // Pago (0)
-            d / 2,          // En cola (1) - half distance
-            d / 2 + d,      // En preparación (2)
-            d / 2 + 2 * d,  // En camino (3)
-            d / 2 + 3 * d   // Entregado (4)
+            0,
+            d / 2,
+            d / 2 + d,
+            d / 2 + 2 * d,
+            d / 2 + 3 * d
         ];
     }, []);
 
-  // Compute fill percentage
-  const fillPercent = useMemo(() => {
-    if (currentIndex === 'CANCELLED') return 100;
-    if (currentIndex == null || currentIndex < 0) return 0; // UNPAID
-    return tickPositions[Math.min(currentIndex, tickPositions.length - 1)];
-  }, [currentIndex, tickPositions]);
+    const fillPercent = useMemo(() => {
+        if (currentIndex === 'CANCELLED') return 100;
+        if (currentIndex == null || currentIndex < 0) return 0;
+        return tickPositions[Math.min(currentIndex, tickPositions.length - 1)];
+    }, [currentIndex, tickPositions]);
 
-  const cancelled = currentIndex === 'CANCELLED';
+    const cancelled = currentIndex === 'CANCELLED';
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg" drawAsComponent={drawAsComponent}>
-      {!order ? (
-        <div className="text-gray-600">No se encontró información del pedido.</div>
-      ) : (
-        <div className="px-2 sm:px-4">{/* extra horizontal padding */}
-          {/* Header with order basic info if available */}
-          {(order?.id || order?.code) && (
-            <div className="mb-4 text-sm text-gray-600">Pedido #{order?.code ?? order?.id}</div>
-          )}
-
-          {/* Progress bar area */}
-          <div className="w-full">
-            {/* Cancelled state: full red bar and message */}
-            {cancelled ? (
-              <div className="text-center">
-                <div className="relative h-3 w-full bg-red-500 rounded-full" />
-                <div className="mt-3 text-red-600 font-semibold">Cancelado! :(</div>
-              </div>
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title={title} size="lg" drawAsComponent={drawAsComponent}>
+            {!order ? (
+                <div className="text-gray-600">No se encontró información del pedido.</div>
             ) : (
-              <div>
-                <div className="relative h-3 w-full bg-gray-200 rounded-full overflow-visible">
-                  {/* Filled part */}
-                  <div
-                    className="h-3 bg-green-500 rounded-full transition-all duration-500"
-                    style={{ width: `${fillPercent}%` }}
-                  />
+                <div className="px-2 sm:px-4">
+                    {/* Header */}
+                    <div className="mb-4 flex items-center justify-between">
+                        <div className="text-sm text-gray-600">
+                            Pedido #{order?.id}  {/* ← Usar solo el ID */}
+                        </div>
 
-                  {/* Tick marks */}
-                  {tickPositions.map((pos, idx) => (
-                    <div
-                      key={idx}
-                      className="absolute top-1/2 -translate-y-1/2"
-                      style={{ left: `calc(${pos}% - 1px)` }}
-                    >
-                      <div className="w-0.5 h-5 bg-gray-400 translate-y-[-6px]" />
+                        {/* Indicador de conexión */}
+                        <div className="flex items-center gap-2">
+                            <div className={`h-2 w-2 rounded-full ${
+                                isConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
+                            }`} />
+                            <span className="text-xs text-gray-500">{isConnected ? 'Tiempo real' : 'Desconectado'}</span>
+                        </div>
                     </div>
-                  ))}
-                </div>
 
-                {/* Labels */}
-                <div className="relative mt-4">
-                  {LABELS.map((label, idx) => (
-                    <div
-                      key={label}
-                      className="absolute -translate-x-1/2 text-xs text-gray-700 whitespace-nowrap px-1 text-center"
-                      style={{ left: `${tickPositions[idx]}%` }}
-                    >
-                      {label}
+                    {/* Error de conexión */}
+                    {error && (
+                        <div className="mb-4 p-2 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-700">
+                            ⚠️ Reconectando...
+                        </div>
+                    )}
+
+                    {/* Progress bar */}
+                    <div className="w-full">
+                        {cancelled ? (
+                            <div className="text-center">
+                                <div className="relative h-3 w-full bg-red-500 rounded-full" />
+                                <div className="mt-3 text-red-600 font-semibold">Cancelado! :(</div>
+                            </div>
+                        ) : (
+                            <div>
+                                <div className="relative h-3 w-full bg-gray-200 rounded-full overflow-visible">
+                                    <div
+                                        className="h-3 bg-green-500 rounded-full transition-all duration-500"
+                                        style={{ width: `${fillPercent}%` }}
+                                    />
+
+                                    {tickPositions.map((pos, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="absolute top-1/2 -translate-y-1/2"
+                                            style={{ left: `calc(${pos}% - 1px)` }}
+                                        >
+                                            <div className="w-0.5 h-5 bg-gray-400 translate-y-[-6px]" />
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="relative mt-4">
+                                    {LABELS.map((label, idx) => (
+                                        <div
+                                            key={label}
+                                            className="absolute -translate-x-1/2 text-xs text-gray-700 whitespace-nowrap px-1 text-center"
+                                            style={{ left: `${tickPositions[idx]}%` }}
+                                        >
+                                            {label}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
-                  ))}
                 </div>
-              </div>
             )}
-          </div>
-        </div>
-      )}
 
-      {/* Footer */}
-      <div className="mt-8 flex justify-end px-2 sm:px-4">{/* match extra padding */}
-      </div>
-    </Modal>
-  );
+            <div className="mt-8 flex justify-end px-2 sm:px-4" />
+        </Modal>
+    );
 };
 
 export default OrderStatusModal;

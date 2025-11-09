@@ -1,5 +1,5 @@
 import {ChevronLeft, Heart} from 'lucide-react';
-import {Header} from '../components/common/Header';
+import {Header} from '../components/common/Header.jsx';
 import {useFavorites} from '../contexts/FavoritesContext';
 import React, {useEffect, useMemo, useState} from 'react';
 import toast from 'react-hot-toast';

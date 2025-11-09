@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useAuth } from './AuthContext.jsx';
+import {API_URL} from "../utils/StringUtils.jsx";
 
-export const useOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true) => {
+export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true) => {
     const [isConnected, setIsConnected] = useState(false);
     const [error, setError] = useState(null);
     const clientRef = useRef(null);
@@ -19,7 +20,7 @@ export const useOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true)
         if (clientRef.current) return;
 
         const client = new Client({
-            webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+            webSocketFactory: () => new SockJS(`${API_URL}/ws`),
             connectHeaders: {
                 Authorization: `Bearer ${user.token}`,
             },

@@ -1,6 +1,7 @@
 import {transformCreationData} from "../utils/parsers.jsx";
+import {API_URL} from "../utils/StringUtils.jsx";
 
-const API_BASE_URL = 'http://localhost:8080/api';
+export const API_BASE_URL = `${API_URL}/api`;
 
 const getAuthHeaders = () => {
     const userStr = localStorage.getItem('user');

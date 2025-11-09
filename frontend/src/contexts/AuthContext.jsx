@@ -1,7 +1,7 @@
 import {createContext, useContext, useEffect, useState} from 'react';
 import toast from "react-hot-toast";
 import {jwtDecode} from "jwt-decode";
-import {fetchFromAPI} from "../services/api.js";
+import {API_BASE_URL, fetchFromAPI} from "../services/api.js";
 
 const AuthContext = createContext();
 
@@ -155,7 +155,7 @@ export const AuthProvider = ({ children }) => {
 
     const validate = async (token) => {
         try {
-            const response = await fetch('http://localhost:8080/api/auth/v1/verify', {
+            const response = await fetch(`${API_BASE_URL}/auth/v1/verify`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`

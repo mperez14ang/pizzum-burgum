@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../components/common/Modal.jsx';
-import {useOrderWebSocket} from "../../contexts/UseOrderWebSocket.jsx";
+import {UseOrderWebSocket} from "../../contexts/UseOrderWebSocket.jsx";
 
 export const OrderStatusModal = ({
                                      isOpen,
@@ -14,7 +14,7 @@ export const OrderStatusModal = ({
     const [localOrder, setLocalOrder] = useState(order);
 
     // 🔥 Usar WebSocket en lugar de polling
-    const { isConnected, error } = useOrderWebSocket(
+    const { isConnected, error } = UseOrderWebSocket(
         order?.id,
         (update) => {
             // Actualizar orden cuando llega una actualización

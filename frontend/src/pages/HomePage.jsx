@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Header} from '../components/common/Header';
+import {Header} from '../components/common/Header.jsx';
 import {FavoritesCarousel} from '../components/FavoritesCarousel';
 import burgerImg from '../assets/burger.jpg';
 import pizzaImg from '../assets/pizza.jpg';

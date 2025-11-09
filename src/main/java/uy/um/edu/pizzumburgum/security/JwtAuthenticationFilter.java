@@ -47,6 +47,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
+        String path = request.getRequestURI();
+        System.out.println(path);
+        // Ignorar assets y archivos públicos
+        if (
+                path.startsWith("/assets")
+                        || path.equals("/")
+                        || path.equals("/index.html")
+                        || path.equals("/vite.svg")
+                        || path.startsWith("/api/auth")
+        ) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             logger.info("REQUEST: {} NOT LOGGED IN", request.getRequestURI());
             filterChain.doFilter(request, response);

@@ -1,4 +1,4 @@
-export const API_URL = "http://localhost:8080";
+export const API_URL = "http://pizzumnburgum.duckdns.org";
 
 export const CATEGORY_IMAGES = {
     BEVERAGE: `${API_URL}/assets/beverage.jpeg`,

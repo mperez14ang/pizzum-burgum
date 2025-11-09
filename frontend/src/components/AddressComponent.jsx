@@ -1,6 +1,6 @@
 import {Edit3, MapPin, Plus, Trash2} from "lucide-react";
 import React, {useEffect, useMemo, useRef, useState} from "react";
-import {useAddresses} from "../contexts/UseAddresses.jsx";
+import {UseAddresses} from "../contexts/UseAddresses.jsx";
 import toast from "react-hot-toast";
 import {AddAddressModal} from "../pages/modals/AddAddressModal.jsx";
 import {getBackendErrorMessage} from "../utils/parsers.jsx";
@@ -20,7 +20,7 @@ export const AddressComponent = ({
         handleCreateAddress,
         handleUpdateAddress,
         handleDeleteAddress
-    } = useAddresses();
+    } = UseAddresses();
 
     const [selectedAddressId, setSelectedAddressId] = useState('');
     const [showAddressModal, setShowAddressModal] = useState(false);

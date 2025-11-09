@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(
         name = "order_has_creation"
@@ -22,6 +24,10 @@ public class OrderHasCreations {
     @Min(1)
     @Column(name = "quantity")
     private int quantity;
+
+    // Precio calculado
+    @Column(name = "price")
+    private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creation_id", nullable = false)

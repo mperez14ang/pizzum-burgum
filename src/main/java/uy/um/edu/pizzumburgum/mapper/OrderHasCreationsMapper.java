@@ -10,6 +10,7 @@ public class OrderHasCreationsMapper {
         return OrderHasCreations.builder()
                 .id(orderHasCreationsRequest.getId())
                 .quantity(orderHasCreationsRequest.getQuantity())
+                .price(null)
                 .build();
     }
 
@@ -17,6 +18,7 @@ public class OrderHasCreationsMapper {
         return OrderHasCreationsResponse.builder()
                 .quantity(orderHasCreations.getQuantity())
                 .creation(CreationMapper.toCreationDto(orderHasCreations.getCreation()))
+                .price(orderHasCreations.getPrice())
                 .build();
     }
 }

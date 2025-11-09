@@ -51,7 +51,7 @@ export const OrderDetailModal = ({
     const calculateTotal = () => {
         if (!selectedOrder?.creations) return 0;
         return selectedOrder.creations.reduce((total, c) => {
-            return total + (c.creation?.price || 0) * c.quantity;
+            return total + (c?.price || 0) * c.quantity;
         }, 0);
     };
 
@@ -118,55 +118,84 @@ export const OrderDetailModal = ({
                         <h4 className="font-semibold text-gray-900 mb-2">Creaciones</h4>
                         {selectedOrder.creations?.length > 0 ? (
                             <div className="space-y-3">
-                                {selectedOrder.creations.map((c) => (
-                                    <div
-                                        key={c.id}
-                                        className="border rounded-xl p-4 bg-gray-50 shadow-sm hover:shadow-md transition-shadow"
-                                    >
-                                        {/* Nombre + Cantidad */}
-                                        <div className="flex justify-between items-center mb-2">
-                                            <h5 className="font-semibold text-gray-900">
-                                                {c.creation?.name || 'Sin nombre'}
-                                            </h5>
-                                            <Badge variant="outline">x{c.quantity}</Badge>
-                                        </div>
+                                {selectedOrder.creations.map((c) => {
+                                    const isExtra = c.creation?.type === 'EXTRA';
 
-                                        {/* Tipo y Precio */}
-                                        <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
-                                            <span>Tipo: {c.creation?.type || 'N/A'}</span>
-                                            <span className="font-medium">
-                                                Precio: ${c.creation?.price || 0} × {c.quantity} = ${(c.creation?.price || 0) * c.quantity}
-                                            </span>
-                                        </div>
+                                    return (
+                                        <div
+                                            key={c.id}
+                                            className="border rounded-xl p-4 bg-gray-50 shadow-sm hover:shadow-md transition-shadow"
+                                        >
+                                            {isExtra ? (
+                                                // Mostrar como producto simple
+                                                <>
+                                                    <div className="flex justify-between items-center">
+                                                        <h5 className="font-semibold text-gray-900">
+                                                            {c.creation?.name || 'Sin nombre'}
+                                                        </h5>
+                                                        <Badge variant="outline">x{c.quantity}</Badge>
+                                                    </div>
+                                                    <div className="flex justify-between items-center text-sm text-gray-600 mt-2">
+                                                        <span className="text-gray-500">Extra</span>
+                                                        <span className="font-medium">${c?.price || 0} × {c.quantity} = ${(c?.price || 0) * c.quantity}</span>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                // Mostrar como creación con productos
+                                                <>
+                                                    {/* Nombre + Cantidad */}
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <h5 className="font-semibold text-gray-900">
+                                                            {c.creation?.name || 'Sin nombre'}
+                                                        </h5>
+                                                        <Badge variant="outline">x{c.quantity}</Badge>
+                                                    </div>
 
-                                        {/* Productos */}
-                                        {c.creation?.products?.length > 0 && (
-                                            <div className="mt-3 pl-3 border-l-2 border-gray-300">
-                                                <p className="font-medium text-gray-700 mb-2 text-sm">
-                                                    Productos:
-                                                </p>
-                                                <ul className="space-y-1 text-sm">
-                                                    {c.creation.products.map((p) => (
-                                                        <li
-                                                            key={p.id}
-                                                            className="flex justify-between text-gray-600"
-                                                        >
-                                                            <span>
-                                                                {p.product?.name || 'Sin nombre'}
-                                                                {p.product?.type && ` (${p.product.type})`}
-                                                            </span>
-                                                            <span className="font-medium">x{p.quantity}</span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
+                                                    {/* Tipo y Precio */}
+                                                    <div className="flex justify-between items-center text-sm text-gray-600 mb-3">
+                                                        <span>Tipo: {c.creation?.type || 'N/A'}</span>
+                                                        <span className="font-medium">
+                                        Precio: ${c?.price || 0} × {c.quantity} = ${(c?.price || 0) * c.quantity}
+                                    </span>
+                                                    </div>
+
+                                                    {/* Productos */}
+                                                    {c.creation?.products?.length > 0 && (
+                                                        <div className="mt-3 pl-3 border-l-2 border-gray-300">
+                                                            <p className="font-medium text-gray-700 mb-2 text-sm">
+                                                                Productos:
+                                                            </p>
+                                                            <ul className="space-y-1 text-sm">
+                                                                {c.creation.products.map((p) => (
+                                                                    <li
+                                                                        key={p.id}
+                                                                        className="flex justify-between text-gray-600"
+                                                                    >
+                                                    <span>
+                                                        {p.product?.name || 'Sin nombre'}
+                                                    </span>
+                                                                        <span className="font-medium">x{p.quantity}</span>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         ) : (
                             <p className="text-gray-600">No hay creaciones en este pedido</p>
                         )}
+                    </div>
+
+                    <div className="pt-2 border-t border-gray-200">
+                        <div className="flex justify-between items-center text-gray-800">
+                            <h4 className="font-semibold">Delivery</h4>
+                            <p className="font-medium">${selectedOrder.extraAmount}</p>
+                        </div>
                     </div>
 
                     {/* Total */}
@@ -175,7 +204,7 @@ export const OrderDetailModal = ({
                             <div className="flex justify-between items-center">
                                 <h4 className="font-semibold text-gray-900 text-lg">Total</h4>
                                 <p className="font-bold text-gray-900 text-xl">
-                                    ${calculateTotal().toFixed(2)}
+                                    ${selectedOrder.totalPrice}
                                 </p>
                             </div>
                         </div>

@@ -1,5 +1,6 @@
 package uy.um.edu.pizzumburgum.mapper;
 
+import lombok.extern.slf4j.Slf4j;
 import uy.um.edu.pizzumburgum.dto.request.OrderByRequest;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderHasCreationsResponse;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
+@Slf4j
 public class OrderByMapper {
 
 
@@ -47,14 +49,25 @@ public class OrderByMapper {
             orderBy.setExtraAmount(BigDecimal.ZERO);
         }
 
-        // Obtener monto total (suma de prodcutos*quantity)*creation_quantity + extra
-        BigDecimal totalPrice = orderBy.getCreations().stream()
-                .flatMap(c -> c.getCreation().getProducts().stream()
-                        .map(product -> product.getProduct().getPrice()
-                                .multiply(BigDecimal.valueOf(product.getQuantity()))
-                                .multiply(BigDecimal.valueOf(c.getQuantity()))))
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .add(orderBy.getExtraAmount());
+        // Si el pedido todavia no esta pagado, entonces es sujeto a actualizaciones de precios
+        BigDecimal totalPrice;
+        if (orderBy.getState().equals(OrderState.UNPAID)){
+            // Obtener monto total (suma de prodcutos*quantity)*creation_quantity + extra
+            totalPrice = orderBy.getCreations().stream()
+                    .flatMap(c -> c.getCreation().getProducts().stream()
+                            .map(product -> product.getProduct().getPrice()
+                                    .multiply(BigDecimal.valueOf(product.getQuantity()))
+                                    .multiply(BigDecimal.valueOf(c.getQuantity()))))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        // Si el pedido ya fue pagado, o se esta pagando, entonces los precios ya fueron establecidos en OrderHasCreations
+        else {
+            totalPrice = orderBy.getCreations().stream()
+                    .map(c -> c.getPrice().multiply(BigDecimal.valueOf(c.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        // Agregar propina
+        totalPrice = totalPrice.add(orderBy.getExtraAmount());
 
         return OrderByResponse.builder()
                 .id(orderBy.getId())

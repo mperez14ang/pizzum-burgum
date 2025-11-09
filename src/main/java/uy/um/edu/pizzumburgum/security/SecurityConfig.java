@@ -94,6 +94,9 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/admin/**").hasRole(ADMIN)
 
+                        // Web sockets
+                        .requestMatchers("/ws/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)

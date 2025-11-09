@@ -33,10 +33,14 @@ public class OrderByService implements OrderByInt {
     @Autowired
     private CreationRepository creationRepository;
 
-    public OrderByService(OrderByRepository orderByRepository, AddressRepository addressRepository, ClientRepository clientRepository) {
+    @Autowired
+    private OrderNotificationService orderNotificationService;
+
+    public OrderByService(OrderByRepository orderByRepository, AddressRepository addressRepository, ClientRepository clientRepository, OrderNotificationService orderNotificationService) {
         this.orderByRepository = orderByRepository;
         this.addressRepository = addressRepository;
         this.clientRepository = clientRepository;
+        this.orderNotificationService = orderNotificationService;
     }
 
     @Override
@@ -193,7 +197,12 @@ public class OrderByService implements OrderByInt {
         }
 
         // Guardar cambios
-        orderByRepository.saveAndFlush(existingOrder);
+        OrderBy order = orderByRepository.saveAndFlush(existingOrder);
+
+        if (oldState != null && !oldState.equals(order.getState())) {
+            // Notificar al WebSocket de order
+            orderNotificationService.notifyOrderStatusChange(order);
+        }
 
         return OrderByMapper.toOrderByDto(existingOrder);
     }
@@ -240,6 +249,9 @@ public class OrderByService implements OrderByInt {
 
         orderBy.setState(state);
         orderByRepository.save(orderBy);
+
+        // Notificar a websocket
+        orderNotificationService.notifyOrderStatusChange(orderBy);
 
         return OrderByMapper.toOrderByDto(orderBy);
     }

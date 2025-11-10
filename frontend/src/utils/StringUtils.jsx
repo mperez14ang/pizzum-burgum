@@ -1,11 +1,15 @@
-export const API_URL = "http://pizzumnburgum.duckdns.org";
+import {BEVERAGE_IMAGE, BURGER_IMAGE, DESSERT_IMAGE, OTHER_IMAGE, PIZZA_IMAGE, SIDE_IMAGE} from "./assets.jsx";
 
 export const CATEGORY_IMAGES = {
-    BEVERAGE: `${API_URL}/assets/beverage.jpeg`,
-    DESSERT: `${API_URL}/assets/dessert.jpeg`,
-    SIDE: `${API_URL}/assets/side.jpeg`,
-    OTHER: `${API_URL}/assets/other.jpeg`
+    BEVERAGE: BEVERAGE_IMAGE,
+    DESSERT: DESSERT_IMAGE,
+    SIDE: SIDE_IMAGE,
+    OTHER: OTHER_IMAGE
 };
+
+export const API_URL = import.meta.env.PROD
+    ? window.location.origin
+    : "http://localhost:8080";
 
 export const getImage = (item, type, category) => {
     if (type === 'EXTRA') {
@@ -19,11 +23,11 @@ export const getImage = (item, type, category) => {
     }
 
     if (type === 'PIZZA') {
-        return `${API_URL}/assets/pizza.jpg`;
+        return PIZZA_IMAGE;
     }
 
     if (type === 'HAMBURGER') {
-        return `${API_URL}/assets/burger.jpg`;
+        return BURGER_IMAGE;
     }
 
     return '/placeholder.png';

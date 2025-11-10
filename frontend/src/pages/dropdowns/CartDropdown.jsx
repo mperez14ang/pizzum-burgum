@@ -175,6 +175,12 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
                                         <ArrowRight className="w-5 h-5" />
                                     </button>
                                     <button
+                                        onClick={onGoToExtras}
+                                        className="w-full bg-orange-400 text-white py-2 rounded-lg hover:bg-orange-500 transition-colors border border-gray-300 text-sm"
+                                    >
+                                        Extras
+                                    </button>
+                                    <button
                                         onClick={onClose}
                                         className="w-full bg-white text-gray-700 py-2 rounded-lg hover:bg-gray-100 transition-colors border border-gray-300 text-sm"
                                     >

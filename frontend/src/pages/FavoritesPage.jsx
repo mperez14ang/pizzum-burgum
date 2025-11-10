@@ -1,5 +1,5 @@
 import {ChevronLeft, Heart} from 'lucide-react';
-import {Header} from '../components/common/Header';
+import {Header} from '../components/common/Header.jsx';
 import {useFavorites} from '../contexts/FavoritesContext';
 import React, {useEffect, useMemo, useState} from 'react';
 import toast from 'react-hot-toast';
@@ -9,7 +9,7 @@ import FavoriteDetailModal from "./modals/FavoriteDetailModal.jsx";
 import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
 import {Loading} from "../components/common/Loading.jsx";
-import {API_URL} from "../utils/StringUtils.jsx";
+import {BURGER_IMAGE, PIZZA_IMAGE} from "../utils/assets.jsx";
 
 export const FavoritesPage = ({ onNavigate, onBack }) => {
     const { favorites, isLoading, removeFromFavorites } = useFavorites();
@@ -39,8 +39,8 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                         type: firstCreation.type, // 'PIZZA' | 'HAMBURGER'
                         price: totalPrice,
                         image: firstCreation.type === 'PIZZA'
-                            ? `${API_URL}/assets/pizza.jpg`
-                            : `${API_URL}/assets/burger.jpg`,
+                            ? PIZZA_IMAGE
+                            : BURGER_IMAGE,
                         description: `${firstCreation.type === 'PIZZA' ? 'Pizza' : 'Hamburguesa'} personalizada`,
                         creationCount: fav.creations.length,
                         available: fav.available,

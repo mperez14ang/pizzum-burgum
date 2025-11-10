@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { clientService } from '../services/api.js';
 import toast from 'react-hot-toast';
 
-export const useAddresses = () => {
+export const UseAddresses = () => {
     const [addresses, setAddresses] = useState([]);
     const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
 

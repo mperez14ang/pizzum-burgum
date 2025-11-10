@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import {Accordion} from "./common/accordion.jsx";
+import {Accordion} from "./common/Accordion.jsx";
 import {QuantitySelector} from "./common/QuantitySelector.jsx";
 
 export const ProductSection = ({

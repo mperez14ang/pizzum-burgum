@@ -1,11 +1,11 @@
 // Configuración centralizada de productos
-import {API_URL} from "./StringUtils.jsx";
+import {BURGER_IMAGE, PIZZA_IMAGE} from "./assets.jsx";
 
 export const PRODUCT_CONFIG = {
     pizza: {
         type: 'PIZZA',
         displayName: 'Pizza',
-        image: `${API_URL}/assets/pizza.jpg`,
+        image: PIZZA_IMAGE,
         placeholder: 'Ej: Mi Pizza Suprema',
 
         sections: [
@@ -68,7 +68,7 @@ export const PRODUCT_CONFIG = {
     burger: {
         type: 'HAMBURGER',
         displayName: 'Hamburguesa',
-        image: `${API_URL}/assets/burger.jpg`,
+        image: BURGER_IMAGE,
         placeholder: 'Ej: Mi Burger Especial',
 
         sections: [

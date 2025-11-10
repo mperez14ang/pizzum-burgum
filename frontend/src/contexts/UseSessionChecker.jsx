@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAuth } from "./AuthContext.jsx";
 
-export const useSessionChecker = (
+export const UseSessionChecker = (
     handleNavigate,
     setPrevPageType,
     currentPage,

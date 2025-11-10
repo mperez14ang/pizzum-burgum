@@ -24,6 +24,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.bouncycastle.math.raw.Mont256.reduce;
+
 @Service
 @Slf4j
 public class CartService {
@@ -342,6 +344,17 @@ public class CartService {
 
         // Agregar las notas
         cart.setNotes(request.getNotes());
+
+        // Setear los precios de todos las creaciones (OrderHasCreations)
+        cart.getCreations().stream()
+                .peek(c -> {
+                    BigDecimal totalPrice = c.getCreation().getProducts().stream()
+                                    .map(product -> product.getProduct().getPrice()
+                                            .multiply(BigDecimal.valueOf(product.getQuantity())))
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    c.setPrice(totalPrice);
+                })
+                .forEach(orderHasCreationsRepository::save);
 
         // El metodo de pago se puede mostrar en frontend pero no lo guardamos en BD
         // Si quisieras guardarlo, tendrías que agregar un campo en OrderBy

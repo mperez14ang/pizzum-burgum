@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {useAuth} from './contexts/AuthContext';
-import {CreatorProvider} from './contexts/CreatorContext';
+import {CreatorProvider} from './contexts/CreatorContext.jsx';
 import {FavoritesProvider} from './contexts/FavoritesContext';
 import {HomePage} from './pages/HomePage';
 import {CreatorPage} from './pages/CreatorPage';
@@ -12,9 +12,9 @@ import {ExtrasPage} from './pages/ExtrasPage';
 import FavoritesPage from "./pages/FavoritesPage.jsx";
 import OrderHistoryPage from "./pages/OrderHistoryPage.jsx";
 import {CheckoutPage} from "./pages/CheckoutPage.jsx";
-import {Header} from "./components/common/header.jsx";
+import {Header} from "./components/common/Header.jsx";
 import {CartProvider} from "./contexts/CartContext.jsx";
-import {useSessionChecker} from "./contexts/UseSessionChecker.jsx";
+import {UseSessionChecker} from "./contexts/UseSessionChecker.jsx";
 
 function App() {
     const headerRef = useRef()
@@ -107,7 +107,7 @@ function App() {
         await handleNavigate(prevPageType, false)
     }
 
-    useSessionChecker(handleNavigate, setPrevPageType, currentPage, 10000); // Cada 10 segundos
+    UseSessionChecker(handleNavigate, setPrevPageType, currentPage, 10000); // Cada 10 segundos
 
     if (isAuthenticated && user?.role === 'ADMIN') {
         return (

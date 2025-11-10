@@ -1,9 +1,9 @@
 import {useEffect, useRef, useState} from 'react';
 import {ChevronLeft} from 'lucide-react';
-import {Header} from '../components/common/Header';
+import {Header} from '../components/common/Header.jsx';
 import {AddToCartModalLogin} from './modals/AddToCartModalLogin.jsx';
 import {AddToCartModal} from './modals/AddToCartModal.jsx';
-import {useCreatorStore} from '../contexts/CreatorContext';
+import {useCreatorStore} from '../contexts/CreatorContext.jsx';
 import {useFavorites} from '../contexts/FavoritesContext';
 import {useAuth} from '../contexts/AuthContext';
 import {cartService, ingredientsService} from '../services/api';

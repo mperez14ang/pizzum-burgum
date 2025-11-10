@@ -47,8 +47,14 @@ public class SecurityConfig {
                         // Authentication
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // Assets (images)
-                        .requestMatchers("/assets/**").permitAll()
+                        // Permitir acceso completo a archivos estáticos
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/favicon.ico",
+                                "/vite.svg",
+                                "/assets/**"
+                        ).permitAll()
 
                         // DGI and BPS
                         .requestMatchers("/api/dgi/**").permitAll()
@@ -129,7 +135,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of(
                 "http://localhost:*",
-                "http://127.0.0.1:*"
+                "http://127.0.0.1:*",
+                "https://pizzumnburgum.duckdns.org",
+                "http://pizzumnburgum.duckdns.org"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowCredentials(true);

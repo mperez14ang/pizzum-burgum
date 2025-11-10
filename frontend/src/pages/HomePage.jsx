@@ -1,13 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Header} from '../components/common/Header';
+import {Header} from '../components/common/Header.jsx';
 import {FavoritesCarousel} from '../components/FavoritesCarousel';
-import burgerImg from '../assets/burger.jpg';
-import pizzaImg from '../assets/pizza.jpg';
 import {useAuth} from "../contexts/AuthContext.jsx";
 import {LoginAndRegisterModal} from "./modals/LoginAndRegisterModal.jsx";
 import OrderStatusModal from "./modals/OrderStatusModal.jsx";
 import {adminService} from "../services/api.js";
 import {OrderDetailModal} from "./modals/OrderDetailModal.jsx";
+import {BURGER_IMAGE, PIZZA_IMAGE} from "../utils/assets.jsx";
 
 export const HomePage = ({ onNavigate, orderPayedId=null }) => {
     const { logout } = useAuth();
@@ -52,7 +51,7 @@ export const HomePage = ({ onNavigate, orderPayedId=null }) => {
                     >
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
                         <img
-                            src={burgerImg}
+                            src={BURGER_IMAGE}
                             alt="Hamburger"
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
@@ -69,7 +68,7 @@ export const HomePage = ({ onNavigate, orderPayedId=null }) => {
                     >
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
                         <img
-                            src={pizzaImg}
+                            src={PIZZA_IMAGE}
                             alt="Pizza"
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />

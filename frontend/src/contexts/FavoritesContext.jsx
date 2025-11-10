@@ -1,6 +1,7 @@
 import {createContext, useCallback, useContext, useEffect, useState} from 'react';
 import {useAuth} from './AuthContext';
 import {transformCreationData} from "../utils/parsers.jsx";
+import {API_BASE_URL} from "../services/api.js";
 
 const FavoritesContext = createContext();
 
@@ -22,7 +23,7 @@ export const FavoritesProvider = ({ children }) => {
             setIsLoading(true);
             setError(null);
 
-            const response = await fetch('http://localhost:8080/api/favorites/my', {
+            const response = await fetch(`${API_BASE_URL}/favorites/my`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -72,7 +73,7 @@ export const FavoritesProvider = ({ children }) => {
         }
 
         try {
-            const response = await fetch('http://localhost:8080/api/creation/v1', {
+            const response = await fetch(`${API_BASE_URL}/creation/v1`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ export const FavoritesProvider = ({ children }) => {
 
             console.log('📤 Enviando favorito:', JSON.stringify(payload, null, 2));
 
-            const response = await fetch('http://localhost:8080/api/favorites', {
+            const response = await fetch(`${API_BASE_URL}/favorites`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -184,7 +185,7 @@ export const FavoritesProvider = ({ children }) => {
             setIsLoading(true);
             setError(null);
 
-            const response = await fetch(`http://localhost:8080/api/favorites/${favoriteId}`, {
+            const response = await fetch(`${API_BASE_URL}/favorites/${favoriteId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useAuth } from './AuthContext.jsx';
-import {API_URL} from "../utils/StringUtils.jsx";
+import { API_URL } from "../utils/StringUtils.jsx";
 
 export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true) => {
     const [isConnected, setIsConnected] = useState(false);
     const [error, setError] = useState(null);
     const clientRef = useRef(null);
+    const subscriptionRef = useRef(null);
+    const orderIdRef = useRef(orderId);
     const { user } = useAuth();
 
     const callbackRef = useRef(onOrderUpdate);
@@ -15,54 +17,141 @@ export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true)
         callbackRef.current = onOrderUpdate;
     }, [onOrderUpdate]);
 
+    // Keep orderIdRef in sync
     useEffect(() => {
-        if (!enabled || !user) return;
-        if (clientRef.current) return;
+        orderIdRef.current = orderId;
+    }, [orderId]);
 
-        const client = new Client({
-            webSocketFactory: () => new SockJS(`${API_URL}/ws`),
-            connectHeaders: {
-                Authorization: `Bearer ${user.token}`,
-            },
-            reconnectDelay: 5000,
-            heartbeatIncoming: 4000,
-            heartbeatOutgoing: 4000,
+    // Handle subscription changes when orderId changes
+    useEffect(() => {
+        const client = clientRef.current;
+        if (!client || !isConnected || !enabled) return;
 
-            onConnect: () => {
-                setIsConnected(true);
-                setError(null);
+        // Unsubscribe from previous topic
+        if (subscriptionRef.current) {
+            console.log('(UseOrderWebSocket) Cancelando suscripción anterior...');
+            subscriptionRef.current.unsubscribe();
+            subscriptionRef.current = null;
+        }
 
-                // suscribirse al topic
-                const destination = orderId
-                    ? `/topic/order/${orderId}`
-                    : '/topic/orders';
+        // Subscribe to new topic
+        const destination = orderId
+            ? `/topic/order/${orderId}`
+            : '/topic/orders';
 
-                client.subscribe(destination, (message) => {
+        console.log(`(UseOrderWebSocket) Suscribiendo a ${destination}`);
+
+        try {
+            subscriptionRef.current = client.subscribe(destination, (message) => {
+                try {
                     const update = JSON.parse(message.body);
+                    console.log('(UseOrderWebSocket) Mensaje recibido:', update);
                     callbackRef.current?.(update);
-                });
-            },
+                } catch (err) {
+                    console.error('(UseOrderWebSocket) Error parseando mensaje:', err);
+                }
+            });
+        } catch (err) {
+            console.error('(UseOrderWebSocket) Error suscribiendo:', err);
+            setError('Error al suscribirse');
+        }
 
-            onDisconnect: () => {
-                setIsConnected(false);
-            },
-
-            onStompError: (frame) => {
-                setError(frame.headers?.message || 'Error de conexión');
-                setIsConnected(false);
-            },
-        });
-
-        clientRef.current = client;
-        client.activate();
-
-        // cleanup al desmontar
         return () => {
-            console.log('Desconectando WebSocket...');
-            client.deactivate();
-            clientRef.current = null;
+            if (subscriptionRef.current) {
+                console.log('(UseOrderWebSocket) Limpiando suscripción...');
+                subscriptionRef.current.unsubscribe();
+                subscriptionRef.current = null;
+            }
         };
-    }, [enabled, orderId, user?.token]);
+    }, [orderId, isConnected, enabled]);
+
+    // Manage WebSocket client lifecycle
+    useEffect(() => {
+        if (!enabled || !user?.token) {
+            // Cleanup if disabled
+            if (clientRef.current) {
+                console.log('(UseOrderWebSocket) Desconectando WebSocket (disabled)...');
+                if (subscriptionRef.current) {
+                    subscriptionRef.current.unsubscribe();
+                    subscriptionRef.current = null;
+                }
+                clientRef.current.deactivate();
+                clientRef.current = null;
+                setIsConnected(false);
+            }
+            return;
+        }
+
+        // Create client only once
+        if (!clientRef.current) {
+            console.log('(UseOrderWebSocket) Creando nuevo cliente WebSocket...');
+
+            const client = new Client({
+                webSocketFactory: () => new SockJS(`${API_URL}/ws`),
+                connectHeaders: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+                reconnectDelay: 5000,
+                heartbeatIncoming: 4000,
+                heartbeatOutgoing: 4000,
+
+                onConnect: () => {
+                    console.log('(UseOrderWebSocket) Conectado a WebSocket');
+                    setIsConnected(true);
+                    setError(null);
+
+                    // Subscribe immediately on connect
+                    const destination = orderIdRef.current
+                        ? `/topic/order/${orderIdRef.current}`
+                        : '/topic/orders';
+
+                    console.log(`(UseOrderWebSocket) Suscripción inicial a ${destination}`);
+
+                    try {
+                        subscriptionRef.current = client.subscribe(destination, (message) => {
+                            try {
+                                const update = JSON.parse(message.body);
+                                console.log('(UseOrderWebSocket) Mensaje recibido:', update);
+                                callbackRef.current?.(update);
+                            } catch (err) {
+                                console.error('(UseOrderWebSocket) Error parseando mensaje:', err);
+                            }
+                        });
+                    } catch (err) {
+                        console.error('(UseOrderWebSocket) Error en suscripción inicial:', err);
+                        setError('Error al suscribirse');
+                    }
+                },
+
+                onDisconnect: () => {
+                    console.log('(UseOrderWebSocket) Desconectado de WebSocket');
+                    setIsConnected(false);
+                    subscriptionRef.current = null;
+                },
+
+                onStompError: (frame) => {
+                    console.error('(UseOrderWebSocket) Error STOMP:', frame);
+                    setError(frame.headers?.message || 'Error de conexión');
+                    setIsConnected(false);
+                },
+            });
+
+            clientRef.current = client;
+            client.activate();
+        }
+
+        return () => {
+            console.log('(UseOrderWebSocket) Cleanup final...');
+            if (subscriptionRef.current) {
+                subscriptionRef.current.unsubscribe();
+                subscriptionRef.current = null;
+            }
+            if (clientRef.current) {
+                clientRef.current.deactivate();
+                clientRef.current = null;
+            }
+        };
+    }, [enabled, user?.token]);
 
     return { isConnected, error };
 };

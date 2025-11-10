@@ -17,6 +17,7 @@ export const OrderStatusModal = ({
     const { isConnected, error } = UseOrderWebSocket(
         order?.id,
         (update) => {
+            console.log("Subscribing")
             // Actualizar orden cuando llega una actualización
             if (update.orderId === order?.id) {
                 const updatedOrder = { ...localOrder, state: update.state };

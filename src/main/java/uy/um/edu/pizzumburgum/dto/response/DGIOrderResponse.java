@@ -15,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DGIOrderResponse {
+    private Long id;
     private OrderState state;
     private LocalDate dateCreated;
     private String deliveryStreet;

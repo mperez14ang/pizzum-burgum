@@ -21,6 +21,7 @@ public class DGIMapper {
         OrderByResponse orderByDto = OrderByMapper.toOrderByDto(orderBy);
 
         return DGIOrderResponse.builder()
+                .id(orderBy.getId())
                 .state(orderBy.getState())
                 .dateCreated(orderBy.getDateCreated())
                 .deliveryStreet(orderBy.getDeliveryStreet())

@@ -21,13 +21,11 @@ public class DGIMapper {
         OrderByResponse orderByDto = OrderByMapper.toOrderByDto(orderBy);
 
         return DGIOrderResponse.builder()
-                .id(orderBy.getId())
                 .state(orderBy.getState())
                 .dateCreated(orderBy.getDateCreated())
                 .deliveryStreet(orderBy.getDeliveryStreet())
                 .deliveryCity(orderBy.getDeliveryCity())
                 .deliveryPostalCode(orderBy.getDeliveryPostalCode())
-                .creations(orderByDto.getCreations())
                 .extraAmount(orderBy.getExtraAmount())
                 .totalPrice(orderByDto.getTotalPrice())
                 .clientEmail(orderByDto.getClientEmail())

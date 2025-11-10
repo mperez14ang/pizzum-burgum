@@ -15,13 +15,11 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DGIOrderResponse {
-    private Long id;
     private OrderState state;
     private LocalDate dateCreated;
     private String deliveryStreet;
     private String deliveryCity;
     private String deliveryPostalCode;
-    private Set<OrderHasCreationsResponse> creations;
     private BigDecimal extraAmount;
     private BigDecimal totalPrice;
     private String clientEmail;

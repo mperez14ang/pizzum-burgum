@@ -20,7 +20,7 @@ public class DGIService implements DGIServiceInt {
 
     @Override
     public List<DGIOrderResponse> getOrdersByDate(LocalDate date) {
-        List<OrderBy> orders = orderByRepository.findByCreatedAtDate(date);
+        List<OrderBy> orders = orderByRepository.findByCreatedAtDateExcludingUnpaidAndCancelled(date);
 
         return orders.stream()
                 .map(DGIMapper::toDGIOrderResponse)
@@ -29,7 +29,7 @@ public class DGIService implements DGIServiceInt {
 
     @Override
     public List<DGIOrderResponse> getOrdersByDateRange(LocalDate startDate, LocalDate endDate) {
-        List<OrderBy> orders = orderByRepository.findByCreatedAtBetween(startDate, endDate);
+        List<OrderBy> orders = orderByRepository.findByCreatedAtBetweenExcludingUnpaidAndCancelled(startDate, endDate);
 
         return orders.stream()
                 .map(DGIMapper::toDGIOrderResponse)

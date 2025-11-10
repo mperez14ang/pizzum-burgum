@@ -27,7 +27,6 @@ public class DGIMapper {
                 .deliveryStreet(orderBy.getDeliveryStreet())
                 .deliveryCity(orderBy.getDeliveryCity())
                 .deliveryPostalCode(orderBy.getDeliveryPostalCode())
-                .creations(orderByDto.getCreations())
                 .extraAmount(orderBy.getExtraAmount())
                 .totalPrice(orderByDto.getTotalPrice())
                 .clientEmail(orderByDto.getClientEmail())

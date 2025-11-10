@@ -19,7 +19,15 @@ public interface OrderByRepository extends JpaRepository<OrderBy,Long> {
         @Query("SELECT o FROM OrderBy o WHERE o.dateCreated >= :startDate AND o.dateCreated <= :endDate")
         List<OrderBy> findByCreatedAtBetween(@Param("startDate") LocalDate startDate,
                                               @Param("endDate") LocalDate endDate);
+        @Query("SELECT o FROM OrderBy o WHERE o.dateCreated = :date " +
+                "AND o.state != 'UNPAID' AND o.state != 'CANCELLED'")
+        List<OrderBy> findByCreatedAtDateExcludingUnpaidAndCancelled(@Param("date") LocalDate date);
 
+        @Query("SELECT o FROM OrderBy o WHERE o.dateCreated BETWEEN :startDate AND :endDate " +
+                "AND o.state != 'UNPAID' AND o.state != 'CANCELLED'")
+        List<OrderBy> findByCreatedAtBetweenExcludingUnpaidAndCancelled(
+                @Param("startDate") LocalDate startDate,
+                @Param("endDate") LocalDate endDate);
         // Buscar ordenes de un día específico
         @Query("SELECT o FROM OrderBy o WHERE o.dateCreated = :date")
         List<OrderBy> findByCreatedAtDate(@Param("date") LocalDate date);

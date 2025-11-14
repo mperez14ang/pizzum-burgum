@@ -1,11 +1,13 @@
 package uy.um.edu.pizzumburgum.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uy.um.edu.pizzumburgum.dto.request.OrderByRequest;
 import uy.um.edu.pizzumburgum.dto.response.OrderByDataResponse;
 import uy.um.edu.pizzumburgum.dto.response.OrderByResponse;
 import uy.um.edu.pizzumburgum.entities.OrderState;
+import uy.um.edu.pizzumburgum.services.AuthService;
 import uy.um.edu.pizzumburgum.services.OrderByService;
 
 import java.util.List;
@@ -16,8 +18,11 @@ import java.util.Map;
 public class OrderByController {
     OrderByService orderByService;
 
-    public OrderByController(OrderByService orderByService) {
+    AuthService authService;
+
+    public OrderByController(OrderByService orderByService, AuthService authService) {
         this.orderByService = orderByService;
+        this.authService = authService;
     }
 
     @PostMapping
@@ -76,5 +81,11 @@ public class OrderByController {
     @GetMapping("/list")
     private ResponseEntity<List<OrderByDataResponse>> getOrderByList(){
         return ResponseEntity.ok(orderByService.getOrdersSimpleData());
+    }
+
+    @GetMapping("/list/my")
+    private ResponseEntity<List<OrderByDataResponse>> getClientOrderByList(HttpServletRequest httpRequest){
+        String clientEmail = authService.getUserEmail(httpRequest);
+        return ResponseEntity.ok(orderByService.getClientOrdersSimpleData(clientEmail));
     }
 }

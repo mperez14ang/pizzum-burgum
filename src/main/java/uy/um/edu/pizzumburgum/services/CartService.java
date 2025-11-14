@@ -348,11 +348,14 @@ public class CartService {
         // Setear los precios de todos las creaciones (OrderHasCreations)
         cart.getCreations().stream()
                 .peek(c -> {
-                    BigDecimal totalPrice = c.getCreation().getProducts().stream()
-                                    .map(product -> product.getProduct().getPrice()
-                                            .multiply(BigDecimal.valueOf(product.getQuantity())))
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-                    c.setPrice(totalPrice);
+                    CreationResponse creationResponse = CreationMapper.toCreationDto(c.getCreation());
+                    if (!creationResponse.getAvailable()){
+                        throw new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "No se pudo realizar el pago, existe una creacion no disponible"
+                        );
+                    }
+                    c.setPrice(creationResponse.getPrice());
                 })
                 .forEach(orderHasCreationsRepository::save);
 

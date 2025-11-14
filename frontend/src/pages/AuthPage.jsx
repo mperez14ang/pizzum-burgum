@@ -13,7 +13,11 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
         email_register: '',
         password_register: '',
         birthDate: '',
-        dni: ''
+        dni: '',
+        street: '',
+        door: '',
+        city: '',
+        postalCode: ''
     });
     const [errors, setErrors] = useState({
         firstName: '',
@@ -23,7 +27,11 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
         email_register: '',
         password_register: '',
         birthDate: '',
-        dni: ''
+        dni: '',
+        street: '',
+        door: '',
+        city: '',
+        postalCode: ''
     });
     const [isLoading, setIsLoading] = useState(false);
 
@@ -98,6 +106,22 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                     newErrors.birthDate = 'Fecha de nacimiento inválida';
                 }
             }
+
+            if (!formData.street.trim()) {
+                newErrors.street = 'La calle es requerida';
+            }
+
+            if (!formData.city.trim()) {
+                newErrors.city = 'La ciudad es requerida';
+            }
+
+            if (!formData.door.trim()) {
+                newErrors.door = 'El numero de puerta es necesario';
+            }
+
+            if (!formData.postalCode.trim()) {
+                newErrors.postalCode = 'El codigo postal es requerido';
+            }
         }
 
         setErrors(newErrors);
@@ -113,7 +137,17 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
             let response = null
             if (isRegister){
                 response = await Promise.race([
-                    register(formData.email_register, formData.password_register, formData.firstName, formData.lastName, formData.birthDate, formData.dni),
+                    register(
+                        formData.email_register,
+                        formData.password_register,
+                        formData.firstName,
+                        formData.lastName,
+                        formData.birthDate,
+                        formData.dni,
+                        `${formData.street.trim()} ${formData.door}`.trim(), // Numero de puerta
+                        formData.city,
+                        formData.postalCode
+                    ),
                     timeout(5000),
                 ]);
             }
@@ -217,6 +251,7 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                             error={errors.dni}
                             isLoading={isLoading}
                             maxLength={8}
+                            onlyNumbers={true}
                         />
 
                         <InputField
@@ -227,6 +262,53 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                             onChange={(e) => handleInputChange("birthDate", e.target.value)}
                             error={errors.birthDate}
                             isLoading={isLoading}
+                        />
+
+                        <div className="col-span-2 mt-4 mb-2">
+                            <h3 className="text-lg font-semibold text-gray-900 border-b pb-1">
+                                Direccion
+                            </h3>
+                        </div>
+
+
+                        <InputField
+                            label="Calle"
+                            id="street"
+                            value={formData.street}
+                            onChange={(e) => handleInputChange("street", e.target.value)}
+                            error={errors.street}
+                            isLoading={isLoading}
+                        />
+
+                        <InputField
+                            label="Numero de puerta"
+                            id="door"
+                            value={formData.door}
+                            onChange={(e) => handleInputChange("door", e.target.value)}
+                            error={errors.door}
+                            isLoading={isLoading}
+                            maxLength={4}
+                            onlyNumbers={true}
+                        />
+
+                        <InputField
+                            label="Ciudad"
+                            id="city"
+                            value={formData.city}
+                            onChange={(e) => handleInputChange("city", e.target.value)}
+                            error={errors.city}
+                            isLoading={isLoading}
+                        />
+
+                        <InputField
+                            label="Codigo Postal"
+                            id="postal_code"
+                            value={formData.postalCode}
+                            onChange={(e) => handleInputChange("postalCode", e.target.value)}
+                            error={errors.postalCode}
+                            isLoading={isLoading}
+                            maxLength={10}
+                            onlyNumbers={true}
                         />
                     </div>
                 )}
@@ -302,28 +384,43 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
     );
 };
 
-function InputField({ label, id, type = "text", value, onChange, error, isLoading, maxLength, autoComplete='off' }) {
+function InputField({
+                        label,
+                        id,
+                        type = "text",
+                        value,
+                        onChange,
+                        error,
+                        isLoading,
+                        maxLength,
+                        autoComplete = "off",
+                        onlyNumbers = false,
+                    }) {
     return (
         <div className="text-left">
             <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
                 {label}
             </label>
             <input
-                type={type}
+                type={onlyNumbers ? "tel" : type}
                 id={id}
                 name={id}
                 value={value}
-                onChange={onChange}
+                onChange={(e) => {
+                    if (onlyNumbers) {
+                        const cleaned = e.target.value.replace(/\D+/g, "");
+                        onChange({ target: { value: cleaned } });
+                    } else {
+                        onChange(e);
+                    }
+                }}
                 disabled={isLoading}
-                autoComplete={autoComplete || "off"}
+                autoComplete={autoComplete}
                 {...(maxLength && maxLength > 0 && { maxLength })}
                 className={`w-full border rounded-xl px-4 py-3 text-base focus:outline-none focus:ring-2
-                 
-          ${
-                    error
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-blue-500"
-                } ${isLoading ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                    ${error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"}
+                    ${isLoading ? "bg-gray-100 cursor-not-allowed" : ""}
+                `}
             />
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         </div>

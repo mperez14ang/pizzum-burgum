@@ -223,6 +223,31 @@ public class OrderByService implements OrderByInt {
     @Override
     public List<OrderByDataResponse> getOrdersSimpleData() {
         List<OrderBy> orderByList = orderByRepository.findAll();
+        return this.getOrderByDataResponseList(orderByList);
+    }
+
+    @Override
+    public List<OrderByDataResponse> getClientOrdersSimpleData(String clientEmail) {
+        Client client = clientRepository.findById(clientEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Client not found: " + clientEmail));
+
+        return this.getOrderByDataResponseList(client.getOrders().stream().toList());
+    }
+
+    public OrderByResponse updateOrderState(Long id, OrderState state) {
+        OrderBy orderBy = orderByRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Orden " + id + " no encontrada"));
+
+        orderBy.setState(state);
+        orderByRepository.save(orderBy);
+
+        // Notificar a websocket
+        orderNotificationService.notifyOrderStatusChange(orderBy);
+
+        return OrderByMapper.toOrderByDto(orderBy);
+    }
+
+    private List<OrderByDataResponse> getOrderByDataResponseList(List<OrderBy> orderByList) {
         return orderByList.stream()
                 .map(
                         orderBy -> {
@@ -238,21 +263,9 @@ public class OrderByService implements OrderByInt {
                                     .clientEmail(orderBy.getClient().getEmail())
                                     .state(orderBy.getState())
                                     .address(address)
+                                    .dateCreated(orderBy.getDateCreated())
                                     .build();
                         }
                 ).collect(Collectors.toList());
-    }
-
-    public OrderByResponse updateOrderState(Long id, OrderState state) {
-        OrderBy orderBy = orderByRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Orden " + id + " no encontrada"));
-
-        orderBy.setState(state);
-        orderByRepository.save(orderBy);
-
-        // Notificar a websocket
-        orderNotificationService.notifyOrderStatusChange(orderBy);
-
-        return OrderByMapper.toOrderByDto(orderBy);
     }
 }

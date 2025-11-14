@@ -360,6 +360,12 @@ export const clientService = {
         return fetchFromAPI(`/card/v1/${cardId}/active`, {
             method: 'PATCH'
         })
+    },
+
+    getClientOrders(){
+        return fetchFromAPI(`/order/v1/list/my`, {
+            method: 'GET'
+        })
     }
 }
 

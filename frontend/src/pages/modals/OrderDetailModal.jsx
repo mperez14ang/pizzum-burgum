@@ -45,6 +45,7 @@ export const OrderDetailModal = ({
     const handleOrderUpdated = useCallback((updatedOrder) => {
         setSelectedOrder(updatedOrder);
         onOrderUpdated?.(updatedOrder);
+        order.state = updatedOrder.state;
     }, [onOrderUpdated]);
 
     // Calculate total price

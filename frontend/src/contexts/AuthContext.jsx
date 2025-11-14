@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }) => {
         return addUser(data, logInAfter)
     };
 
-    const register = async (email, password, firstName, lastName, birthDate, dni, logInAfter=true) => {
+    const register = async (email, password, firstName, lastName, birthDate, dni, street, city, postalCode, logInAfter=true) => {
         setIsLoading(true)
         const data = await fetchFromAPI('/auth/v1/register', {
             method: 'POST',
@@ -119,7 +119,11 @@ export const AuthProvider = ({ children }) => {
                 dni,
                 email,
                 password,
-                addresses: [],
+                addresses: [{
+                    street,
+                    city,
+                    postalCode
+                }],
                 favorites: [],
             })
         })

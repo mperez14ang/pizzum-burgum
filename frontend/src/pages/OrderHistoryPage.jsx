@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, Filter as FilterIcon, Calendar, Clock } from 'lucide-react';
-import { fetchFromAPI } from '../services/api.js';
+import {adminService, clientService, fetchFromAPI} from '../services/api.js';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { OrderStatusModal } from './modals/OrderStatusModal.jsx';
 import { OrderDetailModal } from './modals/OrderDetailModal.jsx';
@@ -73,10 +73,11 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
             setError(null);
             try {
                 // Traemos TODAS las órdenes y filtramos por cliente en el frontend
-                const data = await fetchFromAPI('/order/v1');
-                const myOrders = Array.isArray(data)
-                    ? data.filter(o => o.clientEmail === user.email)
-                    : [];
+                const data = await clientService.getClientOrders();
+                if (!Array.isArray(data)){
+                    return
+                }
+                console.log(data)
 
                 // Aplicar filtros de fecha
                 const now = new Date();
@@ -86,7 +87,7 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
                 const thirtyDaysAgo = new Date(startOfToday);
                 thirtyDaysAgo.setDate(startOfToday.getDate() - 29); // incluye hoy → 30 días
 
-                const filtered = myOrders.filter(order => {
+                const filtered = data.filter(order => {
                     const raw = order.dateCreated; // puede ser 'YYYY-MM-DD' o 'YYYY-MM-DDTHH:mm:ss'
                     if (!raw) return false;
                     const datePart = String(raw).split('T')[0];

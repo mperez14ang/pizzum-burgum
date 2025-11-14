@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uy.um.edu.pizzumburgum.entities.OrderState;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -18,4 +20,6 @@ public class OrderByDataResponse {
     private String clientEmail;
 
     private OrderState state;
+
+    private LocalDate dateCreated;
 }

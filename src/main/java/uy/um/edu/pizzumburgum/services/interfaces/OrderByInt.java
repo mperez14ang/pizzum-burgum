@@ -23,4 +23,6 @@ public interface OrderByInt {
     ResponseEntity<Map<String, Object>> deleteOrder(Long id);
 
     List<OrderByDataResponse> getOrdersSimpleData();
+
+    List<OrderByDataResponse> getClientOrdersSimpleData(String clientEmail);
 }

@@ -1,5 +1,7 @@
 package uy.um.edu.pizzumburgum.services;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -15,14 +17,11 @@ import uy.um.edu.pizzumburgum.dto.request.LoginRequest;
 import uy.um.edu.pizzumburgum.dto.response.AuthResponse;
 import uy.um.edu.pizzumburgum.dto.response.ClientResponse;
 import uy.um.edu.pizzumburgum.dto.response.TokenResponse;
-import uy.um.edu.pizzumburgum.entities.Client;
 import uy.um.edu.pizzumburgum.entities.User;
-import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.repository.UserRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.AuthServiceInt;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,28 +31,22 @@ import java.util.Map;
 @Service
 public class AuthService implements AuthServiceInt {
     private final UserRepository userRepository;
-
     private final ClientService clientService;
-
-    private final ClientRepository clientRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, ClientService clientService, ClientRepository clientRepository, JwtService jwtService) {
+    public AuthService(UserRepository userRepository, ClientService clientService, JwtService jwtService) {
         this.userRepository = userRepository;
         this.clientService = clientService;
-        this.clientRepository = clientRepository;
         this.jwtService = jwtService;
     }
 
     @Override
     public AuthResponse register(ClientCreateRequest request) {
-        // Crea Client con ClientService
         ClientResponse clientResponse = clientService.createClient(request);
-
         String jwtToken = jwtService.generateToken(clientResponse);
         return AuthResponse.builder()
                 .token(jwtToken)
@@ -63,7 +56,6 @@ public class AuthService implements AuthServiceInt {
                 .role(clientResponse.getUserType())
                 .message("Usuario " + clientResponse.getEmail() + " registrado correctamente")
                 .build();
-
     }
 
     @Override
@@ -91,32 +83,43 @@ public class AuthService implements AuthServiceInt {
     public TokenResponse verifyUser(HttpServletRequest request) {
         boolean verified = false;
         Date expirationDate = null;
-        Date emmissionDate = null;
+        Date emissionDate = null;
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null) {
-            String userEmail = this.getUserEmail(request);
-
-            if (userEmail != null && userRepository.findById(userEmail).isPresent()) {
+            try {
                 String token = this.getToken(request);
                 log.info("Token: {}", token);
+
                 if (!token.isEmpty()) {
-                    verified = this.verifyToken(token);
-                    expirationDate = this.getTokenExpirationDate(token);
-                    emmissionDate = this.getTokenExpirationDate(token);
-                }
-                else{
+                    String userEmail = this.getTokenUsername(token);
+
+                    if (userEmail != null && userRepository.findById(userEmail).isPresent()) {
+                        verified = this.verifyToken(token);
+                        expirationDate = this.getTokenExpirationDate(token);
+                        emissionDate = this.getTokenEmissionDate(token);
+                    }
+                } else {
                     verified = true;
                 }
+            } catch (ExpiredJwtException e) {
+                log.warn("Token expirado en verifyUser: {}", e.getMessage());
+                verified = false;
+                expirationDate = e.getClaims().getExpiration();
+                emissionDate = e.getClaims().getIssuedAt();
+            } catch (JwtException e) {
+                log.error("Token inválido en verifyUser: {}", e.getMessage());
+                verified = false;
+            } catch (Exception e) {
+                log.error("Error inesperado en verifyUser: {}", e.getMessage());
+                verified = false;
             }
         }
-
-
 
         return TokenResponse.builder()
                 .verified(verified)
                 .expirationDate(expirationDate)
-                .emittedDate(emmissionDate)
+                .emittedDate(emissionDate)
                 .build();
     }
 
@@ -124,9 +127,17 @@ public class AuthService implements AuthServiceInt {
     public String getUserEmail(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader.startsWith("Bearer ")){
-            String token = this.getToken(request);
-            return this.getTokenUsername(token);
+        if (authHeader.startsWith("Bearer ")) {
+            try {
+                String token = this.getToken(request);
+                return this.getTokenUsername(token);
+            } catch (ExpiredJwtException e) {
+                log.warn("Intentando extraer email de token expirado");
+                return e.getClaims().getSubject();
+            } catch (JwtException e) {
+                log.error("Error al extraer email del token: {}", e.getMessage());
+                return null;
+            }
         }
 
         /** Esta autenticacion NO ES SEGURA, solo para PostMan **/
@@ -136,10 +147,7 @@ public class AuthService implements AuthServiceInt {
                 byte[] decodedBytes = Base64.getDecoder().decode(base64Credentials);
                 String decodedCredentials = new String(decodedBytes, StandardCharsets.UTF_8);
 
-                // username:password
                 String[] values = decodedCredentials.split(":", 2);
-
-                // Devolver username
                 return values[0];
 
             } catch (IllegalArgumentException e) {
@@ -157,33 +165,32 @@ public class AuthService implements AuthServiceInt {
         User user = userRepository.findById(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no encontrado"));
 
-        // Validar contraseña antigua
         String oldPassword = changePasswordRequest.getOldPassword();
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Contraseña incorrecta");
         }
 
-        // Validar que las contraseñas coincidan
         if (!changePasswordRequest.getPassword().equals(changePasswordRequest.getPasswordConfirmation())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Las contraseñas no coinciden");
         }
 
-        // La nueva contraseña debe de ser diferente a la antigua
         if (changePasswordRequest.getPassword().equals(oldPassword)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La nueva contraseña no debe coincidir con la antigua");
         }
 
         user.setPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));
-
         userRepository.save(user);
+
         Map<String, Object> body = new HashMap<>();
         body.put("message", "Contraseña actualizada");
         return new ResponseEntity<>(body, HttpStatus.OK);
     }
 
     private boolean verifyToken(String jwtToken) {
-        if (jwtToken == null || jwtToken.isEmpty()) {return false;}
+        if (jwtToken == null || jwtToken.isEmpty()) {
+            return false;
+        }
         return !jwtService.isTokenExpired(jwtToken);
     }
 
@@ -199,10 +206,10 @@ public class AuthService implements AuthServiceInt {
         return jwtService.extractUsername(jwtToken);
     }
 
-    private String getToken(HttpServletRequest request){
+    private String getToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
-        if (authHeader.startsWith("Bearer ")){
-            return request.getHeader("Authorization").substring(7);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
         }
         return "";
     }

@@ -1,9 +1,7 @@
 package uy.um.edu.pizzumburgum.services;
 
 import io.github.cdimascio.dotenv.Dotenv;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -40,8 +38,22 @@ public class JwtService {
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        try {
+            final Claims claims = extractAllClaims(token);
+            return claimsResolver.apply(claims);
+        } catch (ExpiredJwtException e) {
+            logger.error("JWT token expiró: {}", e.getMessage());
+            throw e;
+        } catch (MalformedJwtException e) {
+            logger.error("JWT token mal formado: {}", e.getMessage());
+            throw e;
+        } catch (SignatureException e) {
+            logger.error("JWT firma inválida: {}", e.getMessage());
+            throw e;
+        } catch (JwtException e) {
+            logger.error("JWT token inválido: {}", e.getMessage());
+            throw e;
+        }
     }
 
     public String generateToken(User user) {
@@ -76,16 +88,27 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        try {
+            final String username = extractUsername(token);
+            return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        } catch (ExpiredJwtException e) {
+            logger.warn("Token expirado durante validacion");
+            return false;
+        } catch (JwtException e) {
+            logger.warn("Token inválido durante validación: {}", e.getMessage());
+            return false;
+        }
     }
 
     public boolean isTokenExpired(String token) {
         try {
             Date expiration = extractExpiration(token);
-            if (expiration == null)return true;
+            if (expiration == null) return true;
             return expiration.before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true;
         } catch (Exception e) {
+            logger.error("Error al verificar expiración del token: {}", e.getMessage());
             return true;
         }
     }
@@ -93,7 +116,10 @@ public class JwtService {
     public Date extractExpiration(String token) {
         try {
             return extractClaim(token, Claims::getExpiration);
+        } catch (ExpiredJwtException e) {
+            return e.getClaims().getExpiration();
         } catch (Exception e) {
+            logger.error("Error al extraer fecha de expiración: {}", e.getMessage());
             return null;
         }
     }
@@ -101,19 +127,35 @@ public class JwtService {
     public Date extractEmisionDate(String token) {
         try {
             return extractClaim(token, Claims::getIssuedAt);
+        } catch (ExpiredJwtException e) {
+            return e.getClaims().getIssuedAt();
         } catch (Exception e) {
+            logger.error("Error al extraer fecha de emisión: {}", e.getMessage());
             return null;
         }
-
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts
-                .parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts
+                    .parserBuilder()
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            logger.error("Token expiró el: {}", e.getClaims().getExpiration());
+            throw e;
+        } catch (MalformedJwtException e) {
+            logger.error("Token mal formado");
+            throw e;
+        } catch (SignatureException e) {
+            logger.error("Firma del token inválida");
+            throw e;
+        } catch (JwtException e) {
+            logger.error("Error procesando JWT: {}", e.getMessage());
+            throw e;
+        }
     }
 
     private Key getSignInKey() {

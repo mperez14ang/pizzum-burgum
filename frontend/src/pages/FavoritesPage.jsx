@@ -12,13 +12,18 @@ import {Loading} from "../components/common/Loading.jsx";
 import {BURGER_IMAGE, PIZZA_IMAGE} from "../utils/assets.jsx";
 
 export const FavoritesPage = ({ onNavigate, onBack }) => {
-    const { favorites, isLoading, removeFromFavorites } = useFavorites();
+    const { favorites, isLoading, removeFromFavorites, loadFavorites } = useFavorites();
     const { isAuthenticated } = useAuth()
     const { itemCount, setCartItemCount } = useCart();
 
     const [processed, setProcessed] = useState([]);
     const [showInfoModal, setShowInfoModal] = useState(false);
     const [selectedFavorite, setSelectedFavorite] = useState(null);
+
+    // Re-query favorites when entering this page to avoid stale data
+    useEffect(() => {
+        loadFavorites?.();
+    }, []);
 
     useEffect(() => {
         if (favorites && favorites.length > 0) {

@@ -19,10 +19,12 @@ export const UpdateOrderStateModal = (
                         label="Nuevo estado"
                         value={newState}
                         onChange={(e) => setNewState(e.target.value)}
-                        options={orderStates.map(state => ({
-                            value: state,
-                            label: ORDER_STATE_LABELS[state] || state
-                        }))}
+                        options={orderStates
+                            .filter(state => state !== 'UNPAID')
+                            .map(state => ({
+                                value: state,
+                                label: ORDER_STATE_LABELS[state] || state
+                            }))}
                     />
                 </div>
                 <div className="flex gap-3 justify-end">

@@ -23,4 +23,5 @@ public class CartResponse {
     private List<CartItemResponse> items;
     private BigDecimal total;
     private Integer totalItems;
+    private Boolean available;
 }

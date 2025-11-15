@@ -125,7 +125,7 @@ public class OrderByService implements OrderByInt {
 
     private void canModifyOrder(OrderState orderState) {
         if (orderState != OrderState.UNPAID) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No se puede modificar una orden en estado " + orderState);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede modificar una orden en estado " + orderState);
         }
     }
 
@@ -228,10 +228,15 @@ public class OrderByService implements OrderByInt {
 
     @Override
     public List<OrderByDataResponse> getClientOrdersSimpleData(String clientEmail) {
-        Client client = clientRepository.findById(clientEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Client not found: " + clientEmail));
+        if (!clientRepository.existsById(clientEmail)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Cliente con id " + clientEmail + " no encontrado"
+            );
+        }
 
-        return this.getOrderByDataResponseList(client.getOrders().stream().toList());
+        List<OrderBy> orders = orderByRepository.findByClientEmail(clientEmail);
+        return this.getOrderByDataResponseList(orders);
     }
 
     public OrderByResponse updateOrderState(Long id, OrderState state) {

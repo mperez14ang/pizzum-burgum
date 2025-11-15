@@ -48,7 +48,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
 
         String path = request.getRequestURI();
-        System.out.println(path);
         // Ignorar assets y archivos públicos
         if (
                 path.startsWith("/assets")

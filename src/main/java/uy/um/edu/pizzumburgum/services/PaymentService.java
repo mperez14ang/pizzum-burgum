@@ -66,7 +66,7 @@ public class PaymentService {
         // Verificar que la tarjeta pertenece al cliente
         if (!card.getClient().getEmail().equals(clientEmail)) {
             throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "La tarjeta no pertenece al cliente"
+                    HttpStatus.BAD_REQUEST, "La tarjeta no pertenece al cliente"
             );
         }
 

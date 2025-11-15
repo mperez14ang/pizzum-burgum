@@ -42,8 +42,7 @@ public class AdminInitializer implements CommandLineRunner {
                     .password(dotenv.get("ADMIN_PASSWORD"))
                     .build();
             adminService.createAdmin(admin, false);
-            logger.debug("Se creo un admin por defecto");
-            logger.debug("Nombre del admin: {} {}", admin.getFirstName(), admin.getLastName());
+            logger.info("Admin {} created", admin.getEmail());
         }
         else  {
             logger.debug("Admin con correo {} ya existe!", adminEmail);

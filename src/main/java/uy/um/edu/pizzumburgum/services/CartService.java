@@ -19,12 +19,10 @@ import uy.um.edu.pizzumburgum.entities.*;
 import uy.um.edu.pizzumburgum.mapper.*;
 import uy.um.edu.pizzumburgum.repository.*;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.bouncycastle.math.raw.Mont256.reduce;
 
 @Service
 @Slf4j
@@ -76,6 +74,10 @@ public class CartService {
                             HttpStatus.NOT_FOUND,
                             "Producto con ID " + productId + " no encontrado"
                     ));
+            if (!product.getAvailable()){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El producto " + product.getName() + " no esta disponible");
+            }
+
             products.add(product);
 
             creationHasProducts.add(CreationHasProducts.builder()
@@ -176,6 +178,12 @@ public class CartService {
                         HttpStatus.NOT_FOUND,
                         "Creation con ID " + request.getCreationId() + " no encontrada"
                 ));
+
+        CreationResponse creationResponse = CreationMapper.toCreationDto(creation);
+
+        if (!creationResponse.getAvailable()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede agregar '" + creation.getName() + "' debido a que uno de los productos no esta disponible.");
+        }
 
         OrderHasCreations cartItem = OrderHasCreations.builder()
                 .order(cart)
@@ -395,11 +403,13 @@ public class CartService {
             );
         }
 
-
         log.info("SE REALIZO UN PAGO DE {} {}", orderResponse.getTotalPrice(), request.getCurrency().toUpperCase());
         // Cambiar estado a IN_QUEUE
         cart.setState(OrderState.IN_QUEUE);
         orderByRepository.save(cart);
+
+        // Cambiar creacion del pedido
+        cart.setDateCreated(LocalDate.now());
 
         log.info("Compra finalizada exitosamente. Orden en cola de preparación");
         return CartCheckoutResponse.builder()
@@ -449,7 +459,7 @@ public class CartService {
         log.info("Obteniendo carrito activo para cliente: {}", clientEmail);
 
         OrderBy cart = orderByRepository
-                .findByClientEmailAndState(clientEmail, OrderState.UNPAID)
+                .findFirstByClientEmailAndState(clientEmail, OrderState.UNPAID)
                 .orElse(null);
 
         if (cart == null){
@@ -460,7 +470,7 @@ public class CartService {
                     ));
 
             cart = orderByRepository
-                    .findByClientEmailAndState(clientEmail, OrderState.UNPAID)
+                    .findFirstByClientEmailAndState(clientEmail, OrderState.UNPAID)
                     .orElseGet(() -> {
                         log.info("No existe carrito activo, creando uno nuevo");
 

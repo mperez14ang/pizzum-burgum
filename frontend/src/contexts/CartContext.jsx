@@ -8,6 +8,7 @@ export const CartProvider = ({ children }) => {
     const { user, isAuthenticated, isLoading:isAuthLoading } = useAuth();
 
     const [cartItems, setCartItems] = useState([]);
+    const [isCartAvailable, setIsCartAvailable] = useState(true)
 
     // Cargar el contador desde localStorage al iniciar
     const [itemCount, setItemCount] = useState(() => {
@@ -36,7 +37,6 @@ export const CartProvider = ({ children }) => {
 
     const loadUserCart = async () => {
         console.log("init cart provider " + localStorage.getItem("cartCount"));
-
         if (isAuthenticated && user) {
             try {
                 if (!user.cartItems) {
@@ -57,8 +57,16 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    useEffect(() => {
+        setIsCartAvailable(cartItems.every(item => item.available));
+    }, [cartItems]);
+
+    const updateCartAvailable = () => {
+        setIsCartAvailable(cartItems.every(item => item.available));
+    }
+
     return (
-        <CartContext.Provider value={{ cartItems, setCartItems, itemCount, setCartItemCount, loadUserCart }}>
+        <CartContext.Provider value={{ cartItems, setCartItems, itemCount, setCartItemCount, loadUserCart, isCartAvailable }}>
             {children}
         </CartContext.Provider>
     );

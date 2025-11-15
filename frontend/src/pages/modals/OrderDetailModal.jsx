@@ -4,6 +4,7 @@ import React, {useEffect, useState, useCallback} from "react";
 import {adminService} from "../../services/api.js";
 import OrderStatusModal from "./OrderStatusModal.jsx";
 import {ORDER_STATE_COLORS, ORDER_STATE_LABELS} from "../../utils/StringUtils.jsx";
+import {Calendar} from "lucide-react";
 
 export const OrderDetailModal = ({
                                      isOpen,
@@ -112,6 +113,16 @@ export const OrderDetailModal = ({
                         ) : (
                             <p className="text-gray-600">N/A</p>
                         )}
+                    </div>
+
+                    {/* Fecha de pedido */}
+                    <div className="font-semibold text-gray-900 mb-2">
+                        <div className="flex items-center gap-2 mb-3">
+                            <h4 className="font-semibold text-gray-900">Fecha de creación</h4>
+                        </div>
+                        <p className="text-gray-700 font-medium">
+                            {selectedOrder.dateCreated.split('-').reverse().join('/')}
+                        </p>
                     </div>
 
                     {/* Creaciones */}

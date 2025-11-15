@@ -160,7 +160,7 @@ export const FavoritesPage = ({ onNavigate, onBack }) => {
                 isOpen={showInfoModal}
                 onClose={() => setShowInfoModal(false)}
                 favorite={selectedFavorite}
-                onOrder={() => handleAddFavoriteToCart(items, isAuthenticated, itemCount, setCartItemCount)}
+                onOrder={() => handleAddFavoriteToCart(items, isAuthenticated, itemCount, setCartItemCount, setL)}
             />
         </div>
     );

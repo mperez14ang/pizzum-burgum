@@ -156,7 +156,7 @@ export const OrderManagement = () => {
                                         </div>
                                         <div className="text-sm text-gray-600 space-y-1">
                                             <p>Cliente: {order.clientEmail}</p>
-                                            <p>Dirección: {order.deliveryStreet}, {order.deliveryCity}</p>
+                                            <p>{order.address}</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
@@ -172,6 +172,7 @@ export const OrderManagement = () => {
                                             variant="primary"
                                             size="sm"
                                             onClick={() => handleUpdateState(order)}
+                                            disabled={order.state === 'UNPAID'}
                                         >
                                             Cambiar estado
                                         </Button>

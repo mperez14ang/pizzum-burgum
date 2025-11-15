@@ -163,20 +163,20 @@ public class AuthService implements AuthServiceInt {
         String email = changePasswordRequest.getEmail();
         log.info(changePasswordRequest.toString());
         User user = userRepository.findById(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
         String oldPassword = changePasswordRequest.getOldPassword();
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Contraseña incorrecta");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contraseña incorrecta");
         }
 
         if (!changePasswordRequest.getPassword().equals(changePasswordRequest.getPasswordConfirmation())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Las contraseñas no coinciden");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Las contraseñas no coinciden");
         }
 
         if (changePasswordRequest.getPassword().equals(oldPassword)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "La nueva contraseña no debe coincidir con la antigua");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La nueva contraseña no debe coincidir con la antigua");
         }
 
         user.setPassword(passwordEncoder.encode(changePasswordRequest.getPassword()));

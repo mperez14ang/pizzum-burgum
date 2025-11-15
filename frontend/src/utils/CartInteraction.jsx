@@ -1,4 +1,4 @@
-import {cartService} from "../services/api.js";
+import {cartService, clientService} from "../services/api.js";
 import toast from "react-hot-toast";
 import {useCart} from "../contexts/CartContext.jsx";
 
@@ -26,7 +26,8 @@ export const cartInteraction = async ({setLoading, setError, setCartItems}) => {
                     subtotal: item.subtotal,
                     image: image,
                     type: item.type,
-                    extraType: item.extraType
+                    extraType: item.extraType,
+                    available: item.available
                 };
             });
 
@@ -144,6 +145,11 @@ export const handleAddFavoriteToCart = async (favorite, isAuthenticated, itemCou
     const result = await cartService.addCreationToCart(favorite.creationId, 1);
 
     if (result) {
+        if (result?.error){
+            toast.error(result.error)
+
+            return;
+        }
         setCartItemCount(itemCount + 1)
         toast.success(`${favorite.name} agregado al carrito`, { duration: 2000 });
     } else {

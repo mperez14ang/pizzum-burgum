@@ -24,11 +24,14 @@ public class CartMapper {
                 .map(CartItemResponse::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-
         // Contar items totales
         int totalItems = items.stream()
                 .mapToInt(CartItemResponse::getQuantity)
                 .sum();
+
+        // Is available
+        boolean creationsAvailable = orderBy.getCreations().stream()
+                .allMatch(orderHasCreations -> orderHasCreations.getCreation().getAvailable());
 
         return CartResponse.builder()
                 .orderId(orderBy.getId())
@@ -41,6 +44,7 @@ public class CartMapper {
                 .items(items)
                 .total(total)
                 .totalItems(totalItems)
+                .available(creationsAvailable)
                 .build();
     }
 
@@ -63,6 +67,9 @@ public class CartMapper {
         BigDecimal unitPrice = CreationMapper.toCreationDto(orderHasCreations.getCreation()).getPrice();
         BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(orderHasCreations.getQuantity()));
 
+        // Is available
+        boolean available = orderHasCreations.getCreation().getAvailable();
+
         return CartItemResponse.builder()
                 .itemId(orderHasCreations.getId())
                 .creationId(orderHasCreations.getCreation().getId())
@@ -74,6 +81,7 @@ public class CartMapper {
                 .subtotal(subtotal)
                 .image(image)
                 .extraType(extraType)
+                .available(available)
                 .build();
     }
 }

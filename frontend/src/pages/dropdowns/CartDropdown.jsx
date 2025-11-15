@@ -13,7 +13,7 @@ import {useCart} from "../../contexts/CartContext.jsx";
 import {getImage} from "../../utils/StringUtils.jsx";
 
 const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckout, onGoToExtras }) => {
-    const { cartItems, setCartItems, itemCount, setCartItemCount } = useCart();
+    const { cartItems, setCartItems, itemCount, setCartItemCount, isCartAvailable } = useCart();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [isLoginModals, setIsLoginModals] = useState(null)
@@ -32,7 +32,6 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
     // Obtener carrito cuando se abre el dropdown (solo si está autenticado)
     useEffect(() => {
         if (!isOpen || !isAuthenticated) return;
-
         cartInteraction({ setLoading, setCartItems, setError }).then((res) => {
             // actualizar itemCount al cargar el carrito
             const count = cartItemCount(res || []);
@@ -119,13 +118,22 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
                         <>
                             <div className="flex-grow overflow-y-auto px-6 py-4 space-y-4">
                                 {cartItems.map(item => (
-                                    <div key={item.id} className="flex gap-4 pb-4 border-b border-gray-100 last:border-0">
-                                        <img
-                                            src={getImage(item,item.type, item.extraType)}
-                                            alt={item.name}
-                                            className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-                                        />
+                                    <div key={item.id} className={`flex gap-4 pb-4 border-b border-gray-100 last:border-0 ${!item.available ? 'opacity-60' : ''}`}>
+                                        <div className="relative">
+                                            <img
+                                                src={getImage(item, item.type, item.extraType)}
+                                                alt={item.name}
+                                                className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
+                                            />
+                                        </div>
+
                                         <div className="flex-grow">
+                                            {!item.available && (
+                                                <div className="mb-2 px-2 py-1 bg-red-100 border border-red-300 rounded text-xs text-red-700">
+                                                    ⚠️ Producto no disponible
+                                                </div>
+                                            )}
+
                                             <div className="flex justify-between items-start mb-2">
                                                 <h3 className="text-sm font-medium text-gray-800 line-clamp-2">{item.name}</h3>
                                                 <button
@@ -142,6 +150,7 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
                                                     <button
                                                         onClick={() => updateQuantity(item.id, item.quantity - 1, cartItems, setCartItems, debounceTimers)}
                                                         className="w-6 h-6 flex items-center justify-center hover:bg-white rounded transition-colors"
+                                                        disabled={!item.available}
                                                     >
                                                         <Minus className="w-3 h-3" />
                                                     </button>
@@ -149,13 +158,12 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
                                                     <button
                                                         onClick={() => updateQuantity(item.id, item.quantity + 1, cartItems, setCartItems, debounceTimers)}
                                                         className="w-6 h-6 flex items-center justify-center hover:bg-white rounded transition-colors"
+                                                        disabled={!item.available}
                                                     >
                                                         <Plus className="w-3 h-3" />
                                                     </button>
                                                 </div>
-                                                <span className="text-sm font-bold text-gray-800">
-                                                    ${(item.price * item.quantity).toFixed(2)}
-                                                </span>
+                                                <span className="text-sm font-bold text-gray-800">${(item.price * item.quantity).toFixed(2)}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -169,11 +177,22 @@ const CartDropdown = ({ isOpen, onToggle, onClose, handleClickOutside, onCheckou
                                 </div>
 
                                 <div className="space-y-2">
-                                    <button className="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition-colors font-semibold flex items-center justify-center gap-2"
-                                    onClick={onGoToExtras}>
-                                        Finalizar Compra
-                                        <ArrowRight className="w-5 h-5" />
-                                    </button>
+                                    {isCartAvailable ? (
+                                        <button className="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700 transition-colors font-semibold flex items-center justify-center gap-2"
+                                                onClick={onGoToExtras}>
+                                            Finalizar Compra
+                                            <ArrowRight className="w-5 h-5" />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="w-full bg-gray-400 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 cursor-not-allowed opacity-60"
+                                            disabled={true}
+                                        >
+                                            No es posible finalizar la compra
+                                            <ArrowRight className="w-5 h-5" />
+                                        </button>
+                                    )}
+
                                     <button
                                         onClick={onClose}
                                         className="w-full bg-white text-gray-700 py-2 rounded-lg hover:bg-gray-100 transition-colors border border-gray-300 text-sm"

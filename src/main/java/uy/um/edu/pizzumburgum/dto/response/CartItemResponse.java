@@ -27,4 +27,5 @@ public class CartItemResponse {
     private Integer quantity;
     private BigDecimal subtotal;
     private String image;
+    private Boolean available;
 }

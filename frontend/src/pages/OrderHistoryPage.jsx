@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronLeft, Filter as FilterIcon, Calendar, Clock } from 'lucide-react';
-import {adminService, clientService, fetchFromAPI} from '../services/api.js';
-import { useAuth } from '../contexts/AuthContext.jsx';
-import { OrderStatusModal } from './modals/OrderStatusModal.jsx';
-import { OrderDetailModal } from './modals/OrderDetailModal.jsx';
-import {ORDER_STATE_LABELS, ORDER_STATE_COLORS} from "../utils/StringUtils.jsx";
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {Calendar, ChevronLeft, Clock, Filter as FilterIcon} from 'lucide-react';
+import {clientService} from '../services/api.js';
+import {useAuth} from '../contexts/AuthContext.jsx';
+import {OrderStatusModal} from './modals/OrderStatusModal.jsx';
+import {OrderDetailModal} from './modals/OrderDetailModal.jsx';
+import {ORDER_STATE_LABELS} from "../utils/StringUtils.jsx";
 
 export const OrderHistoryPage = ({ onNavigate, onBack }) => {
     const { user } = useAuth();
@@ -88,6 +88,8 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
                 thirtyDaysAgo.setDate(startOfToday.getDate() - 29); // incluye hoy → 30 días
 
                 const filtered = data.filter(order => {
+                    if (order.state === 'UNPAID') return false;
+
                     const raw = order.dateCreated; // puede ser 'YYYY-MM-DD' o 'YYYY-MM-DDTHH:mm:ss'
                     if (!raw) return false;
                     const datePart = String(raw).split('T')[0];

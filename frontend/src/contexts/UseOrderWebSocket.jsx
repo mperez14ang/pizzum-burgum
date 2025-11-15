@@ -27,9 +27,8 @@ export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true)
         const client = clientRef.current;
         if (!client || !isConnected || !enabled) return;
 
-        // Unsubscribe from previous topic
+        // Desuscribir del socket
         if (subscriptionRef.current) {
-            console.log('(UseOrderWebSocket) Cancelando suscripción anterior...');
             subscriptionRef.current.unsubscribe();
             subscriptionRef.current = null;
         }
@@ -39,13 +38,10 @@ export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true)
             ? `/topic/order/${orderId}`
             : '/topic/orders';
 
-        console.log(`(UseOrderWebSocket) Suscribiendo a ${destination}`);
-
         try {
             subscriptionRef.current = client.subscribe(destination, (message) => {
                 try {
                     const update = JSON.parse(message.body);
-                    console.log('(UseOrderWebSocket) Mensaje recibido:', update);
                     callbackRef.current?.(update);
                 } catch (err) {
                     console.error('(UseOrderWebSocket) Error parseando mensaje:', err);
@@ -58,7 +54,6 @@ export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true)
 
         return () => {
             if (subscriptionRef.current) {
-                console.log('(UseOrderWebSocket) Limpiando suscripción...');
                 subscriptionRef.current.unsubscribe();
                 subscriptionRef.current = null;
             }
@@ -68,9 +63,7 @@ export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true)
     // Manage WebSocket client lifecycle
     useEffect(() => {
         if (!enabled || !user?.token) {
-            // Cleanup if disabled
             if (clientRef.current) {
-                console.log('(UseOrderWebSocket) Desconectando WebSocket (disabled)...');
                 if (subscriptionRef.current) {
                     subscriptionRef.current.unsubscribe();
                     subscriptionRef.current = null;
@@ -82,9 +75,8 @@ export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true)
             return;
         }
 
-        // Create client only once
+        // Crear cliente una sola vez
         if (!clientRef.current) {
-            console.log('(UseOrderWebSocket) Creando nuevo cliente WebSocket...');
 
             const client = new Client({
                 webSocketFactory: () => new SockJS(`${API_URL}/ws`),
@@ -96,7 +88,6 @@ export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true)
                 heartbeatOutgoing: 4000,
 
                 onConnect: () => {
-                    console.log('(UseOrderWebSocket) Conectado a WebSocket');
                     setIsConnected(true);
                     setError(null);
 
@@ -105,13 +96,10 @@ export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true)
                         ? `/topic/order/${orderIdRef.current}`
                         : '/topic/orders';
 
-                    console.log(`(UseOrderWebSocket) Suscripción inicial a ${destination}`);
-
                     try {
                         subscriptionRef.current = client.subscribe(destination, (message) => {
                             try {
                                 const update = JSON.parse(message.body);
-                                console.log('(UseOrderWebSocket) Mensaje recibido:', update);
                                 callbackRef.current?.(update);
                             } catch (err) {
                                 console.error('(UseOrderWebSocket) Error parseando mensaje:', err);
@@ -124,7 +112,6 @@ export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true)
                 },
 
                 onDisconnect: () => {
-                    console.log('(UseOrderWebSocket) Desconectado de WebSocket');
                     setIsConnected(false);
                     subscriptionRef.current = null;
                 },
@@ -141,7 +128,6 @@ export const UseOrderWebSocket = (orderId = null, onOrderUpdate, enabled = true)
         }
 
         return () => {
-            console.log('(UseOrderWebSocket) Cleanup final...');
             if (subscriptionRef.current) {
                 subscriptionRef.current.unsubscribe();
                 subscriptionRef.current = null;

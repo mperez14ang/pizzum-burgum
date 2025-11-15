@@ -35,21 +35,13 @@ public class ProductService implements ProductServiceInt {
         // Validar que el tipo sea compatible con la categoría
         this.checkCompatibility(productDto.getType(), productDto.getCategory());
 
-        System.out.println("=== CREANDO PRODUCTO ===");
-        System.out.println("DTO recibido: " + productDto);
-
         Product product = ProductMapper.toProduct(productDto);
-        System.out.println("Producto mapeado: " + product);
 
         product.setCreations(new HashSet<>());
 
         product = productRepository.save(product);
-        System.out.println("Producto guardado con ID: " + product.getId());
 
-        ProductDto result = ProductMapper.toProductDto(product);
-        System.out.println("DTO retornado: " + result);
-
-        return result;
+        return ProductMapper.toProductDto(product);
     }
 
     @Transactional(readOnly = true)

@@ -31,7 +31,7 @@ export const fetchFromAPI = async (endpoint, options = {}) => {
         });
 
         if (!response.ok) {
-            if (response.status === 401 || response.status === 403) {
+            if (response.status === 401) {
                 localStorage.removeItem('user');
                 window.location.href = '/';
             }

@@ -48,17 +48,15 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
                                         userDetails.getAuthorities()
                                 );
 
-                        // ✅ Esto persiste la autenticación en toda la sesión WebSocket
                         accessor.setUser(authentication);
-                        logger.info("✅ Usuario autenticado en WebSocket: {}", username);
                     } else {
-                        logger.warn("⚠️ Token inválido para usuario: {}", username);
+                        logger.warn("Token inválido para usuario: {}", username);
                     }
                 } catch (Exception e) {
-                    logger.error("❌ Error procesando JWT en WebSocket: {}", e.getMessage());
+                    logger.error("Error procesando JWT en WebSocket: {}", e.getMessage());
                 }
             } else {
-                logger.warn("❌ No se encontró token de autorización en WebSocket CONNECT");
+                logger.warn("No se encontró token de autorización en WebSocket CONNECT");
             }
         }
 

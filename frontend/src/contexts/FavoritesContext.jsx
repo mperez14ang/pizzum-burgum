@@ -51,8 +51,6 @@ export const FavoritesProvider = ({ children }) => {
                 }
             }
 
-            // Los datos vienen como un array de objetos Favorites
-            console.log('✅ Favoritos cargados:', data?.length || 0);
             setFavorites(data || []);
         } catch (err) {
             console.error('Error loading favorites:', err);
@@ -104,7 +102,6 @@ export const FavoritesProvider = ({ children }) => {
             return { success: false, error: err.message };
         }
     }
-
 
     const addToFavorites = async (creationData) => {
         // Validar autenticación
@@ -178,7 +175,6 @@ export const FavoritesProvider = ({ children }) => {
             setIsLoading(false);
         }
     };
-
 
     const removeFromFavorites = async (favoriteId) => {
         try {

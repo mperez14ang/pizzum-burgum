@@ -1,10 +1,9 @@
 import {Badge} from "../../components/common/Badge.jsx";
 import {Modal} from "../../components/common/Modal.jsx";
-import React, {useEffect, useState, useCallback} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {adminService} from "../../services/api.js";
 import OrderStatusModal from "./OrderStatusModal.jsx";
 import {ORDER_STATE_COLORS, ORDER_STATE_LABELS} from "../../utils/StringUtils.jsx";
-import {Calendar} from "lucide-react";
 
 export const OrderDetailModal = ({
                                      isOpen,

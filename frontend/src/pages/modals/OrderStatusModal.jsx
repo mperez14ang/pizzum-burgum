@@ -13,7 +13,6 @@ export const OrderStatusModal = ({
     const LABELS = ['Pago', 'En cola', 'En preparación', 'En camino', 'Entregado'];
     const [localOrder, setLocalOrder] = useState(order);
 
-    // 🔥 Usar WebSocket en lugar de polling
     const { isConnected, error } = UseOrderWebSocket(
         order?.id,
         (update) => {
@@ -83,8 +82,8 @@ export const OrderStatusModal = ({
             {!order ? (
                 <div className="text-gray-600">No se encontró información del pedido.</div>
             ) : (
-                <div className="px-2 sm:px-4">
-                    {/* Header */}
+                <div className="px-2 sm:px-4 min-w-[340px]">
+                {/* Header */}
                     <div className="mb-4 flex items-center justify-between">
                         <div className="text-sm text-gray-600">
                             Pedido #{order?.id}  {/* ← Usar solo el ID */}

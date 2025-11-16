@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {adminService} from '../../services/api';
 import {Card, CardBody} from '../../components/common/Card';
 import {Button} from '../../components/common/Button';
@@ -8,6 +8,7 @@ import {Loading} from '../../components/common/Loading';
 import {Edit, Plus, ToggleLeft, ToggleRight, Trash2} from 'lucide-react';
 import toast from 'react-hot-toast';
 import {CreateProductModal} from "../modals/CreateProductModal.jsx";
+import {useConfirm} from "../../contexts/UseConfirm.jsx";
 
 const CATEGORY_LABELS = {
     PIZZA: 'Pizza',
@@ -16,6 +17,8 @@ const CATEGORY_LABELS = {
 };
 
 export const ProductManagement = () => {
+    const confirm = useConfirm();
+
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [categoryFilter, setCategoryFilter] = useState('');
@@ -43,7 +46,6 @@ export const ProductManagement = () => {
         loadTypes();
     }, []);
 
-    // Función auxiliar para aplicar filtros actuales
     const getCurrentFilters = () => ({
         deleted: isDeleted,
         available: isAvailable,
@@ -54,12 +56,9 @@ export const ProductManagement = () => {
         try {
             setLoading(true);
 
-            // Si no se pasan filtros, usar los actuales
             const activeFilters = filters !== null ? filters : getCurrentFilters();
-
             const data = await adminService.getAllProducts(activeFilters);
 
-            // Solo actualizar estados de filtros si se pasaron nuevos filtros
             if (filters !== null) {
                 setIsAvailable(activeFilters.available);
                 setIsDeleted(activeFilters.deleted);
@@ -96,7 +95,6 @@ export const ProductManagement = () => {
     const loadTypesByCategory = async (category) => {
         try {
             const data = await adminService.getProductTypesByCategory(category);
-            console.log(`Tipos cargados para ${category}:`, data);
             setAvailableTypes(data);
         } catch (error) {
             console.error('Error loading types by category:', error);
@@ -120,7 +118,6 @@ export const ProductManagement = () => {
 
     const handleEdit = (product) => {
         setEditingProduct(product);
-        console.log("editing")
         setFormData(product);
         setFormErrors({});
         if (product.category) {
@@ -129,14 +126,14 @@ export const ProductManagement = () => {
         setIsFormModalOpen(true);
     };
 
-    const handleDelete = async (product) => {
-        if (!window.confirm(`¿Estás seguro de eliminar el producto "${product.name}"?`)) {
-            return;
-        }
+    const askDelete = async (product) => {
+        const ok = await confirm("¿Desea borrar el producto?", "Eliminar Producto");
+
+        if (!ok) return;
+
         try {
             await adminService.deleteProduct(product.id);
             toast.success('Producto eliminado');
-            // Recargar sin pasar filtros para mantener los actuales
             await loadProducts();
         } catch (error) {
             toast.error('Error al eliminar producto');
@@ -148,15 +145,18 @@ export const ProductManagement = () => {
         try {
             await adminService.toggleProductAvailability(product.id, !product.available);
 
-            // Actualizar el estado local del producto
-            setProducts(prevProducts =>
-                prevProducts.map(p =>
-                    p.id === product.id
-                        ? { ...p, available: !p.available }
-                        : p
+            setProducts(prev =>
+                prev.map(p =>
+                    p.id === product.id ? { ...p, available: !p.available } : p
                 )
             );
-            toast.success(product.available ? 'Producto marcado como no disponible' : 'Producto marcado como disponible', { duration: 2000 });
+
+            toast.success(
+                product.available
+                    ? 'Producto marcado como no disponible'
+                    : 'Producto marcado como disponible',
+                { duration: 2000 }
+            );
         } catch (error) {
             toast.error('Error al cambiar disponibilidad');
             console.error(error);
@@ -166,21 +166,10 @@ export const ProductManagement = () => {
     const validateForm = () => {
         const errors = {};
 
-        if (!formData.name.trim()) {
-            errors.name = 'El nombre es obligatorio';
-        }
-
-        if (!formData.price || parseFloat(formData.price) <= 0) {
-            errors.price = 'El precio debe ser mayor a 0';
-        }
-
-        if (!formData.category) {
-            errors.category = 'La categoría es obligatoria';
-        }
-
-        if (!formData.type) {
-            errors.type = 'El tipo es obligatorio';
-        }
+        if (!formData.name.trim()) errors.name = 'El nombre es obligatorio';
+        if (!formData.price || parseFloat(formData.price) <= 0) errors.price = 'El precio debe ser mayor a 0';
+        if (!formData.category) errors.category = 'La categoría es obligatoria';
+        if (!formData.type) errors.type = 'El tipo es obligatorio';
 
         setFormErrors(errors);
         return Object.keys(errors).length === 0;
@@ -189,43 +178,32 @@ export const ProductManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!validateForm()) {
-            return;
-        }
+        if (!validateForm()) return;
 
         try {
             setSubmitting(true);
-            const payload = {
-                ...formData,
-                price: parseFloat(formData.price)
-            };
-
-            console.log('Enviando producto:', payload);
+            const payload = { ...formData, price: parseFloat(formData.price) };
 
             if (editingProduct) {
-                console.log(payload)
                 await adminService.updateProduct(editingProduct.id, payload);
-                toast.success('Producto actualizado');
 
-                setProducts(prevProducts =>
-                    prevProducts.map(p =>
-                        p.id === editingProduct.id  // Usa editingProduct.id
-                            ? { ...p, ...payload }  // Spread payload para fusionar propiedades
-                            : p
+                setProducts(prev =>
+                    prev.map(p =>
+                        p.id === editingProduct.id ? { ...p, ...payload } : p
                     )
                 );
 
+                toast.success('Producto actualizado');
             } else {
                 await adminService.createProduct(payload);
                 toast.success('Producto creado');
-                // Recargar sin pasar filtros para mantener los actuales
                 await loadProducts();
             }
 
             setIsFormModalOpen(false);
         } catch (error) {
             toast.error(editingProduct ? 'Error al actualizar producto' : 'Error al crear producto');
-            console.error('Error completo:', error);
+            console.error(error);
         } finally {
             setSubmitting(false);
         }
@@ -280,14 +258,12 @@ export const ProductManagement = () => {
             <div className="mb-6">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold text-gray-900">Gestión de Productos</h2>
-                    <Button
-                        onClick={handleCreate}
-                        className="flex items-center gap-2"
-                    >
+                    <Button onClick={handleCreate} className="flex items-center gap-2">
                         <Plus className="w-4 h-4" />
                         <span>Nuevo Producto</span>
                     </Button>
                 </div>
+
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                     <div className="flex gap-4 w-full sm:w-auto">
                         <div className="w-48">
@@ -301,6 +277,7 @@ export const ProductManagement = () => {
                                 }))}
                             />
                         </div>
+
                         <div className="w-48">
                             <Select
                                 placeholder={'Todos Los Activos'}
@@ -315,22 +292,14 @@ export const ProductManagement = () => {
                                 }
                                 onChange={(e) => handleStatusFilterChange(e.target.value)}
                                 options={[
-                                    {
-                                        value: "available",
-                                        label: "Disponibles",
-                                    },
-                                    {
-                                        value: "not_available",
-                                        label: "No Disponibles",
-                                    },
-                                    {
-                                        value: "show_deleted",
-                                        label: "Borrados",
-                                    },
+                                    { value: "available", label: "Disponibles" },
+                                    { value: "not_available", label: "No Disponibles" },
+                                    { value: "show_deleted", label: "Borrados" }
                                 ]}
                             />
                         </div>
                     </div>
+
                     <p className="text-sm text-gray-600">
                         Mostrando {products.length} producto{products.length !== 1 ? 's' : ''}
                     </p>
@@ -354,28 +323,33 @@ export const ProductManagement = () => {
                                             ESTE PRODUCTO ESTÁ BORRADO
                                         </p>
                                     )}
+
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                                            <p className="text-sm text-gray-500">{product.type?.replace(/_/g, ' ')}</p>
+                                            <p className="text-sm text-gray-500">
+                                                {product.type?.replace(/_/g, ' ')}
+                                            </p>
                                         </div>
+
                                         <Badge variant={product.available ? 'success' : 'danger'}>
                                             {product.available ? 'Disponible' : 'No disponible'}
                                         </Badge>
                                     </div>
+
                                     <div className="flex items-center justify-between">
                                         <span className="text-lg font-bold text-primary">
                                             ${Number(product.price).toFixed(2)}
                                         </span>
                                         <Badge>{CATEGORY_LABELS[product.category] || product.category}</Badge>
                                     </div>
+
                                     <div className="flex gap-2 pt-2">
                                         {!product.deleted && (
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => handleToggleAvailability(product)}
-                                                title={product.available ? 'Marcar como no disponible' : 'Marcar como disponible'}
                                             >
                                                 {product.available ? (
                                                     <ToggleRight className="w-4 h-4" />
@@ -384,6 +358,7 @@ export const ProductManagement = () => {
                                                 )}
                                             </Button>
                                         )}
+
                                         {!product.deleted && (
                                             <Button
                                                 variant="ghost"
@@ -393,11 +368,12 @@ export const ProductManagement = () => {
                                                 <Edit className="w-4 h-4" />
                                             </Button>
                                         )}
+
                                         {!product.deleted && (
                                             <Button
                                                 variant="danger"
                                                 size="sm"
-                                                onClick={() => handleDelete(product)}
+                                                onClick={() => askDelete(product)}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>

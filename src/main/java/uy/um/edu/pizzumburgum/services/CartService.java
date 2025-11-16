@@ -406,10 +406,11 @@ public class CartService {
         log.info("SE REALIZO UN PAGO DE {} {}", orderResponse.getTotalPrice(), request.getCurrency().toUpperCase());
         // Cambiar estado a IN_QUEUE
         cart.setState(OrderState.IN_QUEUE);
-        orderByRepository.save(cart);
 
         // Cambiar creacion del pedido
         cart.setDateCreated(LocalDate.now());
+
+        orderByRepository.save(cart);
 
         log.info("Compra finalizada exitosamente. Orden en cola de preparación");
         return CartCheckoutResponse.builder()

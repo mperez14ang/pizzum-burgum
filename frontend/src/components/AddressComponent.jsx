@@ -6,6 +6,7 @@ import {AddAddressModal} from "../pages/modals/AddAddressModal.jsx";
 import {getBackendErrorMessage} from "../utils/parsers.jsx";
 import {clientService} from "../services/api.js";
 import {Loading} from "./common/Loading.jsx";
+import {useConfirm} from "../contexts/UseConfirm.jsx";
 
 export const AddressComponent = ({
                                      user,
@@ -27,6 +28,7 @@ export const AddressComponent = ({
     const [isEditingAddress, setIsEditingAddress] = useState(false);
     const [editingAddressId, setEditingAddressId] = useState(null);
     const debounceTimers = useRef(null);
+    const confirm = useConfirm();
 
     // Cargar direcciones al montar el componente
     useEffect(() => {
@@ -111,7 +113,18 @@ export const AddressComponent = ({
     };
 
     const handleAddressDeletion = async () => {
-        if (!canInteract)return;
+        if (!canInteract) return;
+
+        const ok = await confirm({
+            title: "Eliminar dirección",
+            message: "¿Desea eliminar esta dirección?",
+            acceptText: "Eliminar",
+            cancelText: "Cancelar",
+            type: "danger"
+        });
+
+        if (!ok) return;
+
         try {
             const response = await handleDeleteAddress(selectedAddress.id);
             if (response) {
@@ -122,10 +135,11 @@ export const AddressComponent = ({
                 }
             }
         } catch (error) {
-            const message = getBackendErrorMessage(error)
-            toast.error(message)
+            const message = getBackendErrorMessage(error);
+            toast.error(message);
         }
     };
+
 
     if (isLoadingAddresses) {
         return (

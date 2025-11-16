@@ -1,24 +1,12 @@
 import {AddToCartButton} from "./common/AddToCartButton.jsx";
-import toast from "react-hot-toast";
-import {useFavorites} from "../contexts/FavoritesContext.jsx";
 import {Info, Trash2} from "lucide-react";
 import {useAuth} from "../contexts/AuthContext.jsx";
 import {handleAddFavoriteToCart} from "../utils/CartInteraction.jsx";
 import {useCart} from "../contexts/CartContext.jsx";
 
-export const FavoriteComponent = ({favorite, handleInfo}) => {
-    const { removeFromFavorites } = useFavorites();
+export const FavoriteComponent = ({favorite, handleInfo, handleDelete}) => {
     const { isAuthenticated } = useAuth()
     const { itemCount, setCartItemCount } = useCart();
-
-    const handleRemove = async (favoriteId) => {
-        if (confirm('¿Eliminar este favorito?')) {
-            const result = await removeFromFavorites(favoriteId);
-            if (!result.success) {
-                toast.error('Error al eliminar: ' + (result.error || 'Intenta de nuevo'));
-            }
-        }
-    };
 
     return <div>
 
@@ -40,7 +28,7 @@ export const FavoriteComponent = ({favorite, handleInfo}) => {
                     <button
                         onClick={(e) => {
                             e.stopPropagation()
-                            handleRemove(favorite.favoriteId)
+                            handleDelete(favorite)
                         }}
                         className="absolute top-2 right-2 bg-white/90 hover:bg-red-50 p-2 rounded-full transition shadow-md"
                         title="Eliminar de favoritos"

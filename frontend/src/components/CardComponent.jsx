@@ -5,6 +5,7 @@ import CardModal from "../pages/modals/CardModal.jsx";
 import {clientService} from "../services/api.js";
 import toast from "react-hot-toast";
 import {Loading} from "./common/Loading.jsx";
+import {useConfirm} from "../contexts/UseConfirm.jsx";
 
 export const CardComponent = ({
                                   user,
@@ -23,6 +24,7 @@ export const CardComponent = ({
     const [selectedCardId, setSelectedCardId] = useState('');
     const [showCardModal, setShowCardModal] = useState(false);
     const debounceTimer = useRef(null);
+    const confirm = useConfirm();
 
     // Cargar tarjetas al montar el componente
     useEffect(() => {
@@ -113,6 +115,17 @@ export const CardComponent = ({
 
     const handleCardDeletion = async (cardId) => {
         if (!canInteract) return
+
+        const ok = await confirm({
+            title: "Eliminar tarjeta",
+            message: "¿Desea eliminar esta tarjeta?",
+            acceptText: "Eliminar",
+            cancelText: "Cancelar",
+            type: "danger"
+        });
+
+        if (!ok) return;
+
         const response = await deleteCard(cardId);
         if (response){
             await getCards();

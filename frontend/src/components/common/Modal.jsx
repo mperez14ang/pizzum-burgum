@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Loading } from "./Loading.jsx";
 
@@ -12,19 +12,25 @@ export const Modal = ({
                           loadingText = "cargando...",
                           drawAsComponent = false
                       }) => {
-    const [showContent, setShowContent] = useState(false);
 
-    // Mostrar contenido solo cuando el modal está abierto
     useEffect(() => {
         if (isOpen) {
-            setShowContent(true);
-        } else {
-            // Limpiar contenido al cerrar
-            setShowContent(false);
+            const scrollY = window.scrollY;
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
+
+            return () => {
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                window.scrollTo(0, scrollY);
+            };
         }
     }, [isOpen]);
 
-    // Cerrar con tecla ESC
     useEffect(() => {
         const handleEscape = (e) => {
             if (e.key === 'Escape' && isOpen) onClose();
@@ -43,12 +49,11 @@ export const Modal = ({
     };
 
     const body = () => (
-        <div className="flex-1 overflow-y-auto px-6 py-6">
-            {loading ? (
-                <Loading size="lg" text={loadingText} />
-            ) : (
-                showContent && children
-            )}
+        <div className="flex-1 min-h-0 overflow-auto px-6 py-6">
+            {loading
+                ? <Loading size="lg" text={loadingText} />
+                : children
+            }
         </div>
     );
 
@@ -64,13 +69,13 @@ export const Modal = ({
     );
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-hidden">
             <div
                 className="absolute inset-0 bg-black/30 backdrop-blur-sm"
                 onClick={onClose}
             ></div>
 
-            <div className={`relative w-full ${sizes[size]} bg-white rounded-2xl shadow-2xl max-h-[90vh] flex flex-col`}>
+            <div className={`relative w-full ${sizes[size]} bg-white rounded-2xl shadow-2xl max-h-[90vh] flex flex-col overflow-hidden min-w-[320px]`}>
                 {title ? (
                     <div className="flex-none bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
                         <h2 className="text-2xl font-semibold text-gray-900">{title}</h2>

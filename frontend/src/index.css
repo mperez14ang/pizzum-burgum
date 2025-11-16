@@ -5,13 +5,14 @@
 @tailwind utilities;
 
 body {
-  font-family: 'Poppins', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-family: 'Poppins', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 ::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
     scrollbar-gutter: stable;
 }
 

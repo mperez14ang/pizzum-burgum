@@ -3,7 +3,7 @@ import {useAuth} from "../contexts/AuthContext.jsx";
 import toast from "react-hot-toast";
 
 export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
-    const { login, register } = useAuth();
+    const {login, register} = useAuth();
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -38,8 +38,8 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
     const isRegister = type === 'register';
 
     const handleInputChange = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-        setErrors(prev => ({ ...prev, [field]: '' }));
+        setFormData(prev => ({...prev, [field]: value}));
+        setErrors(prev => ({...prev, [field]: ''}));
     };
 
     const timeout = (ms) =>
@@ -49,18 +49,18 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
 
     const validatePassword = (password) => {
         if (!password) {
-            return  'La contraseña es requerida';
+            return 'La contraseña es requerida';
         } else if (password.length < 8) {
-            return  'La contraseña debe tener al menos 8 caracteres';
+            return 'La contraseña debe tener al menos 8 caracteres';
         }
         return ''
     }
 
     const validateEmail = (email) => {
         if (!email.trim()) {
-            return  'El correo electrónico es requerido';
+            return 'El correo electrónico es requerido';
         } else if (!/\S+@\S+\.\S+/.test(email)) {
-            return  'Correo electrónico inválido';
+            return 'Correo electrónico inválido';
         }
         return ''
     }
@@ -68,7 +68,7 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
     const validateForm = () => {
         const newErrors = {};
 
-        if (!isRegister){
+        if (!isRegister) {
             const emailError = validateEmail(formData.email);
             if (emailError) newErrors.email = emailError;
 
@@ -76,7 +76,7 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
             if (passwordError) newErrors.password = passwordError;
         }
 
-        if (isRegister){
+        if (isRegister) {
             const emailError = validateEmail(formData.email_register);
             if (emailError) newErrors.email_register = emailError;
 
@@ -133,9 +133,9 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
         if (!validateForm()) return;
 
         setIsLoading(true);
-        try{
+        try {
             let response = null
-            if (isRegister){
+            if (isRegister) {
                 response = await Promise.race([
                     register(
                         formData.email_register,
@@ -150,8 +150,7 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                     ),
                     timeout(5000),
                 ]);
-            }
-            else {
+            } else {
                 response = await Promise.race([
                     login(formData.email, formData.password),
                     timeout(5000),
@@ -177,7 +176,7 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
 
     return (
         <div>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4 sm:gap-6">
                 {!isRegister && (
                     <>
                         <InputField
@@ -203,7 +202,7 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                 )}
 
                 {isRegister && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <InputField
                             label="Nombre"
                             id="firstName"
@@ -264,9 +263,9 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                             isLoading={isLoading}
                         />
 
-                        <div className="col-span-2 mt-4 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900 border-b pb-1">
-                                Direccion
+                        <div className="col-span-1 sm:col-span-2 mt-2 sm:mt-4 mb-1 sm:mb-2">
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 border-b pb-1">
+                                Dirección
                             </h3>
                         </div>
 
@@ -314,9 +313,10 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                 )}
 
                 <button
-                    type="submit"
+                    type="button"
+                    onClick={handleSubmit}
                     disabled={isLoading}
-                    className={`w-full px-8 py-3 text-base rounded-lg transition-colors flex items-center justify-center ${
+                    className={`w-full px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-colors flex items-center justify-center ${
                         isLoading
                             ? 'bg-orange-400 cursor-not-allowed'
                             : 'bg-orange-500 hover:bg-orange-600'
@@ -379,10 +379,10 @@ export const AuthPage = ({type, onToggleAuthType, canSwitch}) => {
                     </div>
                 )}
 
-            </form>
+            </div>
         </div>
     );
-};
+}
 
 function InputField({
                         label,

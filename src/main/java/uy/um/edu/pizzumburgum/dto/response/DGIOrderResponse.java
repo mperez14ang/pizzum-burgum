@@ -21,7 +21,6 @@ public class DGIOrderResponse {
     private String deliveryStreet;
     private String deliveryCity;
     private String deliveryPostalCode;
-    private BigDecimal extraAmount;
     private BigDecimal totalPrice;
     private String clientEmail;
     private String clientName;

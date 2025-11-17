@@ -70,7 +70,7 @@ public class ProductController {
                 .toList());
 
         ingredients.put("BURGER_SAUCES", availableProducts.stream()
-                .filter(p -> p.getType().equals(ProductType.SAUCE))
+                .filter(p -> p.getType().equals(ProductType.CONDIMENTS))
                 .toList());
 
         ingredients.put("PIZZA_DOUGH", availableProducts.stream()

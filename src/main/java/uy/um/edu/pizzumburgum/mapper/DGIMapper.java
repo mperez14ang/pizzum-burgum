@@ -20,6 +20,9 @@ public class DGIMapper {
     public static DGIOrderResponse toDGIOrderResponse(OrderBy orderBy) {
         OrderByResponse orderByDto = OrderByMapper.toOrderByDto(orderBy);
 
+        BigDecimal totalPriceWithExtra = orderByDto.getTotalPrice()
+                .add(orderBy.getExtraAmount() != null ? orderBy.getExtraAmount() : BigDecimal.ZERO);
+
         return DGIOrderResponse.builder()
                 .id(orderBy.getId())
                 .state(orderBy.getState())
@@ -27,8 +30,7 @@ public class DGIMapper {
                 .deliveryStreet(orderBy.getDeliveryStreet())
                 .deliveryCity(orderBy.getDeliveryCity())
                 .deliveryPostalCode(orderBy.getDeliveryPostalCode())
-                .extraAmount(orderBy.getExtraAmount())
-                .totalPrice(orderByDto.getTotalPrice())
+                .totalPrice(totalPriceWithExtra)
                 .clientEmail(orderByDto.getClientEmail())
                 .clientName(orderBy.getClient().getFirstName() + " " + orderBy.getClient().getLastName())
                 .clientDni(orderBy.getClient().getDni())

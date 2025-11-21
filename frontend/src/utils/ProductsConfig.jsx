@@ -53,7 +53,6 @@ export const PRODUCT_CONFIG = {
                 stateKey: 'selectedToppings',
                 type: 'multi-select',
                 gridCols: 3,
-                maxItems: 10,
                 showCounter: true
             }
         ],

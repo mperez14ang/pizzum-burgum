@@ -83,9 +83,10 @@ export const ProductSection = ({
 
     return (
         <Accordion title={renderTitle()} isOpen={isOpen}>
-            {section.showCounter && section.type === 'multi-select' && (
+            {section.type === 'multi-select' && (
                 <p className="text-sm text-gray-600 mb-3">
-                    Seleccionados: {(currentValue || []).length}/{section.maxItems}
+                    Seleccionados: {(currentValue || []).length}
+                    {section.maxItems && `/${section.maxItems}`}
                 </p>
             )}
 

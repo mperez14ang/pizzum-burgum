@@ -252,6 +252,29 @@ public class OrderByService implements OrderByInt {
         return OrderByMapper.toOrderByDto(orderBy);
     }
 
+    @Override
+    public OrderByResponse cancelOrder(Long id) {
+        OrderBy orderBy = orderByRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Orden " + id + " no encontrada"));
+
+        // Verificar que el pedido esté en estado IN_QUEUE
+        if (orderBy.getState() != OrderState.IN_QUEUE) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Solo se pueden cancelar pedidos en estado 'En cola'. Estado actual: " + orderBy.getState()
+            );
+        }
+
+        // Cambiar estado a CANCELLED
+        orderBy.setState(OrderState.CANCELLED);
+        orderByRepository.save(orderBy);
+
+        // Notificar a websocket
+        orderNotificationService.notifyOrderStatusChange(orderBy);
+
+        return OrderByMapper.toOrderByDto(orderBy);
+    }
+
     private List<OrderByDataResponse> getOrderByDataResponseList(List<OrderBy> orderByList) {
         return orderByList.stream()
                 .map(

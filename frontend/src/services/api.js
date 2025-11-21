@@ -366,6 +366,12 @@ export const clientService = {
         return fetchFromAPI(`/order/v1/list/my`, {
             method: 'GET'
         })
+    },
+
+    cancelOrder(orderId){
+        return fetchFromAPI(`/order/v1/${orderId}/cancel`, {
+            method: 'POST'
+        })
     }
 }
 

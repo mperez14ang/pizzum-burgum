@@ -88,4 +88,9 @@ public class OrderByController {
         String clientEmail = authService.getUserEmail(httpRequest);
         return ResponseEntity.ok(orderByService.getClientOrdersSimpleData(clientEmail));
     }
+
+    @PostMapping("{id}/cancel")
+    public ResponseEntity<OrderByResponse> cancelOrder(@PathVariable Long id) {
+        return ResponseEntity.ok(orderByService.cancelOrder(id));
+    }
 }

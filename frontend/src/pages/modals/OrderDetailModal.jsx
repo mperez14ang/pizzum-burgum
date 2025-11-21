@@ -1,9 +1,10 @@
 import {Badge} from "../../components/common/Badge.jsx";
 import {Modal} from "../../components/common/Modal.jsx";
 import React, {useCallback, useEffect, useState} from "react";
-import {adminService} from "../../services/api.js";
+import {adminService, clientService} from "../../services/api.js";
 import OrderStatusModal from "./OrderStatusModal.jsx";
 import {ORDER_STATE_COLORS, ORDER_STATE_LABELS} from "../../utils/StringUtils.jsx";
+import {X} from "lucide-react";
 
 export const OrderDetailModal = ({
                                      isOpen,
@@ -14,6 +15,10 @@ export const OrderDetailModal = ({
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    // Cancel modal state
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [canceling, setCanceling] = useState(false);
 
     // Memoize the load function to prevent unnecessary recreations
     const loadSelectedOrder = useCallback(async () => {
@@ -56,6 +61,28 @@ export const OrderDetailModal = ({
         }, 0);
     };
 
+    const handleCancelOrder = async () => {
+        if (!selectedOrder?.id) return;
+
+        setCanceling(true);
+        try {
+            const response = await clientService.cancelOrder(selectedOrder.id);
+
+            // Actualizar el pedido seleccionado con el nuevo estado
+            const updatedOrder = { ...selectedOrder, state: 'CANCELLED' };
+            setSelectedOrder(updatedOrder);
+
+            // Notificar al componente padre para actualizar la lista
+            onOrderUpdated?.(updatedOrder);
+
+            setIsCancelModalOpen(false);
+        } catch (error) {
+            alert(error?.message || 'Error al cancelar el pedido');
+        } finally {
+            setCanceling(false);
+        }
+    };
+
     return (
         <Modal
             isOpen={isOpen}
@@ -80,7 +107,17 @@ export const OrderDetailModal = ({
                 <div className="space-y-6">
                     {/* Estado */}
                     <div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Estado</h4>
+                        <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-semibold text-gray-900">Estado</h4>
+                            {selectedOrder.state === 'IN_QUEUE' && (
+                                <button
+                                    onClick={() => setIsCancelModalOpen(true)}
+                                    className="text-sm font-medium text-red-600 hover:text-red-700 px-3 py-1 rounded-lg border border-red-200 hover:bg-red-50 transition"
+                                >
+                                    Cancelar pedido
+                                </button>
+                            )}
+                        </div>
                         <Badge variant={ORDER_STATE_COLORS[selectedOrder.state]}>
                             {ORDER_STATE_LABELS[selectedOrder.state] || selectedOrder.state}
                         </Badge>
@@ -220,6 +257,46 @@ export const OrderDetailModal = ({
                             </div>
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* Cancel Confirmation Modal */}
+            {isCancelModalOpen && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                                    <X className="text-red-600" size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">Cancelar pedido</h3>
+                                    <p className="text-sm text-gray-500">Pedido #{selectedOrder?.id}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p className="text-gray-600 mb-6">
+                            ¿Estás seguro de que deseas cancelar este pedido? Esta acción no se puede deshacer.
+                        </p>
+
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={() => setIsCancelModalOpen(false)}
+                                disabled={canceling}
+                                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition disabled:opacity-50"
+                            >
+                                No, volver
+                            </button>
+                            <button
+                                onClick={handleCancelOrder}
+                                disabled={canceling}
+                                className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                            >
+                                {canceling ? 'Cancelando...' : 'Sí, cancelar pedido'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </Modal>

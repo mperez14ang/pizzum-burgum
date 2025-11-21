@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {Calendar, ChevronLeft, Clock, Filter as FilterIcon} from 'lucide-react';
+import {Calendar, ChevronLeft, Clock, Filter as FilterIcon, X} from 'lucide-react';
 import {clientService} from '../services/api.js';
 import {useAuth} from '../contexts/AuthContext.jsx';
 import {OrderStatusModal} from './modals/OrderStatusModal.jsx';
@@ -21,6 +21,11 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
     const [selectedOrder, setSelectedOrder] = useState(null);
 
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+    // Cancel modal state
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [orderToCancel, setOrderToCancel] = useState(null);
+    const [canceling, setCanceling] = useState(false);
 
     const dateInputRef = useRef(null);
     const detailsRef = useRef(null);
@@ -130,6 +135,32 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
         loadOrders();
     }, [user?.email, filter, selectedDate]);
 
+    const handleCancelOrder = async () => {
+        if (!orderToCancel) return;
+
+        setCanceling(true);
+        try {
+            await clientService.cancelOrder(orderToCancel.id);
+
+            // Actualizar la orden en la lista
+            setOrders(prev => prev.map(o =>
+                o.id === orderToCancel.id ? { ...o, state: 'CANCELLED' } : o
+            ));
+
+            // Si la orden está seleccionada, actualizarla también
+            if (selectedOrder?.id === orderToCancel.id) {
+                setSelectedOrder(prev => ({ ...prev, state: 'CANCELLED' }));
+            }
+
+            setIsCancelModalOpen(false);
+            setOrderToCancel(null);
+        } catch (error) {
+            alert(error?.message || 'Error al cancelar el pedido');
+        } finally {
+            setCanceling(false);
+        }
+    };
+
     const renderOrderCard = (order) => {
         const raw = order?.dateCreated;
         const hasTime = raw && String(raw).includes('T');
@@ -167,7 +198,15 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
                     <div className="mt-3 text-sm text-gray-600">{order.notes}</div>
                 )}
 
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex justify-end gap-3">
+                    {order.state === 'IN_QUEUE' && (
+                        <button
+                            onClick={() => { setOrderToCancel(order); setIsCancelModalOpen(true); }}
+                            className="text-sm font-medium text-red-600 hover:text-red-700"
+                        >
+                            Cancelar pedido
+                        </button>
+                    )}
                     <button
                         onClick={() => { setSelectedOrder(order); setIsDetailModalOpen(true); }}
                         className="text-sm font-medium text-orange-600 hover:text-orange-700"
@@ -284,6 +323,46 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
                         setSelectedOrder(prev => (prev && prev.id === updated.id) ? { ...prev, ...updated } : prev);
                     }}
                 />
+
+                {/* Cancel Confirmation Modal */}
+                {isCancelModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                        <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                                        <X className="text-red-600" size={24} />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-gray-900">Cancelar pedido</h3>
+                                        <p className="text-sm text-gray-500">Pedido #{orderToCancel?.id}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p className="text-gray-600 mb-6">
+                                ¿Estás seguro de que deseas cancelar este pedido? Esta acción no se puede deshacer.
+                            </p>
+
+                            <div className="flex gap-3 justify-end">
+                                <button
+                                    onClick={() => { setIsCancelModalOpen(false); setOrderToCancel(null); }}
+                                    disabled={canceling}
+                                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition disabled:opacity-50"
+                                >
+                                    No, volver
+                                </button>
+                                <button
+                                    onClick={handleCancelOrder}
+                                    disabled={canceling}
+                                    className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                                >
+                                    {canceling ? 'Cancelando...' : 'Sí, cancelar pedido'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );

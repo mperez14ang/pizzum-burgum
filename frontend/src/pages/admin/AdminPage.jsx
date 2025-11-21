@@ -1,39 +1,33 @@
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { AdminLayout } from '../../layouts/AdminLayout';
 import { OrderManagement } from './OrderManagement';
 import { ProductManagement } from './ProductManagement';
 import { UserManagement } from './UserManagement.jsx';
 import AdminProfilePage from './AdminProfilePage.jsx';
-import { useAuth } from "../../contexts/AuthContext.jsx";
+import {useAuth} from "../../contexts/AuthContext.jsx";
 
 export const AdminPage = () => {
-    const { user } = useAuth();
-    const navigate = useNavigate();
+    const { user} = useAuth();
+    const [currentSection, setCurrentSection] = useState('orders');
 
-    const handleSectionChange = (section) => {
-        navigate(`/admin/${section}`);
-    };
-
-    // Get current section from URL
-    const getCurrentSection = () => {
-        const path = window.location.pathname;
-        const section = path.split('/admin/')[1] || 'orders';
-        return section;
+    const renderSection = () => {
+        switch (currentSection) {
+            case 'orders':
+                return <OrderManagement />;
+            case 'products':
+                return <ProductManagement />;
+            case 'users':
+                return <UserManagement />;
+            case 'profile':
+                return <AdminProfilePage onBack={() => {}} user={user} />;
+            default:
+                return <OrderManagement />;
+        }
     };
 
     return (
-        <AdminLayout
-            currentSection={getCurrentSection()}
-            onSectionChange={handleSectionChange}
-        >
-            <Routes>
-                <Route index element={<Navigate to="/admin/orders" replace />} />
-                <Route path="orders" element={<OrderManagement />} />
-                <Route path="products" element={<ProductManagement />} />
-                <Route path="users" element={<UserManagement />} />
-                <Route path="profile" element={<AdminProfilePage onBack={() => {}} user={user} />} />
-                <Route path="*" element={<Navigate to="/admin/orders" replace />} />
-            </Routes>
+        <AdminLayout currentSection={currentSection} onSectionChange={setCurrentSection}>
+            {renderSection()}
         </AdminLayout>
     );
 };

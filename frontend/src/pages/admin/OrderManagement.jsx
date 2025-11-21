@@ -43,7 +43,6 @@ export const OrderManagement = () => {
             // Sort by id descending (most recent first)
             const sortedData = data.sort
             ((a, b) => b.id - a.id);
-            console.log(data)
             setOrders(sortedData);
             setFilteredOrders(sortedData);
         } catch (error) {

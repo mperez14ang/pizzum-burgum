@@ -36,7 +36,6 @@ export const CartProvider = ({ children }) => {
     }, [cartItems]);
 
     const loadUserCart = async () => {
-        console.log("init cart provider " + localStorage.getItem("cartCount"));
         if (isAuthenticated && user) {
             try {
                 if (!user.cartItems) {

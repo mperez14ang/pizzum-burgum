@@ -205,7 +205,7 @@ public class CartService {
     /**
      * Obtiene el carrito activo de un cliente
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public CartResponse getCart(String clientEmail) {
         OrderBy cart = this.getActiveCart(clientEmail);
 

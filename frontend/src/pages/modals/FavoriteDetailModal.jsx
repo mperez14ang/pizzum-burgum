@@ -4,15 +4,9 @@ import { PRODUCT_CONFIG } from "../../utils/ProductsConfig.jsx";
 export const FavoriteDetailModal = ({ isOpen, onClose, favorite, onOrder }) => {
     if (!isOpen || !favorite) return null;
 
-    // 🔍 DEBUG: Ver qué datos recibe el modal
-    console.log('🔍 FavoriteDetailModal - favorite recibido:', favorite);
-    console.log('🔍 favorite.creations:', favorite.creations);
-
     const safeCreations = Array.isArray(favorite?.creations)
         ? favorite.creations
-        : [favorite]; // si no hay 'creations', tratamos al favorito como una sola creación
-
-    console.log('🔍 safeCreations procesadas:', safeCreations);
+        : [favorite];
 
     const renderSectionInfo = (creation) => {
         const typeKey = creation?.type === 'PIZZA' ? 'pizza' : (creation?.type === 'HAMBURGER' ? 'burger' : (creation?.type || '').toLowerCase());
@@ -135,12 +129,10 @@ export const FavoriteDetailModal = ({ isOpen, onClose, favorite, onOrder }) => {
                                     </p>
                                     <div className="space-y-1.5">
                                         {creation.products.map((p, pIdx) => {
-                                            console.log(`🔍 Producto ${pIdx}:`, p);
                                             const product = p.product || p;
                                             const quantity = p.quantity || 1;
                                             const productPrice = product.price || 0;
                                             const subtotal = productPrice * quantity;
-                                            console.log(`   - Nombre: ${product.name}, Cantidad: ${quantity}, Precio: ${productPrice}, Subtotal: ${subtotal}`);
 
                                             return (
                                                 <div

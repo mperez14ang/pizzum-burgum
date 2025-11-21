@@ -77,7 +77,6 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
                 if (!Array.isArray(data)){
                     return
                 }
-                console.log(data)
 
                 // Aplicar filtros de fecha
                 const now = new Date();

@@ -11,7 +11,6 @@ export const UseAddresses = () => {
         try {
             const new_addresses = await clientService.getAddresses();
             setAddresses(new_addresses);
-            console.log(new_addresses);
         } catch (error) {
             console.error('Error al cargar direcciones:', error);
             toast.error('Error al cargar direcciones');
@@ -21,7 +20,6 @@ export const UseAddresses = () => {
     };
 
     const handleCreateAddress = async (addressData, user) => {
-        console.log(addressData)
         if (!user.email){
             toast.error("Usuario no esta autenticado")
         }
@@ -38,8 +36,6 @@ export const UseAddresses = () => {
     };
 
     const handleUpdateAddress = async (addressId, addressData) => {
-
-        console.log(addressData, addressId)
         const response = await clientService.updateAddress(addressId, addressData.street, addressData.city, addressData.postalCode)
 
         if (response){

@@ -93,8 +93,6 @@ export const AuthProvider = ({ children }) => {
             })
         })
 
-        console.log(data)
-
         if (data.error){
             toast.error(data.error)
             setIsLoading(false)

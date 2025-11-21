@@ -62,7 +62,6 @@ export const FavoritesProvider = ({ children }) => {
     }, [isAuthenticated, user]);
 
     const addCreation = async (transformedCreationData) => {
-        console.log(transformedCreationData)
         if (!isAuthenticated || !user) {
             return {
                 success: false,
@@ -94,7 +93,6 @@ export const FavoritesProvider = ({ children }) => {
                 throw new Error('La creation creada no tiene ID');
             }
 
-            console.log('Creation creada con ID:', creation.id);
             return { success: true, data: creation };
 
         } catch (err) {
@@ -138,8 +136,6 @@ export const FavoritesProvider = ({ children }) => {
                 creationsIds: [creation.id]
             };
 
-            console.log('📤 Enviando favorito:', JSON.stringify(payload, null, 2));
-
             const response = await fetch(`${API_BASE_URL}/favorites`, {
                 method: 'POST',
                 headers: {
@@ -163,12 +159,11 @@ export const FavoritesProvider = ({ children }) => {
             }
 
             const data = await response.json();
-            console.log('✅ Favorito creado:', data);
 
             return { success: true, data };
 
         } catch (err) {
-            console.error('❌ Error en addToFavorites:', err);
+            console.error('Error en addToFavorites:', err);
             setError(err.message);
             return { success: false, error: err.message };
         } finally {

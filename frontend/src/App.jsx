@@ -88,7 +88,7 @@ function UserLayout({ children, hideCart = false }) {
 
     return (
         <>
-            <Header onNavigate={handleNavigate} hideCartButton={hideCart} />
+            <Header onNavigate={handleNavigate} hideCart={hideCart} />
             {children}
         </>
     );

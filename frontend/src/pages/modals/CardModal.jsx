@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { AlertCircle, CreditCard, Check, Loader2 } from 'lucide-react';
-import { useCard } from '../../contexts/CardContext.jsx';
+import React, {useEffect} from 'react';
+import {AlertCircle, Check, CreditCard, Loader2} from 'lucide-react';
+import {useCard} from '../../contexts/CardContext.jsx';
 import toast from "react-hot-toast";
 import {Modal} from "../../components/common/Modal.jsx";
 
@@ -19,9 +19,13 @@ export const CardModal = ({ isOpen, onClose, onSuccess }) => {
         setEmail,
     } = useCard();
 
+    if (isOpen && user === null) {
+        return null;
+    }
+
     useEffect(() => {
         if (!isOpen || !stripe) return;
-
+        // ... (rest of useEffect remains the same)
         const elements = stripe.elements();
         const card = elements.create('card', {
             style: {
@@ -69,6 +73,12 @@ export const CardModal = ({ isOpen, onClose, onSuccess }) => {
         }
     };
 
+    const placeholderName = user
+        ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim()
+        : '';
+
+    const userEmail = user?.email ?? '';
+
     return (
         <>
             <Modal
@@ -108,7 +118,7 @@ export const CardModal = ({ isOpen, onClose, onSuccess }) => {
                             type="text"
                             id="cardholder-name"
                             value={cardholderName}
-                            placeholder={`${user.firstName} ${user.lastName}`}
+                            placeholder={placeholderName || "Nombre y Apellido"}
                             onChange={(e) => setCardholderName(e.target.value)}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                             required
@@ -123,7 +133,7 @@ export const CardModal = ({ isOpen, onClose, onSuccess }) => {
                             disabled={true}
                             type="email"
                             id="email"
-                            value={user.email}
+                            value={userEmail}
                             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>

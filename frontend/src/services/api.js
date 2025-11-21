@@ -243,7 +243,6 @@ export const cartService = {
 
     //Obtiene el carrito activo del cliente
     getActiveCart: async () => {
-        console.log("Get Active Cart")
         try {
             return await fetchFromAPI(`/cart/v1/my`);
         } catch (error) {

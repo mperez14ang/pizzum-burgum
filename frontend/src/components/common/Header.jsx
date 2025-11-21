@@ -5,7 +5,7 @@ import {LoginAndRegisterModal} from "../../pages/modals/LoginAndRegisterModal.js
 import UserDropdown from "../../pages/dropdowns/UserDropdown.jsx";
 import CartDropdown from "../../pages/dropdowns/CartDropdown.jsx";
 
-export const Header = forwardRef(({onNavigate, hideCartButton = false}, ref) => {
+export const Header = forwardRef(({onNavigate, hideCart = false}, ref) => {
     const { user, isAuthenticated, logout } = useAuth();
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -66,7 +66,7 @@ export const Header = forwardRef(({onNavigate, hideCartButton = false}, ref) => 
                             PizzUM & BurgUM
                         </h1>
                         <div className="flex gap-4 items-center">
-                            {!hideCartButton && (
+                            {!hideCart && (
                                 <CartDropdown isOpen={isCartOpen}
                                               onToggle={onToggleCart}
                                               onClose={() => setIsCartOpen(false)}

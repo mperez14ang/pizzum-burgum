@@ -32,8 +32,6 @@ export function transformCreationData(creationData) {
         }
     }
 
-    console.log(products)
-
     return {
         name: creationData.name,
         type: creationData.type,

@@ -47,10 +47,7 @@ export const CardProvider = ({ children }) => {
         try {
             const paymentMethod = await createPaymentMethod();
 
-            console.log('PaymentMethod ID:', paymentMethod.id);
-
             const response = await clientService.addCards(user.email, paymentMethod.id);
-            console.log(response)
             if (response) {
                 toast.success("La tarjeta se guardo con exito")
                 setSuccess(true);
@@ -75,7 +72,6 @@ export const CardProvider = ({ children }) => {
         try {
             const newCards = await clientService.getCards();
             setCards(newCards);
-            console.log(newCards);
         } catch (error) {
             console.error('Error al cargar las tarjetas:', error);
             toast.error('Error al cargar las tarjetas');

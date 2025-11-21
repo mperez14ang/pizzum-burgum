@@ -17,7 +17,6 @@ export const OrderDetailModal = ({
 
     // Memoize the load function to prevent unnecessary recreations
     const loadSelectedOrder = useCallback(async () => {
-        console.log(order)
         if (!order?.id) return;
 
         setLoading(true);

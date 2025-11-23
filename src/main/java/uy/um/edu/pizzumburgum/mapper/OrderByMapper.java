@@ -49,9 +49,13 @@ public class OrderByMapper {
             orderBy.setExtraAmount(BigDecimal.ZERO);
         }
 
-        // Si el pedido todavia no esta pagado, entonces es sujeto a actualizaciones de precios
+        // Si el pedido está cancelado, el precio total es 0
         BigDecimal totalPrice;
-        if (orderBy.getState().equals(OrderState.UNPAID)){
+        if (orderBy.getState().equals(OrderState.CANCELLED)) {
+            totalPrice = BigDecimal.ZERO;
+        }
+        // Si el pedido todavia no esta pagado, entonces es sujeto a actualizaciones de precios
+        else if (orderBy.getState().equals(OrderState.UNPAID)){
             // Obtener monto total (suma de prodcutos*quantity)*creation_quantity + extra
             totalPrice = orderBy.getCreations().stream()
                     .flatMap(c -> c.getCreation().getProducts().stream()
@@ -59,15 +63,17 @@ public class OrderByMapper {
                                     .multiply(BigDecimal.valueOf(product.getQuantity()))
                                     .multiply(BigDecimal.valueOf(c.getQuantity()))))
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
+            // Agregar propina
+            totalPrice = totalPrice.add(orderBy.getExtraAmount());
         }
         // Si el pedido ya fue pagado, o se esta pagando, entonces los precios ya fueron establecidos en OrderHasCreations
         else {
             totalPrice = orderBy.getCreations().stream()
                     .map(c -> c.getPrice().multiply(BigDecimal.valueOf(c.getQuantity())))
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
+            // Agregar propina
+            totalPrice = totalPrice.add(orderBy.getExtraAmount());
         }
-        // Agregar propina
-        totalPrice = totalPrice.add(orderBy.getExtraAmount());
 
         return OrderByResponse.builder()
                 .id(orderBy.getId())

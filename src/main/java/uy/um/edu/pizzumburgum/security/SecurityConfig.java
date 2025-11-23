@@ -73,6 +73,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/order/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers(HttpMethod.POST, "/api/order/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers(HttpMethod.PUT, "/api/order/**").hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.PATCH, "/api/order/v1/cancel/**").hasAnyRole(CLIENT, ADMIN)
                         .requestMatchers(HttpMethod.PATCH, "/api/order/**").hasRole(ADMIN)
                         .requestMatchers(HttpMethod.DELETE, "/api/order/**").hasRole(ADMIN)
 

@@ -69,6 +69,11 @@ public class OrderByController {
         }
     }
 
+    @PatchMapping("cancel/{id}")
+    public ResponseEntity<OrderByResponse> cancelOrder(@PathVariable Long id) {
+        return ResponseEntity.ok(orderByService.cancelOrder(id));
+    }
+
     @GetMapping("/states")
     public ResponseEntity<List<String>> getOrderStates() {
         return ResponseEntity.ok(

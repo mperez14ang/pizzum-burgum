@@ -1,10 +1,10 @@
 package uy.um.edu.pizzumburgum.services;
 
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.OrderByRequest;
 import uy.um.edu.pizzumburgum.dto.response.OrderByDataResponse;
@@ -239,6 +239,40 @@ public class OrderByService implements OrderByInt {
         return this.getOrderByDataResponseList(orders);
     }
 
+    @Transactional
+    @Override
+    public OrderByResponse cancelOrder(Long id) {
+        OrderBy orderBy = orderByRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Orden " + id + " no encontrada"));
+
+        // Validar que el estado actual sea IN_QUEUE
+        if (orderBy.getState() != OrderState.IN_QUEUE) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "No se puede cancelar una orden en estado " + orderBy.getState() + ". Solo se pueden cancelar ordenes en estado IN_QUEUE"
+            );
+        }
+
+        // Cambiar el estado a CANCELLED
+        orderBy.setState(OrderState.CANCELLED);
+        orderBy = orderByRepository.save(orderBy);
+
+        // Forzar la carga de relaciones lazy antes de mapear
+        orderBy.getClient().getEmail();
+        orderBy.getCreations().size();
+        orderBy.getCreations().forEach(c -> {
+            c.getCreation().getName();
+            c.getCreation().getProducts().size();
+            c.getCreation().getProducts().forEach(p -> p.getProduct().getName());
+        });
+
+        // Notificar al WebSocket del cambio
+        orderNotificationService.notifyOrderStatusChange(orderBy);
+
+        return OrderByMapper.toOrderByDto(orderBy);
+    }
+
+
     public OrderByResponse updateOrderState(Long id, OrderState state) {
         OrderBy orderBy = orderByRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Orden " + id + " no encontrada"));
@@ -273,4 +307,5 @@ public class OrderByService implements OrderByInt {
                         }
                 ).collect(Collectors.toList());
     }
+
 }

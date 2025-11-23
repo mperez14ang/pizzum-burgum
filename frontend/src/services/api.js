@@ -365,18 +365,23 @@ export const clientService = {
         return fetchFromAPI(`/order/v1/list/my`, {
             method: 'GET'
         })
+    },
+
+    cancelOrder(orderId) {
+        return fetchFromAPI(`/order/v1/cancel/${orderId}`, {
+            method: 'PATCH'
+        });
     }
 }
 
 
 export const userService = {
     getUserInfo: async (user) => {
-        if (user.role === "CLIENT"){
+        if (user.role === "CLIENT") {
             return fetchFromAPI(`/client/v1/${user.email}`, {
                 method: 'GET'
             })
-        }
-        else if (user.role === "ADMIN"){
+        } else if (user.role === "ADMIN") {
             return fetchFromAPI(`/admin/v1/${user.email}`, {
                 method: 'GET'
             })

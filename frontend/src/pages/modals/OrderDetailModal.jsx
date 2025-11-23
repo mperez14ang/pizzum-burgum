@@ -1,9 +1,13 @@
 import {Badge} from "../../components/common/Badge.jsx";
 import {Modal} from "../../components/common/Modal.jsx";
 import React, {useCallback, useEffect, useState} from "react";
-import {adminService} from "../../services/api.js";
+import {adminService, clientService} from "../../services/api.js";
 import OrderStatusModal from "./OrderStatusModal.jsx";
 import {ORDER_STATE_COLORS, ORDER_STATE_LABELS} from "../../utils/StringUtils.jsx";
+import { useAuth } from "../../contexts/AuthContext.jsx";
+import toast from "react-hot-toast";
+import { useConfirm } from "../../contexts/UseConfirm.jsx";
+
 
 export const OrderDetailModal = ({
                                      isOpen,
@@ -14,7 +18,10 @@ export const OrderDetailModal = ({
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const {user} = useAuth();
+    const [isCancelling, setIsCancelling] = useState(false);
+    const confirm = useConfirm();
+    const isClient = user?.role === 'CLIENT';
     // Memoize the load function to prevent unnecessary recreations
     const loadSelectedOrder = useCallback(async () => {
         if (!order?.id) return;
@@ -39,6 +46,40 @@ export const OrderDetailModal = ({
             loadSelectedOrder();
         }
     }, [isOpen, order?.id, loadSelectedOrder]);
+
+    const handleCancelOrder = useCallback(async () => {
+        if (!selectedOrder?.id) return;
+
+        // Confirmación con modal personalizado
+        const confirmed = await confirm({
+            title: "Cancelar pedido",
+            message: "¿Estás seguro que deseas cancelar este pedido? Esta acción no se puede deshacer.",
+            acceptText: "Cancelar pedido",
+            cancelText: "Volver",
+            type: "danger"
+        });
+
+        if (!confirmed) return;
+
+        setIsCancelling(true);
+        try {
+            await clientService.cancelOrder(selectedOrder.id);
+
+            // Recargar el pedido completo desde el backend
+            const response = await adminService.getOrder(selectedOrder.id);
+            setSelectedOrder(response);
+
+            // Notificar al componente padre para actualizar la lista
+            onOrderUpdated?.(response);
+
+            toast.success('Pedido cancelado exitosamente');
+        } catch (err) {
+            console.error('Error cancelando pedido:', err);
+            toast.error(err.message || 'No se pudo cancelar el pedido');
+        } finally {
+            setIsCancelling(false);
+        }
+    }, [selectedOrder?.id, confirm, onOrderUpdated]);
 
     // Handle order updates
     const handleOrderUpdated = useCallback((updatedOrder) => {
@@ -119,7 +160,7 @@ export const OrderDetailModal = ({
                             <h4 className="font-semibold text-gray-900">Fecha de creación</h4>
                         </div>
                         <p className="text-gray-700 font-medium">
-                            {selectedOrder.dateCreated.split('-').reverse().join('/')}
+                            {selectedOrder.dateCreated ? selectedOrder.dateCreated.split('-').reverse().join('/') : 'N/A'}
                         </p>
                     </div>
 
@@ -128,12 +169,12 @@ export const OrderDetailModal = ({
                         <h4 className="font-semibold text-gray-900 mb-2">Creaciones</h4>
                         {selectedOrder.creations?.length > 0 ? (
                             <div className="space-y-3">
-                                {selectedOrder.creations.map((c) => {
+                                {selectedOrder.creations.map((c, idx) => {
                                     const isExtra = c.creation?.type === 'EXTRA';
 
                                     return (
                                         <div
-                                            key={c.id}
+                                            key={c.creation?.id || idx}
                                             className="border rounded-xl p-4 bg-gray-50 shadow-sm hover:shadow-md transition-shadow"
                                         >
                                             {isExtra ? (
@@ -176,9 +217,9 @@ export const OrderDetailModal = ({
                                                                 Productos:
                                                             </p>
                                                             <ul className="space-y-1 text-sm">
-                                                                {c.creation.products.map((p) => (
+                                                                {c.creation.products.map((p, pIdx) => (
                                                                     <li
-                                                                        key={p.id}
+                                                                        key={p.product?.id || pIdx}
                                                                         className="flex justify-between text-gray-600"
                                                                     >
                                                     <span>
@@ -211,12 +252,29 @@ export const OrderDetailModal = ({
                     {/* Total */}
                     {selectedOrder.creations?.length > 0 && (
                         <div className="pt-4 border-t border-gray-200">
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-center gap-3">
                                 <h4 className="font-semibold text-gray-900 text-lg">Total</h4>
-                                <p className="font-bold text-gray-900 text-xl">
+                                <p className="font-bold text-xl text-gray-900">
                                     ${selectedOrder.totalPrice}
                                 </p>
                             </div>
+                            {selectedOrder.state === 'CANCELLED' && (
+                                <p className="text-sm text-gray-600 text-right mt-1">
+                                    (Pedido cancelado - No se realizó el cobro)
+                                </p>
+                            )}
+                        </div>
+                    )}
+                    {/* Botón de cancelar - Solo visible para clientes en estado IN_QUEUE */}
+                    {isClient && selectedOrder?.state === 'IN_QUEUE' && (
+                        <div className="pt-4 border-t border-gray-200">
+                            <button
+                                onClick={handleCancelOrder}
+                                disabled={isCancelling}
+                                className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-wait transition-colors"
+                            >
+                                {isCancelling ? 'Cancelando...' : 'Cancelar Pedido'}
+                            </button>
                         </div>
                     )}
                 </div>

@@ -33,4 +33,5 @@ public interface OrderByRepository extends JpaRepository<OrderBy,Long> {
 
     @Query("SELECT o FROM OrderBy o WHERE o.client.email = :clientEmail")
     List<OrderBy> findByClientEmail(@Param("clientEmail") String clientEmail);
+
 }

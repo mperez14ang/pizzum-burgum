@@ -156,7 +156,7 @@ export const OrderHistoryPage = ({ onNavigate, onBack }) => {
                         >
                             {ORDER_STATE_LABELS[order.state] || order.state}
                         </button>
-                        {order.totalPrice && (
+                        {order.totalPrice > 0 && (
                             <div className="mt-2 text-gray-900 font-semibold">$ {Number(order.totalPrice).toLocaleString('es-UY')}</div>
                         )}
                     </div>

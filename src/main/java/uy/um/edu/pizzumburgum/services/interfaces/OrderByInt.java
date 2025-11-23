@@ -25,4 +25,6 @@ public interface OrderByInt {
     List<OrderByDataResponse> getOrdersSimpleData();
 
     List<OrderByDataResponse> getClientOrdersSimpleData(String clientEmail);
+
+    OrderByResponse cancelOrder(Long id);
 }

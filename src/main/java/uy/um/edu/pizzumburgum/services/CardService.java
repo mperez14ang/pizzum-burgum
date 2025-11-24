@@ -84,7 +84,7 @@ public class CardService implements CardServiceInt {
         }
 
         // Si es la primera tarjeta, establecer como predeterminada
-        if (client.getCards().isEmpty()) {
+        if (client.getCards() == null || client.getCards().isEmpty()) {
             card.setActive(true);
         }
 

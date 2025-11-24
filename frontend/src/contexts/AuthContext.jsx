@@ -105,31 +105,32 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (email, password, firstName, lastName, birthDate, dni, street, city, postalCode,card, logInAfter=true) => {
         setIsLoading(true)
+        const toSend = JSON.stringify({
+            firstName,
+            lastName,
+            birthDate,
+            dni,
+            email,
+            password,
+            addresses: [{
+                street,
+                city,
+                postalCode
+            }],
+            favorites: [],
+            // Opcional
+            ...(card && { card: {
+                    paymentMethodId: card.paymentMethodId
+                } })
+        })
         const data = await fetchFromAPI('/auth/v1/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                firstName,
-                lastName,
-                birthDate,
-                dni,
-                email,
-                password,
-                addresses: [{
-                    street,
-                    city,
-                    postalCode
-                }],
-                favorites: [],
-                // Opcional
-                ...(card && { card: {
-                    paymentMethodId: card.paymentMethodId
-                } })
-            })
+            body: toSend
         })
-
+        console.log(toSend)
         if (data.error){
             toast.error(data.error)
             setIsLoading(false)

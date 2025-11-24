@@ -6,6 +6,7 @@ import com.stripe.model.Customer;
 import com.stripe.param.CustomerCreateParams;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import uy.um.edu.pizzumburgum.mapper.AddressMapper;
 import uy.um.edu.pizzumburgum.mapper.ClientMapper;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.repository.CreationRepository;
+import uy.um.edu.pizzumburgum.repository.UserRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.ClientServiceInt;
 
 import java.time.LocalDate;
@@ -32,7 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@Log4j2
 public class ClientService implements ClientServiceInt {
 
     private final ClientRepository clientRepository;
@@ -40,9 +42,20 @@ public class ClientService implements ClientServiceInt {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private CardService cardService;
+    @Autowired
+    private UserRepository userRepository;
+
+    public ClientService(ClientRepository clientRepository, CardService cardService) {
+        this.clientRepository = clientRepository;
+        this.cardService = cardService;
+    }
+
     @Transactional
     @Override
     public ClientResponse createClient(ClientCreateRequest clientCreateRequest) {
+        log.info("Creando client {}", clientCreateRequest);
         return this.createClient(clientCreateRequest, true);
     }
 
@@ -65,6 +78,13 @@ public class ClientService implements ClientServiceInt {
                         "La cédula no es valida"
                 );
             }
+        }
+
+        if (userRepository.existsByDni(clientCreateRequest.getDni())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Ya existe un usuario registrado con la cédula " + clientCreateRequest.getDni()
+            );
         }
 
         Client client = ClientMapper.toClient(clientCreateRequest);
@@ -108,7 +128,18 @@ public class ClientService implements ClientServiceInt {
 
         client.setAddresses(addresses);
 
-        client = clientRepository.save(client);
+        try {
+            client = clientRepository.save(client);
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error al guardar el cliente: " + e.getMessage()
+            );
+        }
+
+        if (clientCreateRequest.getCard() != null) {
+            cardService.createCard(clientCreateRequest.getCard(), client.getEmail());
+        }
 
         return ClientMapper.toClientResponse(client);
     }

@@ -37,9 +37,7 @@ public class ClientController {
 
     @PostMapping
     public ClientResponse createClient(@RequestBody ClientCreateRequest client) {
-        ClientResponse clientResponse = clientService.createClient(client);
-        cardService.createCard(client.getCard(), client.getEmail());
-        return clientResponse;
+        return clientService.createClient(client);
     }
 
     @GetMapping("/{clientEmail}")

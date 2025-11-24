@@ -1,6 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { Loading } from "./Loading.jsx";
+
+let activeModals = 0;
+let savedScrollY = 0;
+let modalStack = []; // Stack para rastrear el orden de los modales
 
 export const Modal = ({
                           isOpen,
@@ -12,28 +16,44 @@ export const Modal = ({
                           loadingText = "cargando...",
                           drawAsComponent = false
                       }) => {
+    const modalId = useRef(Math.random().toString(36)); // ID único para cada modal
 
     useEffect(() => {
         if (isOpen) {
-            const scrollY = window.scrollY;
-            document.body.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.top = `-${scrollY}px`;
-            document.body.style.width = '100%';
+            activeModals++;
+            modalStack.push(modalId.current);
+
+            if (activeModals === 1) {
+                savedScrollY = window.scrollY;
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${savedScrollY}px`;
+                document.body.style.width = '100%';
+            }
 
             return () => {
-                document.body.style.overflow = '';
-                document.body.style.position = '';
-                document.body.style.top = '';
-                document.body.style.width = '';
-                window.scrollTo(0, scrollY);
+                activeModals--;
+                modalStack = modalStack.filter(id => id !== modalId.current);
+
+                if (activeModals === 0) {
+                    document.body.style.overflow = '';
+                    document.body.style.position = '';
+                    document.body.style.top = '';
+                    document.body.style.width = '';
+                    window.scrollTo(0, savedScrollY);
+                }
             };
         }
     }, [isOpen]);
 
     useEffect(() => {
         const handleEscape = (e) => {
-            if (e.key === 'Escape' && isOpen) onClose();
+            if (e.key === 'Escape' && isOpen) {
+                const isTopModal = modalStack[modalStack.length - 1] === modalId.current;
+                if (isTopModal) {
+                    onClose();
+                }
+            }
         };
         document.addEventListener('keydown', handleEscape);
         return () => document.removeEventListener('keydown', handleEscape);

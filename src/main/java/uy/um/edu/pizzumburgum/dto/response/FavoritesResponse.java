@@ -4,9 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uy.um.edu.pizzumburgum.dto.request.CreationRequest;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -16,7 +15,7 @@ import java.util.Set;
 public class FavoritesResponse {
     private Long id;
 
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     private String clientEmail;
 

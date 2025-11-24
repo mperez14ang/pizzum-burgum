@@ -20,7 +20,7 @@ public class Favorites {
     private Long id;
 
     @Column(name = "date_created", nullable = false)
-    private LocalDate dateCreated;
+    private LocalDateTime dateCreated;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
@@ -39,6 +39,6 @@ public class Favorites {
 
     @PrePersist
     protected void onCreate() {
-        dateCreated = LocalDate.now();
+        dateCreated = LocalDateTime.now();
     }
 }

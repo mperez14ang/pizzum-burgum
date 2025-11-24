@@ -3,17 +3,16 @@ package uy.um.edu.pizzumburgum.mapper;
 import uy.um.edu.pizzumburgum.dto.request.FavoritesRequest;
 import uy.um.edu.pizzumburgum.dto.response.CreationResponse;
 import uy.um.edu.pizzumburgum.dto.response.FavoritesResponse;
-import uy.um.edu.pizzumburgum.dto.request.CreationRequest;
 import uy.um.edu.pizzumburgum.entities.Creation;
 import uy.um.edu.pizzumburgum.entities.Favorites;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 public class FavoritesMapper {
     public static Favorites toFavorites(FavoritesRequest favoritesDto) {
-        LocalDate currentDate = LocalDate.now();
+        LocalDateTime currentDate = LocalDateTime.now();
 
         return Favorites.builder()
                 .dateCreated(currentDate)

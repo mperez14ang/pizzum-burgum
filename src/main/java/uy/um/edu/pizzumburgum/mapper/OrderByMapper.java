@@ -8,6 +8,7 @@ import uy.um.edu.pizzumburgum.entities.*;
 import uy.um.edu.pizzumburgum.repository.AddressRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ public class OrderByMapper {
 
         return OrderBy.builder()
                 .state(orderByRequest.getState())
-                .dateCreated(java.time.LocalDate.now())
+                .dateCreated(LocalDateTime.now())
                 .deliveryCity(address.getCity())
                 .deliveryStreet(address.getStreet())
                 .deliveryPostalCode(address.getPostalCode())

@@ -171,7 +171,7 @@ export const OrderManagement = () => {
                                             variant="primary"
                                             size="sm"
                                             onClick={() => handleUpdateState(order)}
-                                            disabled={order.state === 'UNPAID'}
+                                            disabled={order.state === 'UNPAID' || order.state === 'CANCELLED'}
                                         >
                                             Cambiar estado
                                         </Button>

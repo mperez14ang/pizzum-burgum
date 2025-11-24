@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ public class OrderBy {
     private OrderState state;
 
     @Column(name = "date_created")
-    private LocalDate dateCreated;
+    private LocalDateTime dateCreated;
 
     @Column(nullable = true)
     private String deliveryStreet;

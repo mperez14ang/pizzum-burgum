@@ -7,7 +7,7 @@ export default defineConfig({
     define: {
         global: 'globalThis',
     },
-    server: {
+    preview: {
         headers: {
             'Cache-Control': 'public, max-age=31536000',
         }

@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }) => {
         return addUser(data, logInAfter)
     };
 
-    const register = async (email, password, firstName, lastName, birthDate, dni, street, city, postalCode, logInAfter=true) => {
+    const register = async (email, password, firstName, lastName, birthDate, dni, street, city, postalCode,card, logInAfter=true) => {
         setIsLoading(true)
         const data = await fetchFromAPI('/auth/v1/register', {
             method: 'POST',
@@ -123,6 +123,10 @@ export const AuthProvider = ({ children }) => {
                     postalCode
                 }],
                 favorites: [],
+                // Opcional
+                ...(card && { card: {
+                    paymentMethodId: card.paymentMethodId
+                } })
             })
         })
 

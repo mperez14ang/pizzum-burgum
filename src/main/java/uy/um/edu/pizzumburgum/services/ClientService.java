@@ -110,8 +110,6 @@ public class ClientService implements ClientServiceInt {
 
         client = clientRepository.save(client);
 
-        // Crear avatar
-
         return ClientMapper.toClientResponse(client);
     }
 

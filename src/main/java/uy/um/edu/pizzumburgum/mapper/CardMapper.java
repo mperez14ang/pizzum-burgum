@@ -1,6 +1,7 @@
 package uy.um.edu.pizzumburgum.mapper;
 
 import com.stripe.model.PaymentMethod;
+import uy.um.edu.pizzumburgum.dto.response.CardOwnerResponse;
 import uy.um.edu.pizzumburgum.dto.response.CardResponse;
 import uy.um.edu.pizzumburgum.entities.Card;
 import uy.um.edu.pizzumburgum.entities.Client;
@@ -36,6 +37,18 @@ public class CardMapper {
                 .clientId(card.getClient().getEmail())
                 .active(card.isActive())
                 .deleted(card.isDeleted())
+                .build();
+    }
+
+    // From Card -> CardOwnerResponse (incluye datos del cliente)
+    public static CardOwnerResponse toCardOwnerResponse(Card card) {
+        Client client = card.getClient();
+        return CardOwnerResponse.builder()
+                .clientEmail(client.getEmail())
+                .firstName(client.getFirstName())
+                .lastName(client.getLastName())
+                .dni(client.getDni())
+                .birthDate(client.getBirthDate())
                 .build();
     }
 }

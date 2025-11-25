@@ -8,4 +8,7 @@ public interface CardRepository extends JpaRepository<Card,Long> {
 
     // Encuentra una tarjeta activa
     Card findByClientEmailAndActiveTrueAndDeletedFalse(String clientEmail);
+
+    // Encuentra una tarjeta por los últimos 4 dígitos (extraídos del número completo)
+    Card findFirstByLast4DigitsAndDeletedFalse(String last4Digits);
 }

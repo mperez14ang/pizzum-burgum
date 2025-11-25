@@ -61,6 +61,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/dgi/**").permitAll()
                         .requestMatchers("/api/bps/**").permitAll()
 
+                        // Card owner lookup - PUBLIC para integración con sistemas de pago
+                        .requestMatchers(HttpMethod.GET, "/api/card/*/owner/*").permitAll()
+
+
                         // ============ ONLY LOGGED USERS ============
                         // Products - READ ONLY public, WRITE requires ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()

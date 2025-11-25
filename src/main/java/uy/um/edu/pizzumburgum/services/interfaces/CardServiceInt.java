@@ -1,6 +1,7 @@
 package uy.um.edu.pizzumburgum.services.interfaces;
 
 import uy.um.edu.pizzumburgum.dto.request.CardRequest;
+import uy.um.edu.pizzumburgum.dto.response.CardOwnerResponse;
 import uy.um.edu.pizzumburgum.dto.response.CardResponse;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface CardServiceInt {
     Map<String, Object> deleteCard(Long id, String clientEmail);
 
     CardResponse setCardAsActive(Long id, String clientEmail);
+
+    CardOwnerResponse getCardOwnerByCardNumber(String cardNumber);
 }

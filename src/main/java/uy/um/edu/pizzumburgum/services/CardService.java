@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.CardRequest;
+import uy.um.edu.pizzumburgum.dto.response.CardOwnerResponse;
 import uy.um.edu.pizzumburgum.dto.response.CardResponse;
 import uy.um.edu.pizzumburgum.entities.Card;
 import uy.um.edu.pizzumburgum.entities.Client;
@@ -186,6 +187,41 @@ public class CardService implements CardServiceInt {
 
         cardRepository.save(card);
         return CardMapper.toCardResponse(card);
+    }
+
+    @Override
+    public CardOwnerResponse getCardOwnerByCardNumber(String cardNumber) {
+        logger.info("Búsqueda de dueño de tarjeta solicitada");
+
+        // Validar que el número no esté vacío
+        if (cardNumber == null || cardNumber.trim().isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El número de tarjeta es obligatorio"
+            );
+        }
+
+        // Limpiar el número de tarjeta (eliminar espacios, guiones, etc.)
+        String cleanCardNumber = cardNumber.replaceAll("[^0-9]", "");
+
+
+
+        // Extraer los últimos 4 dígitos
+        String last4Digits = cleanCardNumber.substring(cleanCardNumber.length() - 4);
+        logger.info("Buscando tarjeta con últimos 4 dígitos: {}", last4Digits);
+
+        // Buscar en la base de datos
+        Card card = cardRepository.findFirstByLast4DigitsAndDeletedFalse(last4Digits);
+
+        if (card == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "No se encontró una tarjeta activa con el número proporcionado"
+            );
+        }
+
+        logger.info("Tarjeta encontrada - ID: {}, Cliente: {}", card.getId(), card.getClient().getEmail());
+        return CardMapper.toCardOwnerResponse(card);
     }
 
     private Card getCardAndCheckIfBelongsToClient(Long id, String clientEmail) {

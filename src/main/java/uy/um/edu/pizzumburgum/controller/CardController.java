@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uy.um.edu.pizzumburgum.dto.request.CardRequest;
+import uy.um.edu.pizzumburgum.dto.response.CardOwnerResponse;
 import uy.um.edu.pizzumburgum.dto.response.CardResponse;
 import uy.um.edu.pizzumburgum.services.AuthService;
 import uy.um.edu.pizzumburgum.services.CardService;
@@ -57,5 +58,11 @@ public class CardController {
     public ResponseEntity<CardResponse> setCardAsActive(HttpServletRequest httpServletRequest, @PathVariable Long id){
         String clientEmail = authService.getUserEmail(httpServletRequest);
         return new ResponseEntity<>(cardService.setCardAsActive(id, clientEmail), HttpStatus.OK);
+    }
+
+
+    @GetMapping("owner/{cardNumber}")
+    public ResponseEntity<CardOwnerResponse> getCardOwnerByCardNumber(@PathVariable String cardNumber) {
+        return new ResponseEntity<>(cardService.getCardOwnerByCardNumber(cardNumber), HttpStatus.OK);
     }
 }

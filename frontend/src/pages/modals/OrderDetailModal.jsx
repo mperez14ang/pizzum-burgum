@@ -160,7 +160,16 @@ export const OrderDetailModal = ({
                             <h4 className="font-semibold text-gray-900">Fecha de creación</h4>
                         </div>
                         <p className="text-gray-700 font-medium">
-                            {selectedOrder.dateCreated ? selectedOrder.dateCreated.split('-').reverse().join('/') : 'N/A'}
+                            {selectedOrder.dateCreated
+                                ? new Date(selectedOrder.dateCreated).toLocaleString('es-UY', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })
+                                : 'N/A'
+                            }
                         </p>
                     </div>
 

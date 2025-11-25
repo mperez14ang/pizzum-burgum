@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uy.um.edu.pizzumburgum.entities.OrderState;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -21,5 +21,5 @@ public class OrderByDataResponse {
 
     private OrderState state;
 
-    private LocalDate dateCreated;
+    private LocalDateTime dateCreated;
 }

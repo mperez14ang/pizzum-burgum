@@ -16,6 +16,7 @@ import uy.um.edu.pizzumburgum.dto.response.AdminResponse;
 import uy.um.edu.pizzumburgum.entities.Admin;
 import uy.um.edu.pizzumburgum.mapper.AdminMapper;
 import uy.um.edu.pizzumburgum.repository.AdminRepository;
+import uy.um.edu.pizzumburgum.repository.UserRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.AdminServiceInt;
 
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class AdminService implements AdminServiceInt {
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @Transactional
     @Override
@@ -55,6 +57,13 @@ public class AdminService implements AdminServiceInt {
             }
         }
 
+        if (userRepository.existsByDni(adminCreateRequest.getDni())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Ya existe un usuario registrado con la cédula " + adminCreateRequest.getDni()
+            );
+        }
+
         // Hashear la contraseña
         adminCreateRequest.setPassword(passwordEncoder.encode(adminCreateRequest.getPassword()));
 
@@ -71,7 +80,15 @@ public class AdminService implements AdminServiceInt {
             admin.setCreatedBy(createdBy);
         }
 
-        admin = adminRepository.save(admin);
+        try {
+            admin = adminRepository.save(admin);
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error al guardar el administrador: " + e.getMessage()
+            );
+        }
+
         return AdminMapper.toAdminDtoResponse(admin);
     }
 

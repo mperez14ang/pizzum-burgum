@@ -31,7 +31,7 @@ public class Client extends User {
     // El atributo esta en la tabla card
     @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             orphanRemoval = true, fetch = FetchType.EAGER)
-    private Set<Card> cards;
+    private Set<Card> cards = new HashSet<>();
 
     @Column(name = "stripe_customer_id", unique = true)
     private String stripeCustomerId;

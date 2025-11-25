@@ -4,10 +4,11 @@ import {useCard} from '../../contexts/CardContext.jsx';
 import toast from "react-hot-toast";
 import {Modal} from "../../components/common/Modal.jsx";
 
-export const CardModal = ({ isOpen, onClose, onSuccess }) => {
+export const CardModal = ({ isOpen, onClose, onSuccess, defaultEmail=""}) => {
     const {
         stripe,
         user,
+        cardElement,
         setCardElement,
         createCard,
         loading,
@@ -19,13 +20,8 @@ export const CardModal = ({ isOpen, onClose, onSuccess }) => {
         setEmail,
     } = useCard();
 
-    if (isOpen && user === null) {
-        return null;
-    }
-
     useEffect(() => {
         if (!isOpen || !stripe) return;
-        // ... (rest of useEffect remains the same)
         const elements = stripe.elements();
         const card = elements.create('card', {
             style: {
@@ -63,21 +59,66 @@ export const CardModal = ({ isOpen, onClose, onSuccess }) => {
         };
     }, [stripe, isOpen]);
 
+    useEffect(() => {
+        const emailToUse = user?.email || defaultEmail;
+        if (emailToUse && isOpen) {
+            setEmail(emailToUse);
+        }
+    }, [user, defaultEmail, isOpen]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (user){
+            const result = await createCard(e);
 
-        const result = await createCard(e);
-
-        if (result) {
-            onSuccess()
+            if (result) {
+                onSuccess()
+            }
+            return null;
         }
+
+        // Si no hay usuario logueado, crear el PaymentMethod para obtener datos de la tarjeta
+        if (!stripe) {
+            toast.error('Stripe no está disponible');
+            return;
+        }
+
+        try {
+            const {paymentMethod, error: stripeError} = await stripe.createPaymentMethod({
+                type: 'card',
+                card: cardElement,
+                billing_details: {
+                    name: cardholderName,
+                    email: email,
+                },
+            });
+
+            if (stripeError) {
+                toast.error(stripeError.message);
+                return;
+            }
+
+            onSuccess({
+                paymentMethodId: paymentMethod.id,
+                cardholderName,
+                email,
+                protectedNumber: paymentMethod.card.last4,
+                brand: paymentMethod.card.brand,
+                expirationMonth: paymentMethod.card.exp_month,
+                expirationYear: paymentMethod.card.exp_year,
+
+            });
+        } catch (err) {
+            toast.error('Error al procesar la tarjeta');
+            console.error(err);
+        }
+
     };
 
     const placeholderName = user
         ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim()
         : '';
 
-    const userEmail = user?.email ?? '';
 
     return (
         <>
@@ -126,15 +167,18 @@ export const CardModal = ({ isOpen, onClose, onSuccess }) => {
                     </div>
 
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                            Email
+                        <label htmlFor="email-input" className="block text-sm font-medium text-gray-700 mb-2">
+                            Email *
                         </label>
                         <input
-                            disabled={true}
                             type="email"
-                            id="email"
-                            value={userEmail}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            id="email-input"
+                            value={email}
+                            placeholder="Correo del titular"
+                            onChange={(e) => {
+                                setEmail(e.target.value);
+                            }}
+                            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500`}
                         />
                     </div>
 

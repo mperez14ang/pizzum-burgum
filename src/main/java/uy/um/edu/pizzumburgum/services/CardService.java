@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import uy.um.edu.pizzumburgum.dto.request.CardRequest;
@@ -23,7 +22,10 @@ import uy.um.edu.pizzumburgum.repository.CardRepository;
 import uy.um.edu.pizzumburgum.repository.ClientRepository;
 import uy.um.edu.pizzumburgum.services.interfaces.CardServiceInt;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,21 +53,26 @@ public class CardService implements CardServiceInt {
         this.clientRepository = clientRepository;
     }
 
-    @Override
     @Transactional
-    public CardResponse createCard(CardRequest cardRequest, String clientEmail) {
+    @Override
+    public CardResponse createCard(CardRequest cardRequest, String clientEmail){
+        // Buscar el cliente
+        Client client = clientRepository.findById(clientEmail)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No se encontró un cliente con email: " + clientEmail
+                ));
+        return this.createCard(cardRequest, clientEmail, client);
+    }
+
+    @Transactional
+    @Override
+    public CardResponse createCard(CardRequest cardRequest, String clientEmail, Client client) {
         // Verificar si la tarjeta ya existe
         Card existingCard = cardRepository.findByStripeId(cardRequest.getPaymentMethodId());
         if (existingCard != null) {
             existingCard.setDeleted(false);
             return CardMapper.toCardResponse(existingCard);
         }
-
-        // Buscar el cliente
-        Client client = clientRepository.findById(clientEmail)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "No se encontró un cliente con email: " + clientEmail
-                ));
 
         PaymentMethod paymentMethod = this.adjustPaymentMethod(cardRequest.getPaymentMethodId(), client);
 
@@ -78,7 +85,7 @@ public class CardService implements CardServiceInt {
         }
 
         // Si es la primera tarjeta, establecer como predeterminada
-        if (client.getCards().isEmpty()) {
+        if (client.getCards() == null || client.getCards().isEmpty()) {
             card.setActive(true);
         }
 

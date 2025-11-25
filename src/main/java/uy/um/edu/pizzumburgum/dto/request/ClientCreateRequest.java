@@ -12,4 +12,6 @@ import java.util.Set;
 public class ClientCreateRequest extends UserCreateRequest {
 
     private Set<AddressRequest> addresses;
+
+    private CardRequest card; // Al registrarse se puede agregar una tarjeta (opcional)
 }

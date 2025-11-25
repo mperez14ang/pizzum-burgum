@@ -53,7 +53,7 @@ public class SecurityConfig {
                                 "/",
                                 "/index.html",
                                 "/favicon.ico",
-                                "/vite.svg",
+                                "/logo.png",
                                 "/assets/**"
                         ).permitAll()
 

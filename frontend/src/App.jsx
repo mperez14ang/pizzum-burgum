@@ -112,7 +112,9 @@ function App() {
     if (isAuthenticated && user?.role === 'ADMIN') {
         return (
             <>
-                <AdminPage />
+                <CardProvider>
+                    <AdminPage />
+                </CardProvider>
             </>
         );
     }

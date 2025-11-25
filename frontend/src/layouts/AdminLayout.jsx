@@ -1,12 +1,11 @@
 import {useEffect, useState} from 'react';
 import {useAuth} from '../contexts/AuthContext';
-import {LogOut, Menu, Package, ShoppingBag, User, Users, X} from 'lucide-react';
+import {LogOut, Menu, Package, ShoppingBag, User, Users, X, BadgeInfoIcon} from 'lucide-react';
 
 export function AdminLayout({ children, currentSection = 'orders', onSectionChange = () => {} }) {
     const { user, logout } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-    // Prevenir scroll del body cuando el sidebar está abierto en móvil
     useEffect(() => {
         if (isSidebarOpen) {
             document.body.style.overflow = 'hidden';
@@ -14,7 +13,6 @@ export function AdminLayout({ children, currentSection = 'orders', onSectionChan
             document.body.style.overflow = 'unset';
         }
 
-        // Cleanup al desmontar
         return () => {
             document.body.style.overflow = 'unset';
         };
@@ -24,7 +22,13 @@ export function AdminLayout({ children, currentSection = 'orders', onSectionChan
         { id: 'orders', label: 'Pedidos', icon: ShoppingBag },
         { id: 'products', label: 'Productos', icon: Package },
         { id: 'users', label: 'Usuarios', icon: Users },
-        { id: 'profile', label: 'Mi Perfil', icon: User }
+        { id: 'profile', label: 'Mi Perfil', icon: User },
+        {
+            id: 'manual',
+            label: 'Manual de uso',
+            icon: BadgeInfoIcon,
+            href: 'https://docs.google.com/document/d/194K-ZeOnpR5dyv2OgXGg8LqtFSZ-yIaU-nG49bQXmGs/edit?usp=sharing'
+        }
     ];
 
     return (
@@ -62,10 +66,36 @@ export function AdminLayout({ children, currentSection = 'orders', onSectionChan
                         isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
                     } flex flex-col overflow-hidden`}
                 >
-                    <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+                    <nav className="flex-1 p-4 pt-20 lg:pt-4">
                         {menuItems.map((item) => {
                             const Icon = item.icon;
                             const isActive = currentSection === item.id;
+
+                            // Definimos las clases comunes para que se vean idénticos
+                            const commonClasses = `w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                                isActive
+                                    ? 'bg-primary text-white'
+                                    : 'text-gray-700 hover:bg-gray-100'
+                            }`;
+
+                            // Si tiene href, es un link externo (<a>)
+                            if (item.href) {
+                                return (
+                                    <a
+                                        key={item.id}
+                                        href={item.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={commonClasses}
+                                        onClick={() => setIsSidebarOpen(false)} // Cierra menú en móvil
+                                    >
+                                        <Icon className="w-5 h-5" />
+                                        {item.label}
+                                    </a>
+                                );
+                            }
+
+                            // Si NO tiene href, es un botón de navegación interna (<button>)
                             return (
                                 <button
                                     key={item.id}
@@ -73,14 +103,10 @@ export function AdminLayout({ children, currentSection = 'orders', onSectionChan
                                         onSectionChange(item.id);
                                         setIsSidebarOpen(false);
                                     }}
-                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                                        isActive
-                                            ? 'bg-primary text-white'
-                                            : 'text-gray-700 hover:bg-gray-100'
-                                    }`}
+                                    className={commonClasses}
                                 >
                                     <Icon className="w-5 h-5" />
-                                    <span className="font-medium">{item.label}</span>
+                                    {item.label}
                                 </button>
                             );
                         })}

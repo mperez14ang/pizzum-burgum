@@ -109,6 +109,9 @@ public class SecurityConfig {
                         // Web sockets
                         .requestMatchers("/ws/**").permitAll()
 
+                        // Apis
+                        .requestMatchers(new RegexRequestMatcher("^(?!/api/).*", null)).permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
@@ -142,7 +145,8 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(List.of(
                 "http://localhost:*",
                 "http://127.0.0.1:*",
-                "https://pizzumnburgum.duckdns.org"
+                "https://pizzumnburgum.duckdns.org",
+                "http://pizzumnburgum.duckdns.org"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowCredentials(true);

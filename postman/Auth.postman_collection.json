@@ -1,0 +1,154 @@
+{
+	"info": {
+		"_postman_id": "721ebfe3-87d6-4f04-9a50-f56167ff2184",
+		"name": "Auth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48421182",
+		"_collection_link": "https://es-delfante-1711710.postman.co/workspace/Proyecto-TIC~36a738b3-35bf-4c75-9475-2006582fef99/collection/48421182-721ebfe3-87d6-4f04-9a50-f56167ff2184?action=share&source=collection_link&creator=48421182"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"admin@admin.com\",\r\n    \"password\":\"proyectotic2025!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/auth/v1/login",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"v1",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\":\"Hugo\",\r\n  \"lastName\": \"Soca\",\r\n  \"birthDate\": \"1987-02-28\",\r\n  \"dni\": \"18004137\",\r\n  \"email\": \"hsoca@example.com\",\r\n  \"password\": \"hola123456789\",\r\n  \"addresses\": [\r\n    {\r\n        \"street\": \"18 de julio\",\r\n        \"city\": \"Montevideo\",\r\n        \"postalCode\": 18000\r\n    }   \r\n  ],\r\n  \"favorites\": [],\r\n  \"card\":{\r\n    \"paymentMethodId\":\"pm_1SNzjgAFyqXIJVLlwiTjFQqZ\"\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/auth/v1/register",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"v1",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/auth/v1/verify",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"v1",
+						"verify"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change Password",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"hsoca@example.com\",\r\n  \"oldPassword\": \"hola1234567\",\r\n  \"password\": \"hola123456789\",\r\n  \"passwordConfirmation\": \"hola123456789\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/auth/v1/password",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"v1",
+						"password"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

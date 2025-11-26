@@ -1,0 +1,86 @@
+{
+	"info": {
+		"_postman_id": "760229ff-cd2e-416c-a0fe-93cf46bb52bd",
+		"name": "DGI - BPS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48421182",
+		"_collection_link": "https://es-delfante-1711710.postman.co/workspace/Proyecto-TIC~36a738b3-35bf-4c75-9475-2006582fef99/collection/49227077-760229ff-cd2e-416c-a0fe-93cf46bb52bd?action=share&source=collection_link&creator=48421182"
+	},
+	"item": [
+		{
+			"name": "Get Orders In A Date",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/dgi/orders?date=2025-11-25",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"dgi",
+						"orders"
+					],
+					"query": [
+						{
+							"key": "date",
+							"value": "2025-11-25"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Orders In A Date Range",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/dgi/orders/range?startDate=2025-01-01&endDate=2025-12-31",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"dgi",
+						"orders",
+						"range"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2025-01-01"
+						},
+						{
+							"key": "endDate",
+							"value": "2025-12-31"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Statistics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/bps/users/statistics",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"bps",
+						"users",
+						"statistics"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

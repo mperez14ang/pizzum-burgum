@@ -1,0 +1,142 @@
+{
+	"info": {
+		"_postman_id": "292dbcf1-ffbd-4816-9371-3aab40654fdf",
+		"name": "Admin",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48421182",
+		"_collection_link": "https://es-delfante-1711710.postman.co/workspace/Proyecto-TIC~36a738b3-35bf-4c75-9475-2006582fef99/collection/49226374-292dbcf1-ffbd-4816-9371-3aab40654fdf?action=share&source=collection_link&creator=48421182"
+	},
+	"item": [
+		{
+			"name": "Create Admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"Pepe\",\r\n  \"lastName\": \"Diaz\",\r\n  \"birthDate\": \"1988-02-28\",\r\n  \"dni\": \"80634721\",\r\n  \"email\": \"jdiaz@example.com\",\r\n  \"password\": \"17652321\",\r\n  \"createdById\": \"admin@admin.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/admin/v1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Admins",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJpYXQiOjE3NjExODg0MzQsImV4cCI6MTc2MTE5MjAzNH0.fMIYFQHXC8sfZdtHCKraS3TJOzzT_Y8wRRvjrc65q6I",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/admin/v1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get One Admin",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/admin/v1/admin@admin.com",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"v1",
+						"admin@admin.com"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Admin",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/admin/v1/admin@admin.com",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"admin",
+						"v1",
+						"admin@admin.com"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{clientToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

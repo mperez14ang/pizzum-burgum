@@ -1,0 +1,107 @@
+{
+	"info": {
+		"_postman_id": "935ac82f-191f-4c45-8a3e-ac3e41ec5cef",
+		"name": "User",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48421182",
+		"_collection_link": "https://es-delfante-1711710.postman.co/workspace/Proyecto-TIC~36a738b3-35bf-4c75-9475-2006582fef99/collection/48421182-935ac82f-191f-4c45-8a3e-ac3e41ec5cef?action=share&source=collection_link&creator=48421182"
+	},
+	"item": [
+		{
+			"name": "Get User Avatar",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{clientToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/v1/user/prueba@prueba.com/avatar",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"prueba@prueba.com",
+						"avatar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change User Avatar",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{clientToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/v1/user/prueba@prueba.com/avatar",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"prueba@prueba.com",
+						"avatar"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{clientToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,328 @@
+{
+	"info": {
+		"_postman_id": "fe410a7c-ab62-44aa-b366-23a2bba3c577",
+		"name": "Card",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48421182",
+		"_collection_link": "https://es-delfante-1711710.postman.co/workspace/Proyecto-TIC~36a738b3-35bf-4c75-9475-2006582fef99/collection/49226374-fe410a7c-ab62-44aa-b366-23a2bba3c577?action=share&source=collection_link&creator=48421182"
+	},
+	"item": [
+		{
+			"name": "Create Card",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"paymentMethodId\":\"pm_1SNzjgAFyqXIJVLlwiTjFQqZ\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/card/v1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"card",
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Card by Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/card/v1/1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"card",
+						"v1",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get My Cards",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/card/v1/my",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"card",
+						"v1",
+						"my"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Cards From Client",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/client/v1/prueba@prueba.com/cards",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"client",
+						"v1",
+						"prueba@prueba.com",
+						"cards"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Card",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/card/v1/1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"card",
+						"v1",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Payment",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "prueba1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "prueba@prueba.com",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"amount\": 1,\r\n  \"cardId\":1,\r\n  \"currency\": \"usd\",\r\n  \"description\": \"Pizza Margherita x2 + Bebida\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/payments",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Payment Status",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/payments/1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"payments",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Card",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "prueba1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "prueba@prueba.com",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clientEmail\":\"prueba@prueba.com\",\r\n    \"paymentMethodId\":\"pm_1SNzjgAFyqXIJVLlwiTjFQqZ\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/card/v1/1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"card",
+						"v1",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Set Card As Active",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "prueba1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "prueba@prueba.com",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/card/v1/25/active",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"card",
+						"v1",
+						"25",
+						"active"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Card Owner",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/card/v1/owner/4242",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"card",
+						"v1",
+						"owner",
+						"4242"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{clientToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,245 @@
+{
+	"info": {
+		"_postman_id": "110a5cda-2c50-4410-9c4c-989c7b64ead6",
+		"name": "Cart",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48421182",
+		"_collection_link": "https://es-delfante-1711710.postman.co/workspace/Proyecto-TIC~36a738b3-35bf-4c75-9475-2006582fef99/collection/48421182-110a5cda-2c50-4410-9c4c-989c7b64ead6?action=share&source=collection_link&creator=48421182"
+	},
+	"item": [
+		{
+			"name": "Create / Add to Cart",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\":\"HAMBURGER\",\r\n    \"products\":[\r\n        {\r\n            \"quantity\":10,\r\n            \"productId\":1\r\n        }\r\n    ],\r\n    \"quantity\":12\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/cart/v1/add",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"cart",
+						"v1",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get My Carts",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "prueba1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "prueba@prueba.com",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clientEmail\":\"hsoca@example.com\",\r\n    \"type\":\"HAMBURGER\",\r\n    \"products\":[\r\n        {\r\n            \"quantity\":10,\r\n            \"productId\":1\r\n        }\r\n    ],\r\n    \"quantity\":12\r\n}"
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/cart/v1/my",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"cart",
+						"v1",
+						"my"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Carts",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Clear Cart",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Remove Cart Item",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Update Cart Item Quantity",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Add Creation",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcnVlYmFAcHJ1ZWJhLmNvbSIsImlhdCI6MTc2MTc5NDQxNywiZXhwIjoxNzYxNzk4MDE3fQ.tPZEoSC4x3tXW-6buDHxQQqf9CPuI1FM69Cs4bvJGJc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"creationId\":8,\r\n    \"quantity\":1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/cart/v1/add_creation",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"cart",
+						"v1",
+						"add_creation"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Checkout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"currency\":\"uyu\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/cart/v1/checkout",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"cart",
+						"v1",
+						"checkout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add products as creations",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"products\" : [\r\n        {\r\n            \"productId\": 1,\r\n            \"quantity\": 1\r\n        },\r\n        {\r\n            \"productId\": 2,\r\n            \"quantity\": 3\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/cart/v1/add_extras_as_creation",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"cart",
+						"v1",
+						"add_extras_as_creation"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{clientToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,149 @@
+{
+	"info": {
+		"_postman_id": "8c51da96-3c92-4e36-8015-09f1f5c28f78",
+		"name": "Creation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48421182",
+		"_collection_link": "https://es-delfante-1711710.postman.co/workspace/Proyecto-TIC~36a738b3-35bf-4c75-9475-2006582fef99/collection/48421182-8c51da96-3c92-4e36-8015-09f1f5c28f78?action=share&source=collection_link&creator=48421182"
+	},
+	"item": [
+		{
+			"name": "Create Creation",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "proyectotic2025!",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin@admin.com",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Pizza Margarita\",\r\n  \"type\": \"PIZZA\",\r\n  \"price\": 12.5,\r\n  \"products\": [\r\n    {\r\n      \"productId\": 1,\r\n      \"quantity\": 1\r\n    }\r\n  ]\r\n  \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/creation/v1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"creation",
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Creations",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/creation/v1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"creation",
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get One Creation",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "proyectotic2025!",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin@admin.com",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Pizza Margarita\",\r\n  \"type\": \"PIZZA\",\r\n  \"price\": 12.5,\r\n  \"products\": [\r\n    {\r\n      \"productId\": 1,\r\n      \"quantity\": 2\r\n    }\r\n  ],\r\n  \"orders\": []\r\n}"
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/creation/v1/1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"creation",
+						"v1",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{clientToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

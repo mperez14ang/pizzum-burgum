@@ -1,0 +1,183 @@
+{
+	"info": {
+		"_postman_id": "0805d584-a45e-472e-9d1e-6ee19939d891",
+		"name": "Client",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48421182",
+		"_collection_link": "https://es-delfante-1711710.postman.co/workspace/Proyecto-TIC~36a738b3-35bf-4c75-9475-2006582fef99/collection/48421182-0805d584-a45e-472e-9d1e-6ee19939d891?action=share&source=collection_link&creator=48421182"
+	},
+	"item": [
+		{
+			"name": "Create Client",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"firstName\": \"Pepe\",\r\n  \"lastName\": \"Diaz\",\r\n  \"birthDate\": \"1988-02-28\",\r\n  \"dni\": \"54711453\",\r\n  \"email\": \"perez@example.com\",\r\n  \"password\": \"1111\",\r\n  \"addresses\": [\r\n    {\r\n      \"street\": \"123 Main St\",\r\n      \"city\": \"Montevideo\",\r\n      \"postalCode\": \"11200\"\r\n    },\r\n    {\r\n      \"street\": \"654 Main St\",\r\n      \"city\": \"Montevideo\",\r\n      \"postalCode\": \"99023\"\r\n    }\r\n  ],\r\n  \"favorites\": []\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/client/v1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"client",
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Clients",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/client/v1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"client",
+						"v1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get One Client",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/client/v1/prueba@prueba.com",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"client",
+						"v1",
+						"prueba@prueba.com"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Client",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/client/v1/hsoca@example.com",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"client",
+						"v1",
+						"hsoca@example.com"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Client",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJoc29jYUBleGFtcGxlLmNvbSIsImlhdCI6MTc2MTIxOTI4OSwiZXhwIjoxNzYxMjIyODg5fQ._g5EXzW_3M1GUMwtYRIgTwIicnNqEv1uRZAIwSXXO_g",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"hsoca@example.com\",\r\n    \"firstName\":\"Javier\",\r\n    \"lastName\":\"Diaz\",\r\n    \"birthDate\":\"1993-05-05\",\r\n    \"dni\":\"54321948\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BaseUrl}}/api/client/v1",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"client",
+						"v1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{clientToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

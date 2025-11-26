@@ -252,6 +252,21 @@ export const OrderDetailModal = ({
                     </div>
 
                     <div className="pt-2 border-t border-gray-200">
+                        <h4 className="font-semibold text-gray-800 mb-2">Notas</h4>
+                        {selectedOrder.notes ? (
+                            <div className="border border-gray-300 rounded p-2 text-sm text-gray-700">
+                                <p className="bg-gray-50 whitespace-pre-line">
+                                    {selectedOrder.notes}
+                                </p>
+                            </div>
+                        ) : (
+                            <p className="text-gray-800">
+                                N/A
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="pt-2 border-t border-gray-200">
                         <div className="flex justify-between items-center text-gray-800">
                             <h4 className="font-semibold">Delivery</h4>
                             <p className="font-medium">${selectedOrder.extraAmount}</p>
